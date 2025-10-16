@@ -171,6 +171,7 @@
   },
   "active": "7314b01c11338a3b",
   "lastOpenFiles": [
+    "layouts/index.html",
     "layouts/about/single.html",
     "layouts/about",
     "public/js/zooming.10d718ecdb4a98eab370ed60963ea87f1c612ac225609eadc52f0e536bc1517c.js",
@@ -181,7 +182,6 @@
     "resources/_gen/assets/scss/core.scss_fb96db281e67f7a46a7605a5c94807cc.json",
     "content/about/_index.md",
     "content/about",
-    "themes/monochrome/layouts/index.html",
-    "public/tags/testing/index.xml"
+    "themes/monochrome/layouts/index.html"
   ]
 }
