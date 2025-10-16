@@ -1,0 +1,22 @@
+baseURL = "https://eeshansrivastava89.github.io/soma-blog-hugo/"
+languageCode = "en-us"
+title = "Science of Marketing Analytics"
+theme = "monochrome"
+
+[[menu.main]]
+name = "Home"
+url = "/"
+weight = 1
+
+[[menu.main]]
+name = "Posts"
+url = "/posts/"
+weight = 2
+
+[[menu.main]]
+name = "About"
+url = "/about/"
+weight = 3
+
+[params]
+description = "Deep dives into marketing analytics, experimentation, and measurement."
