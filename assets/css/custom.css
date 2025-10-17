@@ -39,6 +39,55 @@ body, h1, h2, h3, h4, h5, h6, p, a, li, span {
   letter-spacing: 0.05em !important; /* Slight letter spacing for thin fonts */
 }
 
+/* Beautiful Substack button */
+.substack-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #2d2d2d;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  border: 1px solid #444;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.substack-button:hover {
+  background: #3a3a3a;
+  border-color: #666;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: white;
+}
+
+.substack-icon {
+  color: #ff6719;
+  flex-shrink: 0;
+}
+
+.substack-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.substack-text strong {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+  line-height: 1.2;
+}
+
+.substack-text small {
+  font-size: 0.75rem;
+  color: #aaa;
+  line-height: 1.2;
+}
+
 /* Optional: Customize the main content area spacing */
 #main-content {
   line-height: 1.7;
