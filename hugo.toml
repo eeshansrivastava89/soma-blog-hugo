@@ -1,4 +1,4 @@
-baseURL = "https://eeshansrivastava89.github.io/soma-blog-hugo/"
+baseURL = "https://soma-blog-hugo.vercel.app/"
 languageCode = "en-us"
 title = "Eeshan S."
 theme = "rusty-typewriter"
