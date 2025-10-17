@@ -45,6 +45,10 @@ main() {
   rm "node-v${NODE_VERSION}-linux-x64.tar.xz"
   export PATH="${HOME}/.local/node-v${NODE_VERSION}-linux-x64/bin:${PATH}"
 
+  # Install Python dependencies for API
+  echo "Installing Python dependencies..."
+  pip install -r api/requirements.txt
+
   # Verify installations
   echo "Verifying installations..."
   echo Dart Sass: "$(sass --version)"
