@@ -45,14 +45,7 @@ main() {
   rm "node-v${NODE_VERSION}-linux-x64.tar.xz"
   export PATH="${HOME}/.local/node-v${NODE_VERSION}-linux-x64/bin:${PATH}"
 
-  # Install Python
-  echo "Installing Python..."
-  apt-get update
-  apt-get install -y python3 python3-pip
-
-  # Install Python dependencies for API
-  echo "Installing Python dependencies..."
-  pip3 install -r api/requirements.txt
+  # Note: Python dependencies are automatically handled by Vercel for /api functions
 
   # Verify installations
   echo "Verifying installations..."
