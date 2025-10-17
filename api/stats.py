@@ -13,7 +13,7 @@ async def get_stats(experiment_id: str = Query(...)):
     Get experiment statistics with Bayesian and Frequentist analysis
     """
     try:
-        # Initialize Supabase (moved inside function)
+        # Initialize Supabase
         SUPABASE_URL = os.environ.get("SUPABASE_URL")
         SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
         supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -40,10 +40,18 @@ async def get_stats(experiment_id: str = Query(...)):
         a_rate = a_conversions / a_total if a_total > 0 else 0
         b_rate = b_conversions / b_total if b_total > 0 else 0
         
-        # Frequentist: Chi-square test
-        contingency = [[a_conversions, a_total - a_conversions],
-                       [b_conversions, b_total - b_conversions]]
-        chi2, p_value, dof, expected = scipy_stats.chi2_contingency(contingency)
+        # Frequentist: Chi-square test (only if enough samples)
+        p_value = None
+        significant = False
+        
+        if a_total >= 5 and b_total >= 5:
+            try:
+                contingency = [[a_conversions, a_total - a_conversions],
+                               [b_conversions, b_total - b_conversions]]
+                chi2, p_value, dof, expected = scipy_stats.chi2_contingency(contingency)
+                significant = p_value < 0.05
+            except:
+                p_value = None
         
         # Bayesian: Beta-Binomial credible intervals
         alpha, beta = 1, 1  # Uniform priors
@@ -77,8 +85,8 @@ async def get_stats(experiment_id: str = Query(...)):
                 "credible_interval": [round(x, 4) for x in b_ci]
             },
             "frequentist": {
-                "p_value": round(p_value, 4),
-                "significant": p_value < 0.05
+                "p_value": round(p_value, 4) if p_value else None,
+                "significant": significant
             },
             "bayesian": {
                 "prob_b_better": round(prob_b_better, 4)
