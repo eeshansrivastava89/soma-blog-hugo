@@ -1,0 +1,58 @@
+{{- partial "search_bar.html" -}}
+
+{{ partial "components/side_content.html" (dict "section" "home") }}
+
+<!-- Substack Feed Section -->
+<div class="side-content">
+  <h3>Latest from SOMA</h3>
+  <div class="substack-feed">
+    {{ $feed := resources.GetRemote "https://scienceofmarketinganalytics.substack.com/feed" }}
+    {{ if $feed }}
+      {{ $parsed := $feed.Content | transform.Unmarshal }}
+      {{ if $parsed.channel.item }}
+        <ul style="list-style: none; padding: 0;">
+          {{ range first 4 $parsed.channel.item }}
+          <li style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px var(--dim-color) solid;">
+            <a href="{{ .link }}" target="_blank" rel="noopener" style="font-weight: 500; font-size: 0.9rem; line-height: 1.3; display: block; margin-bottom: 0.25rem;">{{ .title | plainify }}</a>
+            <time style="color: var(--dim-color); font-size: 0.75rem;">{{ .pubDate | dateFormat "Jan 2, 2006" }}</time>
+          </li>
+          {{ end }}
+        </ul>
+        <div style="text-align: center; margin-top: 1rem;">
+          <a href="https://scienceofmarketinganalytics.substack.com" target="_blank" rel="noopener" style="font-size: 0.8rem; color: var(--primary-color);">Read more on Substack →</a>
+        </div>
+      {{ else }}
+        <p style="color: var(--dim-color); font-size: 0.8rem;">No posts available</p>
+      {{ end }}
+    {{ else }}
+      <p style="color: var(--dim-color); font-size: 0.8rem;">Feed temporarily unavailable</p>
+    {{ end }}
+  </div>
+</div>
+
+<!-- Original taxonomy sections -->
+{{- range $filter := site.Params.rtwt.side.home.taxonomies -}}
+  {{- with (index site.Taxonomies $filter) -}}
+    <h3>{{- $filter | title -}}</h3>
+    <ul class="taxonomy-list">
+    {{- $limit := site.Params.rtwt.side.home.countTaxonomy }}
+    {{- $i := $limit -}}
+
+    {{/* For some reason, using "range first N COLLECTION" doesn't work here */}}
+    {{- range (sort . ".Count" "desc") -}}
+      {{ $i = sub $i 1 }}
+      {{- if lt $i 0 -}}{{- break -}}{{- end -}}
+      <li>
+    <a class="tag" href="{{- .Page.Permalink -}}">
+      #{{- .Page.Title | lower -}}&nbsp<span class="text-sm dim">{{ .Count }}</span>
+    </a>
+      </li>
+    {{- end -}}
+      {{- if (gt (len .) $limit) -}}
+      <li>
+        <a href="{{- absURL $filter -}}">{{- i18n "see_all" -}}</a>
+      </li>
+      {{- end -}}
+    </ul>
+  {{- end -}}
+{{- end -}}

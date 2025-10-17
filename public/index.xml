@@ -14,10 +14,10 @@
       
       <guid>http://localhost:1313/soma-blog-hugo/posts/first-post/</guid>
       <description>&lt;!-- end-chunk --&gt;
-&lt;!-- begin-chunk data-anchor=&#34;why-im-writing-this&#34; --&gt;
+&lt;!-- begin-chunk data-anchor=&#34;why-should-i-write-this&#34; --&gt;
 
-&lt;h1 class=&#34;header-anchor-wrapper&#34;&gt;Why I&amp;rsquo;m Writing This
-  &lt;a href=&#34;#why-im-writing-this&#34; class=&#34;header-anchor-link&#34;&gt;
+&lt;h2 class=&#34;header-anchor-wrapper&#34;&gt;Why Should I write this
+  &lt;a href=&#34;#why-should-i-write-this&#34; class=&#34;header-anchor-link&#34;&gt;
 &lt;svg
     xmlns=&#34;http://www.w3.org/2000/svg&#34;
     width=&#34;1rem&#34; height=&#34;1rem&#34; viewBox=&#34;0 0 24 24&#34; fill=&#34;none&#34;
@@ -27,7 +27,7 @@
 &lt;/svg&gt;
 
 &lt;/a&gt;
-&lt;/h1&gt;
+&lt;/h2&gt;
 
 &lt;p&gt;This is my first post. Testing the blog setup.&lt;/p&gt;
 &lt;!-- end-chunk --&gt;

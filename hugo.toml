@@ -1,29 +1,18 @@
 baseURL = "https://eeshansrivastava89.github.io/soma-blog-hugo/"
 languageCode = "en-us"
 title = "Science of Marketing Analytics"
-theme = "monochrome"
+theme = "rusty-typewriter"
 
-[[menu.main]]
-name = "Home"
-url = "/"
-weight = 1
+# Output formats for search
+[outputs]
+home = ["HTML", "RSS", "JSON"]
 
-[[menu.main]]
-name = "Posts"
-url = "/posts/"
-weight = 2
-
-[[menu.main]]
-name = "About"
-url = "/about/"
-weight = 3
-
-[params]
-description = "Deep dives into marketing analytics, experimentation, and measurement."
-
+# Content and taxonomies
 [taxonomies]
 tag = "tags"
 category = "categories"
+topic = "topics"
+series = "series"
 
 [[menu.main]]
 name = "Home"
@@ -39,3 +28,51 @@ weight = 2
 name = "About"
 url = "/about/"
 weight = 3
+
+[[menu.main]]
+name = "Search"
+url = "/search/"
+weight = 4
+
+[params]
+description = "Deep dives into marketing analytics, experimentation, and measurement from a practitioner's perspective."
+dateFormat = "January 2, 2006"
+
+# Author information
+[params.author]
+name = "EeshanS"
+
+# Links
+[params.links]
+theme = "https://github.com/math-queiroz/rusty-typewriter"
+hugo = "https://gohugo.io/"
+
+# Rusty Typewriter theme configuration
+[params.rtwt]
+sidePane = true
+countPageItems = 10
+searchPath = "/search"
+
+[params.rtwt.home]
+showBio = true
+showAuthorImg = true
+showFeatured = true
+showRecent = true
+hideRecentWhenFeatured = false
+countRecent = 5
+
+[params.rtwt.side.home]
+sidePaneSticky = true
+taxonomies = ["tags", "topics"]
+countTaxonomy = 8
+
+[params.rtwt.side.single]
+sidePaneSticky = true
+showDetails = true
+showTableOfContents = true
+showAttachments = false
+showRelated = true
+countRelated = 5
+
+[params.rtwt.side.list]
+sidePaneSticky = false

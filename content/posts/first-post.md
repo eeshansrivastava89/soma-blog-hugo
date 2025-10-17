@@ -1,11 +1,13 @@
 +++
-date = '2025-10-16T00:19:19-07:00'
-draft = false
 title = 'First Post'
+date = '2025-10-16T00:19:19-07:00'
 tags = ["testing", "intro"]
+topics = ["getting-started"]
+featured = true
+weight = 1
 +++
 
-# Why I'm Writing This
+## Why Should I write this
 
 This is my first post. Testing the blog setup.
 

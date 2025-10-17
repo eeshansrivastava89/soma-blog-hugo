@@ -1,0 +1,14 @@
+home:
+  greetings: 'Science of Marketing Analytics'
+  text: 'Deep dives into marketing analytics, experimentation, and measurement from a practitioner''s perspective.'
+  image: 'images/profile.jpg'
+
+side:
+  home:
+    - title: 'Latest from SOMA Substack'
+      content: 'Get the latest insights on marketing analytics, experimentation, and measurement strategies directly from my Substack newsletter.'
+    - title: 'About the Author'
+      content: 'EeshanS is a marketing analytics practitioner focused on experimentation, measurement, and data-driven marketing strategies.'
+  single:
+    - title: 'Connect'
+      content: 'Follow along for more insights on marketing analytics and experimentation.'

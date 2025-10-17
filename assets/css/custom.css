@@ -1,0 +1,28 @@
+/* Custom styles for Science of Marketing Analytics */
+
+/* Enhance the Substack feed styling */
+.substack-feed ul li:last-child {
+  border-bottom: none !important;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.substack-feed a:hover {
+  color: var(--primary-color) !important;
+}
+
+/* Custom accent color to match your brand */
+:root {
+  --primary-color: #cd5c5c; /* Keep the rusty theme color */
+}
+
+/* Optional: Customize the main content area spacing */
+#main-content {
+  line-height: 1.7;
+}
+
+/* Enhance code blocks for better readability */
+pre:has(code) {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
