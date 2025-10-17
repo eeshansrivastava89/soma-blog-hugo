@@ -5,11 +5,6 @@ from datetime import datetime
 
 app = FastAPI()
 
-# Initialize Supabase
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
 @app.post("/api/track")
 async def track_event(request: Request):
     """
@@ -22,6 +17,11 @@ async def track_event(request: Request):
     }
     """
     try:
+        # Initialize Supabase (moved inside function)
+        SUPABASE_URL = os.environ.get("SUPABASE_URL")
+        SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        
         data = await request.json()
         
         # Insert into events table

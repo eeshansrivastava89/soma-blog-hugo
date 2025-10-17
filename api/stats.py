@@ -7,17 +7,17 @@ import numpy as np
 
 app = FastAPI()
 
-# Initialize Supabase
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
 @app.get("/api/stats")
 async def get_stats(experiment_id: str = Query(...)):
     """
     Get experiment statistics with Bayesian and Frequentist analysis
     """
     try:
+        # Initialize Supabase (moved inside function)
+        SUPABASE_URL = os.environ.get("SUPABASE_URL")
+        SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        
         # Fetch all events for this experiment
         response = supabase.table("events").select("*").eq("experiment_id", experiment_id).execute()
         events = response.data
@@ -57,7 +57,6 @@ async def get_stats(experiment_id: str = Query(...)):
         b_ci = scipy_stats.beta.ppf([0.025, 0.975], b_alpha, b_beta).tolist()
         
         # Probability that B is better than A
-        # Simulate from posteriors
         np.random.seed(42)
         a_samples = np.random.beta(a_alpha, a_beta, 10000)
         b_samples = np.random.beta(b_alpha, b_beta, 10000)
