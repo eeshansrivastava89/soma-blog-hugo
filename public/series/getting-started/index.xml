@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Getting-Started on Eeshan S.</title>
-    <link>https://eeshansrivastava89.github.io/soma-blog-hugo/series/getting-started/</link>
+    <link>http://localhost:59755/soma-blog-hugo/series/getting-started/</link>
     <description>Recent content in Getting-Started on Eeshan S.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 16 Oct 2025 00:19:19 -0700</lastBuildDate>
-    <atom:link href="https://eeshansrivastava89.github.io/soma-blog-hugo/series/getting-started/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:59755/soma-blog-hugo/series/getting-started/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>First Post</title>
-      <link>https://eeshansrivastava89.github.io/soma-blog-hugo/posts/first-post/</link>
+      <link>http://localhost:59755/soma-blog-hugo/posts/first-post/</link>
       <pubDate>Thu, 16 Oct 2025 00:19:19 -0700</pubDate>
-      <guid>https://eeshansrivastava89.github.io/soma-blog-hugo/posts/first-post/</guid>
+      <guid>http://localhost:59755/soma-blog-hugo/posts/first-post/</guid>
       <description>&lt;h2 id=&#34;why-should-i-write-this&#34;&gt;Why Should I write this&lt;/h2&gt;&#xA;&lt;p&gt;This is my first post. Testing the blog setup.&lt;/p&gt;&#xA;&lt;h2 id=&#34;what-to-expect&#34;&gt;What to expect&lt;/h2&gt;&#xA;&lt;p&gt;More content coming soon about marketing analytics and experimentation.&lt;/p&gt;</description>
     </item>
   </channel>
