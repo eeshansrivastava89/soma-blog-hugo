@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "**/layouts/index.json": "hugo",
+    "**/layouts/_default/searchindex.json": "hugo"
+  }
+}

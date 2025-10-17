@@ -1,0 +1,15 @@
+[
+{{- $pages := where .Site.RegularPages "Params.indexable" "ne" false -}}
+{{- range $index, $page := $pages -}}
+  {{- if $index -}},{{- end }}
+  {
+    "id": {{ $index }},
+    "title": {{ .Title | jsonify }},
+    "content": {{ .Plain | jsonify }},
+    "tags": {{ .Params.tags | jsonify }},
+    "date": {{ .Date.Format "2006-01-02" | jsonify }},
+    "permalink": {{ .Permalink | jsonify }},
+    "summary": {{ .Summary | plainify | jsonify }}
+  }
+{{- end -}}
+]

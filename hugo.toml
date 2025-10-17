@@ -1,11 +1,17 @@
 baseURL = "https://eeshansrivastava89.github.io/soma-blog-hugo/"
 languageCode = "en-us"
-title = "Science of Marketing Analytics"
+title = "Eeshan S."
 theme = "rusty-typewriter"
 
 # Output formats for search
 [outputs]
-home = ["HTML", "RSS", "JSON"]
+home = ["HTML", "RSS", "JSON", "SearchIndex"]
+
+[outputFormats]
+[outputFormats.SearchIndex]
+baseName = "searchindex"
+mediaType = "application/json"
+isPlainText = true
 
 # Content and taxonomies
 [taxonomies]
@@ -63,7 +69,7 @@ countRecent = 5
 
 [params.rtwt.side.home]
 sidePaneSticky = true
-taxonomies = ["tags", "topics"]
+taxonomies = ["tags", "series"]
 countTaxonomy = 8
 
 [params.rtwt.side.single]

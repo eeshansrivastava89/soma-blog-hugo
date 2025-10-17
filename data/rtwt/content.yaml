@@ -4,11 +4,7 @@ home:
   image: 'images/profile.jpg'
 
 side:
-  home:
-    - title: 'Latest from SOMA Substack'
-      content: 'Get the latest insights on marketing analytics, experimentation, and measurement strategies directly from my Substack newsletter.'
-    - title: 'About the Author'
-      content: 'EeshanS is a marketing analytics practitioner focused on experimentation, measurement, and data-driven marketing strategies.'
+  home: []
   single:
     - title: 'Connect'
       content: 'Follow along for more insights on marketing analytics and experimentation.'

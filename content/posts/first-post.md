@@ -2,7 +2,7 @@
 title = 'First Post'
 date = '2025-10-16T00:19:19-07:00'
 tags = ["testing", "intro"]
-topics = ["getting-started"]
+series = ["getting-started"]
 featured = true
 weight = 1
 +++
