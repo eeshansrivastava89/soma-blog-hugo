@@ -2,34 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://eeshansrivastava89.github.io/soma-blog-hugo/posts/first-post/</loc>
+    <loc>http://localhost:1313/soma-blog-hugo/posts/first-post/</loc>
     <lastmod>2025-10-16T00:19:19-07:00</lastmod>
   </url><url>
-    <loc>https://eeshansrivastava89.github.io/soma-blog-hugo/</loc>
+    <loc>http://localhost:1313/soma-blog-hugo/</loc>
     <lastmod>2025-10-16T00:49:32-07:00</lastmod>
   </url><url>
-    <loc>https://eeshansrivastava89.github.io/soma-blog-hugo/series/getting-started/</loc>
+    <loc>http://localhost:1313/soma-blog-hugo/series/getting-started/</loc>
     <lastmod>2025-10-16T00:19:19-07:00</lastmod>
   </url><url>
-    <loc>https://eeshansrivastava89.github.io/soma-blog-hugo/tags/intro/</loc>
+    <loc>http://localhost:1313/soma-blog-hugo/tags/intro/</loc>
     <lastmod>2025-10-16T00:19:19-07:00</lastmod>
   </url><url>
-    <loc>https://eeshansrivastava89.github.io/soma-blog-hugo/posts/</loc>
+    <loc>http://localhost:1313/soma-blog-hugo/posts/</loc>
     <lastmod>2025-10-16T00:19:19-07:00</lastmod>
   </url><url>
-    <loc>https://eeshansrivastava89.github.io/soma-blog-hugo/series/</loc>
+    <loc>http://localhost:1313/soma-blog-hugo/series/</loc>
     <lastmod>2025-10-16T00:19:19-07:00</lastmod>
   </url><url>
-    <loc>https://eeshansrivastava89.github.io/soma-blog-hugo/tags/</loc>
+    <loc>http://localhost:1313/soma-blog-hugo/tags/</loc>
     <lastmod>2025-10-16T00:19:19-07:00</lastmod>
   </url><url>
-    <loc>https://eeshansrivastava89.github.io/soma-blog-hugo/tags/testing/</loc>
+    <loc>http://localhost:1313/soma-blog-hugo/tags/testing/</loc>
     <lastmod>2025-10-16T00:19:19-07:00</lastmod>
   </url><url>
-    <loc>https://eeshansrivastava89.github.io/soma-blog-hugo/categories/</loc>
+    <loc>http://localhost:1313/soma-blog-hugo/categories/</loc>
   </url><url>
-    <loc>https://eeshansrivastava89.github.io/soma-blog-hugo/search/</loc>
+    <loc>http://localhost:1313/soma-blog-hugo/search/</loc>
   </url><url>
-    <loc>https://eeshansrivastava89.github.io/soma-blog-hugo/topics/</loc>
+    <loc>http://localhost:1313/soma-blog-hugo/topics/</loc>
   </url>
 </urlset>

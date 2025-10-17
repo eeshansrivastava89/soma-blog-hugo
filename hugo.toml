@@ -82,3 +82,9 @@ countRelated = 5
 
 [params.rtwt.side.list]
 sidePaneSticky = false
+
+# Markup configuration to allow unsafe HTML (for search functionality)
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
