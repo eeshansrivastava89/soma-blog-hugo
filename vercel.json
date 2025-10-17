@@ -1,8 +1,0 @@
-{
-  "build": {
-    "env": {
-      "HUGO_VERSION": "0.151.0",
-      "GIT_SUBMODULE_STRATEGY": "recursive"
-    }
-  }
-}
