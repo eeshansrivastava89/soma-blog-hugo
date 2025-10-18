@@ -33,7 +33,6 @@ Welcome! This is an interactive simulator where you can see A/B testing and stat
       <p>Rate: <strong id="variant-a-rate">0%</strong></p>
       <p>95% CI: <strong id="variant-a-ci">[-, -]</strong></p>
     </div>
-    
     <div class="variant-stats">
       <h4>Variant B</h4>
       <p>Users: <strong id="variant-b-users">0</strong></p>
@@ -117,6 +116,18 @@ a_ci = scipy_stats.beta.ppf([0.025, 0.975], a_alpha, a_beta)
   margin: 2rem 0;
   border-radius: 8px;
   background-color: #f9f9f9;
+  color: #333;
+}
+
+.simulator-section h3,
+.simulator-section h4 {
+  color: #333;
+}
+
+.simulator-section p,
+.simulator-section ul,
+.simulator-section li {
+  color: #333;
 }
 
 .dashboard {
@@ -130,10 +141,13 @@ a_ci = scipy_stats.beta.ppf([0.025, 0.975], a_alpha, a_beta)
   border: 1px solid #ddd;
   padding: 1rem;
   border-radius: 4px;
+  background-color: #fff;
+  color: #333;
 }
 
 .variant-stats h4 {
   margin-top: 0;
+  color: #333;
 }
 
 .cta-button {
@@ -144,6 +158,12 @@ a_ci = scipy_stats.beta.ppf([0.025, 0.975], a_alpha, a_beta)
   cursor: pointer;
   margin: 1rem 0;
   font-weight: bold;
+  background-color: #0066cc;
+  color: white;
+}
+
+.cta-button:hover {
+  background-color: #0052a3;
 }
 
 .status-message {
@@ -170,6 +190,10 @@ pre {
   padding: 1rem;
   border-radius: 4px;
   overflow-x: auto;
+}
+
+code {
+  color: #f8f8f2;
 }
 
 @media (max-width: 768px) {

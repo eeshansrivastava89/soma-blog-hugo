@@ -6,7 +6,7 @@
     <description>Recent content on Eeshan S.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 16 Oct 2025 00:19:19 -0700</lastBuildDate>
+    <lastBuildDate>Fri, 17 Oct 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>First Post</title>
@@ -14,6 +14,13 @@
       <pubDate>Thu, 16 Oct 2025 00:19:19 -0700</pubDate>
       <guid>http://localhost:1313/posts/first-post/</guid>
       <description>&lt;h2 id=&#34;why-should-i-write-this&#34;&gt;Why Should I write this&lt;/h2&gt;&#xA;&lt;p&gt;This is my first post. Testing the blog setup.&lt;/p&gt;&#xA;&lt;h2 id=&#34;what-to-expect&#34;&gt;What to expect&lt;/h2&gt;&#xA;&lt;p&gt;More content coming soon about marketing analytics and experimentation.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>A/B Testing Simulator</title>
+      <link>http://localhost:1313/experiments/ab-test-simulator/</link>
+      <pubDate>Fri, 17 Oct 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/experiments/ab-test-simulator/</guid>
+      <description>&lt;h1 id=&#34;ab-testing-simulator&#34;&gt;A/B Testing Simulator&lt;/h1&gt;&#xA;&lt;p&gt;Welcome! This is an interactive simulator where you can see A/B testing and statistical analysis in action.&lt;/p&gt;&#xA;&lt;h2 id=&#34;section-1-your-variant&#34;&gt;Section 1: Your Variant&lt;/h2&gt;&#xA;&lt;div id=&#34;variant-section&#34; class=&#34;simulator-section&#34;&gt;&#xA;  &lt;h3&gt;Your Assigned Variant&lt;/h3&gt;&#xA;  &lt;p&gt;You are in: &lt;strong id=&#34;user-variant&#34;&gt;Loading...&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;button id=&#34;cta-button&#34; class=&#34;cta-button&#34;&gt;Loading&amp;hellip;&lt;/button&gt;&lt;/p&gt;&#xA;  &lt;p id=&#34;status&#34; class=&#34;status-message&#34;&gt;&lt;/p&gt;&#xA;&lt;/div&gt;&#xA;&lt;h2 id=&#34;section-2-live-dashboard&#34;&gt;Section 2: Live Dashboard&lt;/h2&gt;&#xA;&lt;div id=&#34;dashboard-section&#34; class=&#34;simulator-section&#34;&gt;&#xA;  &lt;h3&gt;Results (Live)&lt;/h3&gt;&#xA;  &lt;div class=&#34;dashboard&#34;&gt;&#xA;    &lt;div class=&#34;variant-stats&#34;&gt;&#xA;      &lt;h4&gt;Variant A&lt;/h4&gt;&#xA;      &lt;p&gt;Users: &lt;strong id=&#34;variant-a-users&#34;&gt;0&lt;/strong&gt;&lt;/p&gt;&#xA;      &lt;p&gt;Conversions: &lt;strong id=&#34;variant-a-conversions&#34;&gt;0&lt;/strong&gt;&lt;/p&gt;&#xA;      &lt;p&gt;Rate: &lt;strong id=&#34;variant-a-rate&#34;&gt;0%&lt;/strong&gt;&lt;/p&gt;&#xA;      &lt;p&gt;95% CI: &lt;strong id=&#34;variant-a-ci&#34;&gt;[-, -]&lt;/strong&gt;&lt;/p&gt;&#xA;    &lt;/div&gt;&#xA;    &lt;div class=&#34;variant-stats&#34;&gt;&#xA;      &lt;h4&gt;Variant B&lt;/h4&gt;&#xA;      &lt;p&gt;Users: &lt;strong id=&#34;variant-b-users&#34;&gt;0&lt;/strong&gt;&lt;/p&gt;&#xA;      &lt;p&gt;Conversions: &lt;strong id=&#34;variant-b-conversions&#34;&gt;0&lt;/strong&gt;&lt;/p&gt;&#xA;      &lt;p&gt;Rate: &lt;strong id=&#34;variant-b-rate&#34;&gt;0%&lt;/strong&gt;&lt;/p&gt;&#xA;      &lt;p&gt;95% CI: &lt;strong id=&#34;variant-b-ci&#34;&gt;[-, -]&lt;/strong&gt;&lt;/p&gt;&#xA;    &lt;/div&gt;&#xA;  &lt;/div&gt;&#xA;  &lt;div class=&#34;significance&#34;&gt;&#xA;    &lt;h4&gt;Statistical Significance&lt;/h4&gt;&#xA;    &lt;p&gt;p-value: &lt;strong id=&#34;p-value&#34;&gt;-&lt;/strong&gt;&lt;/p&gt;&#xA;    &lt;p&gt;Prob(B &gt; A): &lt;strong id=&#34;prob-b-better&#34;&gt;-&lt;/strong&gt;&lt;/p&gt;&#xA;  &lt;/div&gt;&#xA;  &lt;p class=&#34;last-updated&#34;&gt;Last updated: &lt;span id=&#34;last-updated&#34;&gt;never&lt;/span&gt;&lt;/p&gt;&#xA;&lt;/div&gt;&#xA;&lt;h2 id=&#34;section-3-python-code&#34;&gt;Section 3: Python Code&lt;/h2&gt;&#xA;&lt;div id=&#34;code-section&#34; class=&#34;simulator-section&#34;&gt;&#xA;  &lt;h3&gt;How We Calculate It&lt;/h3&gt;&#xA;  &lt;p&gt;This is the actual Python code powering the analysis:&lt;/p&gt;</description>
     </item>
     <item>
       <title>Search</title>
