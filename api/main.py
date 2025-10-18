@@ -55,33 +55,35 @@ async def get_stats(experiment_id: str = Query(...)):
         response = supabase.table("events").select("*").eq("experiment_id", experiment_id).execute()
         events = response.data
         
-        if not events:
+        if not events or len(events) == 0:
             return {"status": "error", "message": "No events found"}
         
         df = pd.DataFrame(events)
+        # Convert to native Python bool
+        df['converted'] = df['converted'].astype(bool).apply(bool)
         
         variant_a = df[df['variant'] == 'A']
         variant_b = df[df['variant'] == 'B']
         
-        a_conversions = variant_a['converted'].sum()
-        b_conversions = variant_b['converted'].sum()
+        a_conversions = int(variant_a['converted'].sum())
+        b_conversions = int(variant_b['converted'].sum())
         a_total = len(variant_a)
         b_total = len(variant_b)
         
-        a_rate = a_conversions / a_total if a_total > 0 else 0
-        b_rate = b_conversions / b_total if b_total > 0 else 0
+        if a_total == 0 or b_total == 0:
+            return {"status": "error", "message": "Need data from both variants"}
+        
+        a_rate = float(a_conversions) / float(a_total)
+        b_rate = float(b_conversions) / float(b_total)
         
         p_value = None
         significant = False
         
         if a_total >= 5 and b_total >= 5:
-            try:
-                contingency = [[a_conversions, a_total - a_conversions],
-                               [b_conversions, b_total - b_conversions]]
-                chi2, p_value, dof, expected = scipy_stats.chi2_contingency(contingency)
-                significant = p_value < 0.05
-            except:
-                p_value = None
+            contingency = [[int(a_conversions), int(a_total - a_conversions)],
+                           [int(b_conversions), int(b_total - b_conversions)]]
+            chi2, p_value, dof, expected = scipy_stats.chi2_contingency(contingency)
+            significant = bool(p_value < 0.05)
         
         alpha, beta = 1, 1
         a_alpha = alpha + a_conversions
@@ -95,7 +97,7 @@ async def get_stats(experiment_id: str = Query(...)):
         np.random.seed(42)
         a_samples = np.random.beta(a_alpha, a_beta, 10000)
         b_samples = np.random.beta(b_alpha, b_beta, 10000)
-        prob_b_better = (b_samples > a_samples).mean()
+        prob_b_better = float((b_samples > b_samples).mean())
         
         return {
             "status": "success",
@@ -103,16 +105,16 @@ async def get_stats(experiment_id: str = Query(...)):
                 "n_users": int(a_total),
                 "conversions": int(a_conversions),
                 "conversion_rate": round(a_rate, 4),
-                "credible_interval": [round(x, 4) for x in a_ci]
+                "credible_interval": [round(float(x), 4) for x in a_ci]
             },
             "variant_b": {
                 "n_users": int(b_total),
                 "conversions": int(b_conversions),
                 "conversion_rate": round(b_rate, 4),
-                "credible_interval": [round(x, 4) for x in b_ci]
+                "credible_interval": [round(float(x), 4) for x in b_ci]
             },
             "frequentist": {
-                "p_value": round(p_value, 4) if p_value else None,
+                "p_value": round(float(p_value), 4) if p_value else None,
                 "significant": significant
             },
             "bayesian": {
@@ -121,4 +123,6 @@ async def get_stats(experiment_id: str = Query(...)):
         }
     
     except Exception as e:
+        import traceback
+        print(traceback.format_exc())
         return {"status": "error", "message": str(e)}
