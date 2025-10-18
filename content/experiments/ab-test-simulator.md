@@ -110,6 +110,8 @@ a_ci = scipy_stats.beta.ppf([0.025, 0.975], a_alpha, a_beta)
 </div>
 
 <script>
+const EXPERIMENT_ID = '83cac599-f4bb-4d68-8b12-04458801a22b';
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
   initializeVariant();
@@ -154,10 +156,51 @@ function displayVariant() {
   button.addEventListener('click', handleConversion);
 }
 
-function handleConversion() {
-  console.log('Conversion button clicked');
-  // We'll add the tracking logic in Step 3
-  document.getElementById('status').textContent = '✓ Conversion recorded!';
+async function handleConversion() {
+  const button = document.getElementById('cta-button');
+  button.disabled = true;
+  button.textContent = 'Recording...';
+  
+  try {
+    const variant = localStorage.getItem('simulator_variant');
+    const userId = localStorage.getItem('simulator_user_id');
+    
+    // Send event to backend
+    const response = await fetch('/api/track', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        experiment_id: EXPERIMENT_ID,
+        user_id: userId,
+        variant: variant,
+        converted: true
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      document.getElementById('status').textContent = '✓ Conversion recorded!';
+      console.log('Event tracked successfully', data);
+      
+      // Re-enable button after 2 seconds
+      setTimeout(() => {
+        button.disabled = false;
+        button.textContent = variant === 'A' ? 'Sign Up' : 'Get Started';
+      }, 2000);
+    } else {
+      document.getElementById('status').textContent = '✗ Error: ' + data.message;
+      button.disabled = false;
+      button.textContent = variant === 'A' ? 'Sign Up' : 'Get Started';
+    }
+  } catch (error) {
+    console.error('Error tracking conversion:', error);
+    document.getElementById('status').textContent = '✗ Error tracking conversion';
+    button.disabled = false;
+    button.textContent = variant === 'A' ? 'Sign Up' : 'Get Started';
+  }
 }
 </script>
 
