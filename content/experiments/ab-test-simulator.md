@@ -24,6 +24,12 @@ Welcome! This is an interactive simulator where you can see A/B testing and stat
 
 <div id="dashboard-section" class="simulator-section">
   <h3>Results (Live)</h3>
+
+  <div style="margin-bottom: 1rem;">
+    <button id="polling-toggle" style="padding: 8px 16px; background-color: #666; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+        ▶ Enable Live Refresh
+    </button>
+  </div>
   
   <div class="dashboard">
     <div class="variant-stats">
@@ -111,27 +117,56 @@ a_ci = scipy_stats.beta.ppf([0.025, 0.975], a_alpha, a_beta)
 
 <script>
 const EXPERIMENT_ID = '83cac599-f4bb-4d68-8b12-04458801a22b';
+let pollingInterval = null;
+let isPolling = false;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
   initializeVariant();
   displayVariant();
+  setupPollingToggle();
   
-  // Initial dashboard update
-  updateDashboard();
-  
-  // Poll every 10 seconds
-  setInterval(updateDashboard, 10000);
+  // Don't auto-start polling - user must click button
+  console.log('Page loaded. Click "Enable Live Refresh" to start polling.');
 });
 
+function setupPollingToggle() {
+  const toggleBtn = document.getElementById('polling-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', togglePolling);
+  }
+}
+
+function togglePolling() {
+  const toggleBtn = document.getElementById('polling-toggle');
+  
+  if (isPolling) {
+    // Stop polling
+    clearInterval(pollingInterval);
+    isPolling = false;
+    toggleBtn.textContent = '▶ Enable Live Refresh';
+    toggleBtn.style.backgroundColor = '#666';
+    console.log('Polling stopped');
+  } else {
+    // Start polling
+    isPolling = true;
+    toggleBtn.textContent = '⏸ Disable Live Refresh';
+    toggleBtn.style.backgroundColor = '#27ae60';
+    
+    // Initial update
+    updateDashboard();
+    
+    // Poll every 10 seconds
+    pollingInterval = setInterval(updateDashboard, 10000);
+    console.log('Polling started');
+  }
+}
+
 function initializeVariant() {
-  // Check if user already has a variant assigned
   if (!localStorage.getItem('simulator_variant')) {
-    // New user: randomly assign A or B
     const variant = Math.random() < 0.5 ? 'A' : 'B';
     localStorage.setItem('simulator_variant', variant);
     
-    // Generate unique user ID
     const userId = 'user_' + Math.random().toString(36).substr(2, 9);
     localStorage.setItem('simulator_user_id', userId);
     
@@ -142,23 +177,20 @@ function initializeVariant() {
 function displayVariant() {
   const variant = localStorage.getItem('simulator_variant');
   
-  // Display which variant user is in
   document.getElementById('user-variant').textContent = 'Variant ' + variant;
   
-  // Style button based on variant
   const button = document.getElementById('cta-button');
   
   if (variant === 'A') {
     button.textContent = 'Sign Up';
-    button.style.backgroundColor = '#0066cc'; // blue
+    button.style.backgroundColor = '#0066cc';
     button.style.color = 'white';
   } else {
     button.textContent = 'Get Started';
-    button.style.backgroundColor = '#27ae60'; // green
+    button.style.backgroundColor = '#27ae60';
     button.style.color = 'white';
   }
   
-  // Add click handler
   button.addEventListener('click', handleConversion);
 }
 
@@ -171,7 +203,6 @@ async function handleConversion() {
   button.textContent = 'Recording...';
   
   try {
-    // Detect if local or production
     const apiUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:8000/api/track'
       : 'https://soma-blog-hugo.vercel.app/api/track';
@@ -217,10 +248,8 @@ async function handleConversion() {
   }
 }
 
-// Add this new function to your script
 async function updateDashboard() {
   try {
-    // Detect if local or production
     const apiUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:8000/api/stats?experiment_id=' + EXPERIMENT_ID
       : 'https://soma-blog-hugo.vercel.app/api/stats?experiment_id=' + EXPERIMENT_ID;
@@ -235,7 +264,6 @@ async function updateDashboard() {
     const data = await response.json();
     
     if (data.status === 'success') {
-      // Update variant A
       document.getElementById('variant-a-users').textContent = data.variant_a.n_users;
       document.getElementById('variant-a-conversions').textContent = data.variant_a.conversions;
       document.getElementById('variant-a-rate').textContent = (data.variant_a.conversion_rate * 100).toFixed(1) + '%';
@@ -243,7 +271,6 @@ async function updateDashboard() {
         '[' + (data.variant_a.credible_interval[0] * 100).toFixed(1) + '%, ' + 
         (data.variant_a.credible_interval[1] * 100).toFixed(1) + '%]';
       
-      // Update variant B
       document.getElementById('variant-b-users').textContent = data.variant_b.n_users;
       document.getElementById('variant-b-conversions').textContent = data.variant_b.conversions;
       document.getElementById('variant-b-rate').textContent = (data.variant_b.conversion_rate * 100).toFixed(1) + '%';
@@ -251,7 +278,6 @@ async function updateDashboard() {
         '[' + (data.variant_b.credible_interval[0] * 100).toFixed(1) + '%, ' + 
         (data.variant_b.credible_interval[1] * 100).toFixed(1) + '%]';
       
-      // Update significance
       if (data.frequentist.p_value !== null) {
         document.getElementById('p-value').textContent = data.frequentist.p_value;
       } else {
@@ -260,7 +286,6 @@ async function updateDashboard() {
       
       document.getElementById('prob-b-better').textContent = (data.bayesian.prob_b_better * 100).toFixed(0) + '%';
       
-      // Update last updated timestamp
       const now = new Date();
       document.getElementById('last-updated').textContent = now.toLocaleTimeString();
       
@@ -270,19 +295,6 @@ async function updateDashboard() {
     console.error('Error updating dashboard:', error);
   }
 }
-
-// Start polling on page load
-document.addEventListener('DOMContentLoaded', function() {
-  initializeVariant();
-  displayVariant();
-  
-  // Initial dashboard update
-  updateDashboard();
-  
-  // Poll every 10 seconds
-  setInterval(updateDashboard, 10000);
-});
-
 </script>
 
 <style>
