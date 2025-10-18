@@ -1,44 +1,65 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
 import os
+from datetime import datetime
 import pandas as pd
 from scipy import stats as scipy_stats
 import numpy as np
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get("/api/stats")
-async def get_stats(experiment_id: str = Query(...)):
-    """
-    Get experiment statistics with Bayesian and Frequentist analysis
-    """
+@app.post("/api/track")
+async def track_event(request: Request):
+    """Track user conversion event"""
     try:
-        # Initialize Supabase
         SUPABASE_URL = os.environ.get("SUPABASE_URL")
         SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
         supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
         
-        # Fetch all events for this experiment
+        data = await request.json()
+        
+        response = supabase.table("events").insert({
+            "experiment_id": data.get("experiment_id"),
+            "user_id": data.get("user_id"),
+            "variant": data.get("variant"),
+            "converted": data.get("converted"),
+            "timestamp": datetime.utcnow().isoformat()
+        }).execute()
+        
+        return {"status": "success", "data": response.data}
+    
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.get("/api/stats")
+async def get_stats(experiment_id: str = Query(...)):
+    """Get experiment statistics"""
+    try:
+        SUPABASE_URL = os.environ.get("SUPABASE_URL")
+        SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        
         response = supabase.table("events").select("*").eq("experiment_id", experiment_id).execute()
         events = response.data
         
         if not events:
             return {"status": "error", "message": "No events found"}
         
-        # Convert to pandas dataframe
         df = pd.DataFrame(events)
         
-        # Split by variant
         variant_a = df[df['variant'] == 'A']
         variant_b = df[df['variant'] == 'B']
         
@@ -50,7 +71,6 @@ async def get_stats(experiment_id: str = Query(...)):
         a_rate = a_conversions / a_total if a_total > 0 else 0
         b_rate = b_conversions / b_total if b_total > 0 else 0
         
-        # Frequentist: Chi-square test (only if enough samples)
         p_value = None
         significant = False
         
@@ -63,18 +83,15 @@ async def get_stats(experiment_id: str = Query(...)):
             except:
                 p_value = None
         
-        # Bayesian: Beta-Binomial credible intervals
-        alpha, beta = 1, 1  # Uniform priors
+        alpha, beta = 1, 1
         a_alpha = alpha + a_conversions
         a_beta = beta + (a_total - a_conversions)
         b_alpha = alpha + b_conversions
         b_beta = beta + (b_total - b_conversions)
         
-        # 95% credible intervals
         a_ci = scipy_stats.beta.ppf([0.025, 0.975], a_alpha, a_beta).tolist()
         b_ci = scipy_stats.beta.ppf([0.025, 0.975], b_alpha, b_beta).tolist()
         
-        # Probability that B is better than A
         np.random.seed(42)
         a_samples = np.random.beta(a_alpha, a_beta, 10000)
         b_samples = np.random.beta(b_alpha, b_beta, 10000)

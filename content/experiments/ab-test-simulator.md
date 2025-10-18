@@ -167,8 +167,8 @@ async function handleConversion() {
   try {
     // Detect if local or production
     const apiUrl = window.location.hostname === 'localhost' 
-      ? 'http://localhost:8000/api/track'  // Local Python server
-      : 'https://soma-blog-hugo.vercel.app/api/track';  // Production
+      ? 'http://localhost:8000/api/track'
+      : 'https://soma-blog-hugo.vercel.app/api/track';
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -183,6 +183,10 @@ async function handleConversion() {
       })
     });
     
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const data = await response.json();
     
     if (data.status === 'success') {
@@ -192,17 +196,17 @@ async function handleConversion() {
       setTimeout(() => {
         button.disabled = false;
         button.textContent = variant === 'A' ? 'Sign Up' : 'Get Started';
+        document.getElementById('status').textContent = '';
       }, 2000);
     } else {
-      document.getElementById('status').textContent = '✗ Error: ' + data.message;
+      document.getElementById('status').textContent = '✗ Error: ' + (data.message || 'Unknown error');
       button.disabled = false;
       button.textContent = variant === 'A' ? 'Sign Up' : 'Get Started';
     }
   } catch (error) {
     console.error('Error tracking conversion:', error);
-    document.getElementById('status').textContent = '✗ Error tracking conversion';
+    document.getElementById('status').textContent = '✗ Error: ' + error.message;
     button.disabled = false;
-    const variant = localStorage.getItem('simulator_variant');
     button.textContent = variant === 'A' ? 'Sign Up' : 'Get Started';
   }
 }
