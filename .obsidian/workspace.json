@@ -171,6 +171,8 @@
   },
   "active": "7314b01c11338a3b",
   "lastOpenFiles": [
+    "api/__pycache__/stats.cpython-312.pyc",
+    "api/__pycache__",
     "public/experiments/page/1/index.html",
     "public/experiments/page/1",
     "public/experiments/ab-test-simulator/index.html",
@@ -181,8 +183,6 @@
     "public/experiments",
     "content/experiments/ab-test-simulator.md",
     "content/experiments",
-    "api/stats.py",
-    "api/track.py",
     "themes/rusty-typewriter/static/images/profile.jpg",
     "themes/rusty-typewriter/static/favicon.svg",
     "themes/rusty-typewriter/layouts/partials/svg/sun.svg",

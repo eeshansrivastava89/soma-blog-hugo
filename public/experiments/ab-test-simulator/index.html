@@ -246,15 +246,19 @@ function displayVariant() {
 
 async function handleConversion() {
   const button = document.getElementById('cta-button');
+  const variant = localStorage.getItem('simulator_variant');
+  const userId = localStorage.getItem('simulator_user_id');
+  
   button.disabled = true;
   button.textContent = 'Recording...';
   
   try {
-    const variant = localStorage.getItem('simulator_variant');
-    const userId = localStorage.getItem('simulator_user_id');
+    // Detect if local or production
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost:8000/api/track'  // Local Python server
+      : 'https://soma-blog-hugo.vercel.app/api/track';  // Production
     
-    // Send event to backend
-    const response = await fetch('/api/track', {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -273,7 +277,6 @@ async function handleConversion() {
       document.getElementById('status').textContent = '✓ Conversion recorded!';
       console.log('Event tracked successfully', data);
       
-      // Re-enable button after 2 seconds
       setTimeout(() => {
         button.disabled = false;
         button.textContent = variant === 'A' ? 'Sign Up' : 'Get Started';
@@ -287,9 +290,11 @@ async function handleConversion() {
     console.error('Error tracking conversion:', error);
     document.getElementById('status').textContent = '✗ Error tracking conversion';
     button.disabled = false;
+    const variant = localStorage.getItem('simulator_variant');
     button.textContent = variant === 'A' ? 'Sign Up' : 'Get Started';
   }
 }
+
 </script>
 <style>
 .simulator-section {

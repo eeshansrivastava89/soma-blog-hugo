@@ -165,8 +165,10 @@ async function handleConversion() {
   button.textContent = 'Recording...';
   
   try {
-    // Use full URL to Vercel endpoint
-    const apiUrl = 'https://soma-blog-hugo.vercel.app/api/track';
+    // Detect if local or production
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost:8000/api/track'  // Local Python server
+      : 'https://soma-blog-hugo.vercel.app/api/track';  // Production
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -187,7 +189,6 @@ async function handleConversion() {
       document.getElementById('status').textContent = '✓ Conversion recorded!';
       console.log('Event tracked successfully', data);
       
-      // Re-enable button after 2 seconds
       setTimeout(() => {
         button.disabled = false;
         button.textContent = variant === 'A' ? 'Sign Up' : 'Get Started';
@@ -205,6 +206,7 @@ async function handleConversion() {
     button.textContent = variant === 'A' ? 'Sign Up' : 'Get Started';
   }
 }
+
 </script>
 
 <style>

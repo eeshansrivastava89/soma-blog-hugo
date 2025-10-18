@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
 import os
 import pandas as pd
@@ -6,6 +7,15 @@ from scipy import stats as scipy_stats
 import numpy as np
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/api/stats")
 async def get_stats(experiment_id: str = Query(...)):
