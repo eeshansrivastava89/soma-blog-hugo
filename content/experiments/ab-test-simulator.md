@@ -158,15 +158,17 @@ function displayVariant() {
 
 async function handleConversion() {
   const button = document.getElementById('cta-button');
+  const variant = localStorage.getItem('simulator_variant');
+  const userId = localStorage.getItem('simulator_user_id');
+  
   button.disabled = true;
   button.textContent = 'Recording...';
   
   try {
-    const variant = localStorage.getItem('simulator_variant');
-    const userId = localStorage.getItem('simulator_user_id');
+    // Use full URL to Vercel endpoint
+    const apiUrl = 'https://soma-blog-hugo.vercel.app/api/track';
     
-    // Send event to backend
-    const response = await fetch('/api/track', {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -199,6 +201,7 @@ async function handleConversion() {
     console.error('Error tracking conversion:', error);
     document.getElementById('status').textContent = '✗ Error tracking conversion';
     button.disabled = false;
+    const variant = localStorage.getItem('simulator_variant');
     button.textContent = variant === 'A' ? 'Sign Up' : 'Get Started';
   }
 }
