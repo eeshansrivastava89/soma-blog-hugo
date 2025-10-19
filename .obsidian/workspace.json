@@ -171,6 +171,8 @@
   },
   "active": "7314b01c11338a3b",
   "lastOpenFiles": [
+    "phase-2-implementation-roadmap.md",
+    "phase-2-implementation-roadmap_2.md",
     "public/js/ab-simulator.js",
     "static/js/ab-simulator.js",
     "static/js",
@@ -181,7 +183,6 @@
     "api/main.py",
     "api/__pycache__/stats.cpython-312.pyc",
     "api/__pycache__",
-    "public/experiments/page/1/index.html",
     "content/experiments/ab-test-simulator.md",
     "themes/rusty-typewriter/static/images/profile.jpg",
     "themes/rusty-typewriter/static/favicon.svg",

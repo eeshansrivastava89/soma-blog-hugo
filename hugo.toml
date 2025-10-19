@@ -84,7 +84,10 @@ countRelated = 5
 sidePaneSticky = false
 
 # Markup configuration to allow unsafe HTML (for search functionality)
-[markup]
-  [markup.goldmark]
-    [markup.goldmark.renderer]
-      unsafe = true
+[markup.goldmark.renderer]
+unsafe = true
+
+[markup.goldmark.parser]
+wrapStandAloneImageWithinParagraph = false
+attribute.block = true
+attribute.title = true

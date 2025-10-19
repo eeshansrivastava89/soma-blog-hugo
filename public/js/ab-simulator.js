@@ -92,6 +92,7 @@ function setupPuzzle() {
   document.getElementById('start-button').addEventListener('click', startChallenge);
   document.getElementById('reset-button').addEventListener('click', resetPuzzle);
   document.getElementById('try-again-button').addEventListener('click', resetPuzzle);
+  document.getElementById('try-again-failure-button').addEventListener('click', resetPuzzle);
   document.getElementById('word-input').addEventListener('keypress', handleWordInput);
   
   document.getElementById('puzzle-container').style.display = 'block';
@@ -114,12 +115,20 @@ function startChallenge() {
 
 function updateTimer() {
   const elapsed = Date.now() - puzzleState.startTime;
-  const minutes = Math.floor(elapsed / 60000);
-  const seconds = Math.floor((elapsed % 60000) / 1000);
-  const milliseconds = Math.floor((elapsed % 1000) / 10);
+  
+  // Check if 60 seconds elapsed
+  if (elapsed >= 60000) {
+    failChallenge();
+    return;
+  }
+  
+  // Calculate time REMAINING (countdown from 60s)
+  const remaining = 60000 - elapsed;
+  const seconds = Math.floor(remaining / 1000);
+  const milliseconds = Math.floor((remaining % 1000) / 10);
   
   const display = 
-    String(minutes).padStart(2, '0') + ':' +
+    '00:' +
     String(seconds).padStart(2, '0') + ':' +
     String(milliseconds).padStart(2, '0');
   
@@ -179,6 +188,13 @@ async function completeChallenge() {
   // Update completion message
   document.getElementById('completion-time-display').textContent = timeDisplay;
   document.getElementById('completion-guesses').textContent = puzzleState.guessedWords.length;
+
+  // Show personal best indicator if applicable
+  if (puzzleState.isPersonalBest) {
+    document.getElementById('comparison-text').innerHTML = 
+      '🏆 <strong style="color: #f39c12;">Personal Best!</strong> | ' + 
+      document.getElementById('comparison-text').innerHTML;
+  }
   
   // Show completion message
   document.getElementById('completion-message').style.display = 'block';
@@ -193,6 +209,38 @@ async function completeChallenge() {
   await fetchVariantComparison();
 }
 
+async function failChallenge() {
+  console.log('failChallenge called'); // DEBUG
+  
+  puzzleState.isRunning = false;
+  clearInterval(puzzleState.timerInterval);
+  
+  puzzleState.completionTime = 60000; // 60 seconds
+  
+  document.getElementById('word-input').style.display = 'none';
+  document.getElementById('reset-button').style.display = 'none';
+  
+  const config = PUZZLE_CONFIG[puzzleState.variant];
+  
+  // Update failure message
+  document.getElementById('failure-words-found').textContent = puzzleState.foundWords.length;
+  document.getElementById('failure-words-total').textContent = config.targetCount;
+  
+  console.log('Showing failure message'); // DEBUG
+  
+  // Show failure message
+  const failureMsg = document.getElementById('failure-message');
+  if (failureMsg) {
+    failureMsg.style.display = 'block';
+    console.log('Failure message shown'); // DEBUG
+  } else {
+    console.error('failure-message element not found!'); // DEBUG
+  }
+  
+  // Track as failed completion
+  await trackFailure();
+}
+
 function resetPuzzle() {
   puzzleState.isRunning = false;
   clearInterval(puzzleState.timerInterval);
@@ -201,14 +249,15 @@ function resetPuzzle() {
   puzzleState.foundWords = [];
   puzzleState.completionTime = null;
   
-  document.getElementById('timer').textContent = '00:00:00';
+  document.getElementById('timer').textContent = '00:60:00';
   document.getElementById('start-button').style.display = 'inline-block';
   document.getElementById('reset-button').style.display = 'none';
   document.getElementById('word-input').style.display = 'none';
   document.getElementById('word-input').value = '';
   document.getElementById('found-words-list').textContent = '(none yet)';
   document.getElementById('completion-message').style.display = 'none';
-  
+  document.getElementById('failure-message').style.display = 'none';
+
   // Hide leaderboard
   const leaderboardDiv = document.getElementById('leaderboard-display');
   if (leaderboardDiv) {
@@ -257,6 +306,46 @@ async function trackCompletion() {
   }
 }
 
+async function trackFailure() {
+  try {
+    const variant = puzzleState.variant;
+    const userId = localStorage.getItem('simulator_user_id');
+    
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost:8000/api/track'
+      : 'https://soma-blog-hugo.vercel.app/api/track';
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        experiment_id: EXPERIMENT_ID,
+        user_id: userId,
+        variant: variant,
+        converted: false,  // This is the key difference
+        action_type: 'completed',
+        completion_time: 60.0,
+        success: false,
+        correct_words_count: puzzleState.foundWords.length,
+        total_guesses_count: puzzleState.guessedWords.length,
+        metadata: {
+          found_words: puzzleState.foundWords,
+          puzzle_type: 'word_search',
+          failure_reason: 'timeout'
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      console.error('Error tracking failure:', response.status);
+    }
+  } catch (error) {
+    console.error('Error tracking failure:', error);
+  }
+}
+
 async function fetchVariantComparison() {
   try {
     const apiUrl = window.location.hostname === 'localhost' 
@@ -302,15 +391,15 @@ async function fetchVariantComparison() {
       const otherName = userVariant === 'A' ? 'B' : 'A';
       
       if (diff < 0) {
-        comparisonHTML += `⚡ ${diffAbs.toFixed(1)}s faster than ${variantName}`;
+        comparisonHTML += `⚡ ${diffAbs.toFixed(2)}s faster than ${variantName}`;
       } else if (diff > 0) {
-        comparisonHTML += `${diffAbs.toFixed(1)}s slower than ${variantName}`;
+        comparisonHTML += `${diffAbs.toFixed(2)}s slower than ${variantName}`;
       } else {
         comparisonHTML += `Matched ${variantName} average!`;
       }
       
       if (otherVariantAvg) {
-        comparisonHTML += ` <span style="margin: 0 0.5rem; color: #999;">|</span> ${otherName} avg: ${otherVariantAvg.toFixed(1)}s`;
+        comparisonHTML += ` <span style="margin: 0 0.5rem; color: #999;">|</span> ${otherName} avg: ${otherVariantAvg.toFixed(2)}s`;
       }
     }
     
@@ -335,13 +424,36 @@ function updateLeaderboard(completionTime) {
   // Get existing leaderboard or create new one
   let leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
   
-  // Add new entry
-  leaderboard.push({
-    username: username,
-    time: completionTime / 1000, // convert to seconds
-    variant: variant,
-    timestamp: Date.now()
-  });
+  const newTime = completionTime / 1000;
+  
+  // Check if user already has a best score
+  const userBestIndex = leaderboard.findIndex(entry => entry.username === username);
+  
+  let isPersonalBest = false;
+  
+  if (userBestIndex !== -1) {
+    // User exists - only update if new time is better (faster)
+    const oldBestTime = leaderboard[userBestIndex].time;
+    if (newTime < oldBestTime) {
+      leaderboard[userBestIndex].time = newTime;
+      leaderboard[userBestIndex].variant = variant;
+      leaderboard[userBestIndex].timestamp = Date.now();
+      isPersonalBest = true; // Beat previous best
+    }
+    // If slower, don't update and don't mark as personal best
+  } else {
+    // New user - add to leaderboard
+    leaderboard.push({
+      username: username,
+      time: newTime,
+      variant: variant,
+      timestamp: Date.now()
+    });
+    isPersonalBest = true; // First time completing
+  }
+  
+  // Store in puzzleState for display
+  puzzleState.isPersonalBest = isPersonalBest;
   
   // Sort by time (fastest first)
   leaderboard.sort((a, b) => a.time - b.time);
@@ -353,10 +465,10 @@ function updateLeaderboard(completionTime) {
   localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
   
   // Display leaderboard
-  displayLeaderboard();
+  displayLeaderboard(newTime);
 }
 
-function displayLeaderboard() {
+function displayLeaderboard(currentAttemptTime = null) {
   const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
   const username = localStorage.getItem('simulator_username');
   
@@ -378,12 +490,48 @@ function displayLeaderboard() {
     
     html += `<div style="display: flex; justify-content: space-between; padding: 0.5rem; margin-bottom: 0.25rem; background-color: ${bgColor}; border-radius: 4px; font-weight: ${fontWeight};">`;
     html += `<span>${index + 1}. ${entry.username}</span>`;
-    html += `<span>${entry.time.toFixed(1)}s (${entry.variant})</span>`;
+    html += `<span>${entry.time.toFixed(2)}s (${entry.variant})</span>`;
     html += `</div>`;
   });
   
-  html += '</div></div>';
+  html += '</div></div>';  
+
+  html += '</div>';
   
+  html += '</div>';
+  
+  // Always show current attempt info
+  const userEntry = leaderboard.find(entry => entry.username === username);
+  if (userEntry) {
+    const userPosition = leaderboard.findIndex(entry => entry.username === username) + 1;
+    //const currentAttemptTime = puzzleState.completionTime / 1000; // Current attempt
+    
+    // Show current attempt if it's different from best (and user is in top 10)
+    if (userPosition <= 10 && currentAttemptTime !== userEntry.time) {
+      html += '<div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed #ccc;">';
+      html += '<p style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">This Attempt:</p>';
+      html += `<div style="display: flex; justify-content: space-between; padding: 0.5rem; background-color: #f0f0f0; border-radius: 4px;">`;
+      html += `<span>${username}</span>`;
+      html += `<span>${currentAttemptTime.toFixed(2)}s (${puzzleState.variant})</span>`;
+      html += `</div>`;
+      html += '<p style="font-size: 0.8rem; color: #999; margin-top: 0.25rem;">Your best: #' + userPosition + ' - ' + userEntry.time.toFixed(2) + 's</p>';
+      html += '</div>';
+    }
+    
+    // Show position if outside top 10
+    if (userPosition > 10) {
+      html += '<div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed #ccc;">';
+      html += '<p style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">Your Position:</p>';
+      html += `<div style="display: flex; justify-content: space-between; padding: 0.5rem; background-color: #fff3cd; border-radius: 4px; font-weight: bold;">`;
+      html += `<span>${userPosition}. ${userEntry.username}</span>`;
+      html += `<span>${userEntry.time.toFixed(2)}s (${userEntry.variant})</span>`;
+      html += `</div>`;
+      html += '</div>';
+    }
+  }
+  
+  html += '</div>';
+
   // Insert after completion message
   const completionMsg = document.getElementById('completion-message');
   let leaderboardDiv = document.getElementById('leaderboard-display');
