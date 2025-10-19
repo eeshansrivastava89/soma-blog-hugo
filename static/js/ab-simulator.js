@@ -679,37 +679,39 @@ async function updateDashboard() {
       document.getElementById('variant-b-success-rate').textContent = 
         (data.variant_b.conversion_rate * 100).toFixed(1) + '%';
 
-      // Update funnel for both variants (using same scale)
+      // Update funnel for both variants (using same scale across ALL bars)
       if (data.variant_a.funnel && data.variant_b.funnel) {
         const aFunnel = data.variant_a.funnel;
         const bFunnel = data.variant_b.funnel;
         
-        // Calculate max for each step across both variants
-        const maxStarted = Math.max(aFunnel.started, bFunnel.started, 1);
-        const maxCompleted = Math.max(aFunnel.completed, bFunnel.completed, 1);
-        const maxRepeated = Math.max(aFunnel.repeated, bFunnel.repeated, 1);
+        // Calculate GLOBAL max across all steps and both variants
+        const globalMax = Math.max(
+          aFunnel.started, aFunnel.completed, aFunnel.repeated,
+          bFunnel.started, bFunnel.completed, bFunnel.repeated,
+          1  // Minimum of 1 to avoid division by zero
+        );
         
         // Update Variant A funnel
-        document.getElementById('funnel-a-started').style.width = ((aFunnel.started / maxStarted) * 100) + '%';
+        document.getElementById('funnel-a-started').style.width = ((aFunnel.started / globalMax) * 100) + '%';
         document.getElementById('funnel-a-started').querySelector('.funnel-count').textContent = aFunnel.started;
         
-        document.getElementById('funnel-a-completed').style.width = ((aFunnel.completed / maxCompleted) * 100) + '%';
+        document.getElementById('funnel-a-completed').style.width = ((aFunnel.completed / globalMax) * 100) + '%';
         document.getElementById('funnel-a-completed').querySelector('.funnel-count').textContent = aFunnel.completed;
         
-        document.getElementById('funnel-a-repeated').style.width = ((aFunnel.repeated / maxRepeated) * 100) + '%';
+        document.getElementById('funnel-a-repeated').style.width = ((aFunnel.repeated / globalMax) * 100) + '%';
         document.getElementById('funnel-a-repeated').querySelector('.funnel-count').textContent = aFunnel.repeated;
         
         document.getElementById('funnel-a-rates').textContent = 
           `Completion: ${aFunnel.completion_rate}% | Repeat: ${aFunnel.repeat_rate}%`;
         
         // Update Variant B funnel
-        document.getElementById('funnel-b-started').style.width = ((bFunnel.started / maxStarted) * 100) + '%';
+        document.getElementById('funnel-b-started').style.width = ((bFunnel.started / globalMax) * 100) + '%';
         document.getElementById('funnel-b-started').querySelector('.funnel-count').textContent = bFunnel.started;
         
-        document.getElementById('funnel-b-completed').style.width = ((bFunnel.completed / maxCompleted) * 100) + '%';
+        document.getElementById('funnel-b-completed').style.width = ((bFunnel.completed / globalMax) * 100) + '%';
         document.getElementById('funnel-b-completed').querySelector('.funnel-count').textContent = bFunnel.completed;
         
-        document.getElementById('funnel-b-repeated').style.width = ((bFunnel.repeated / maxRepeated) * 100) + '%';
+        document.getElementById('funnel-b-repeated').style.width = ((bFunnel.repeated / globalMax) * 100) + '%';
         document.getElementById('funnel-b-repeated').querySelector('.funnel-count').textContent = bFunnel.repeated;
         
         document.getElementById('funnel-b-rates').textContent = 
