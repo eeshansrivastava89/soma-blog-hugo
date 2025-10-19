@@ -78,18 +78,21 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 **Completion Status:** `[x]` DONE (localStorage-based, Step 15 will add cross-device sync)
 
 ### Step 5: Funnel Visualization
-- [ ] Track "started" events (puzzle displayed)
-- [ ] Track "completed" events (puzzle solved)
-- [ ] Track "repeated" events (user clicked "Try Again")
-- [ ] Calculate funnel metrics per variant:
+- [x] Track "started" events (puzzle displayed)
+- [x] Track "completed" events (puzzle solved)
+- [x] Track "repeated" events (user clicked "Try Again")
+- [x] Calculate funnel metrics per variant in API:
   - Started count
   - Completed count
   - Repeated count
   - Completion rate %
   - Repeat rate %
-- [ ] Display funnel bars for Variant A and B side-by-side
-- [ ] Update funnel in real-time with polling toggle
+- [x] Display funnel bars for Variant A and B side-by-side
+- [x] Add CSS for funnel visualization
+- [ ] Update funnel in real-time with polling toggle (needs JS update)
 - [ ] Test data accuracy
+
+**Completion Status:** `[~]` MOSTLY DONE (visualization added, need to wire up live updates)
 
 ### Step 6: Testing & Verification
 - [ ] Test locally: Create 10+ events, verify leaderboard works
@@ -264,9 +267,11 @@ soma-blog-hugo/
 - ✅ 60-second countdown timer
 - ✅ Failure tracking for timeouts (converted: false)
 - ✅ Step 4: Leaderboard with personal bests, current attempt display, and position tracking
+- ✅ Step 5: Funnel tracking (started/completed/repeated events) with visualization
 
 **Next Up:**
-- Step 5: Funnel Visualization (started/completed/repeated tracking)
+- Wire up funnel to update live with polling
+- Step 6: Testing & Verification
 
 ---
 
