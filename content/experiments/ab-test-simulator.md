@@ -152,6 +152,16 @@ const PUZZLE_CONFIG = {
   }
 };
 
+// Fun username generator
+const ADJECTIVES = ['Lightning', 'Swift', 'Quick', 'Speedy', 'Rapid', 'Fast', 'Blazing', 'Turbo', 'Sonic', 'Flash'];
+const ANIMALS = ['Leopard', 'Cheetah', 'Falcon', 'Hawk', 'Fox', 'Wolf', 'Tiger', 'Eagle', 'Panther', 'Gazelle'];
+
+function generateUsername() {
+  const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+  const animal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+  return `${adj} ${animal}`;
+}
+
 let puzzleState = {
   variant: null,
   startTime: null,
@@ -177,6 +187,12 @@ function initializeVariant() {
     
     const userId = 'user_' + Math.random().toString(36).substr(2, 9);
     localStorage.setItem('simulator_user_id', userId);
+  }
+  
+  // Always ensure username exists
+  if (!localStorage.getItem('simulator_username')) {
+    const username = generateUsername();
+    localStorage.setItem('simulator_username', username);
   }
 }
 
