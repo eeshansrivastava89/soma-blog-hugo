@@ -216,14 +216,14 @@ function startChallenge() {
 
 function updateTimer() {
   const elapsed = Date.now() - puzzleState.startTime;
-  const seconds = Math.floor(elapsed / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
+  const minutes = Math.floor(elapsed / 60000);
+  const seconds = Math.floor((elapsed % 60000) / 1000);
+  const milliseconds = Math.floor((elapsed % 1000) / 10); // 2-digit ms
   
   const display = 
-    String(hours).padStart(2, '0') + ':' +
-    String(minutes % 60).padStart(2, '0') + ':' +
-    String(seconds % 60).padStart(2, '0');
+    String(minutes).padStart(2, '0') + ':' +
+    String(seconds).padStart(2, '0') + ':' +
+    String(milliseconds).padStart(2, '0');
   
   document.getElementById('timer').textContent = display;
 }
@@ -263,14 +263,20 @@ function completeChallenge() {
   puzzleState.isRunning = false;
   clearInterval(puzzleState.timerInterval);
   
-  puzzleState.completionTime = Math.floor((Date.now() - puzzleState.startTime) / 1000);
+  puzzleState.completionTime = Date.now() - puzzleState.startTime; // milliseconds
   
   document.getElementById('word-input').style.display = 'none';
   document.getElementById('reset-button').style.display = 'none';
   
+  // Convert to display format (mm:ss:ms)
+  const minutes = Math.floor(puzzleState.completionTime / 60000);
+  const seconds = Math.floor((puzzleState.completionTime % 60000) / 1000);
+  const milliseconds = Math.floor((puzzleState.completionTime % 1000) / 10);
+  
   const timeDisplay = 
-    String(Math.floor(puzzleState.completionTime / 60)).padStart(2, '0') + ':' +
-    String(puzzleState.completionTime % 60).padStart(2, '0');
+    String(minutes).padStart(2, '0') + ':' +
+    String(seconds).padStart(2, '0') + ':' +
+    String(milliseconds).padStart(2, '0');
   
   document.getElementById('completion-text').innerHTML = 
     `You found all ${puzzleState.foundWords.length} words in ${timeDisplay}!<br>` +
@@ -278,7 +284,6 @@ function completeChallenge() {
   
   document.getElementById('completion-message').style.display = 'block';
   
-  // Track completion event
   trackCompletion();
 }
 
@@ -304,6 +309,9 @@ async function trackCompletion() {
     const variant = puzzleState.variant;
     const userId = localStorage.getItem('simulator_user_id');
     
+    // Convert milliseconds to seconds.milliseconds
+    const completionTimeSeconds = (puzzleState.completionTime / 1000).toFixed(3);
+    
     const apiUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:8000/api/track'
       : 'https://soma-blog-hugo.vercel.app/api/track';
@@ -319,12 +327,13 @@ async function trackCompletion() {
         variant: variant,
         converted: true,
         action_type: 'completed',
-        completion_time: puzzleState.completionTime,
+        completion_time: parseFloat(completionTimeSeconds),
         success: true,
-        attempts_count: puzzleState.guessedWords.length,
+        correct_words_count: puzzleState.foundWords.length,
+        total_guesses_count: puzzleState.guessedWords.length,
         metadata: {
           found_words: puzzleState.foundWords,
-          total_guesses: puzzleState.guessedWords.length
+          puzzle_type: 'word_search'
         }
       })
     });

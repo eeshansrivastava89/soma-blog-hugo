@@ -31,17 +31,31 @@ async def track_event(request: Request):
         
         data = await request.json()
         
-        response = supabase.table("events").insert({
+        # Build the event object with all fields
+        event_data = {
             "experiment_id": data.get("experiment_id"),
             "user_id": data.get("user_id"),
             "variant": data.get("variant"),
             "converted": data.get("converted"),
-            "timestamp": datetime.utcnow().isoformat()
-        }).execute()
+            "timestamp": datetime.utcnow().isoformat(),
+            "action_type": data.get("action_type"),
+            "completion_time": data.get("completion_time"),
+            "success": data.get("success"),
+            "correct_words_count": data.get("correct_words_count"),
+            "total_guesses_count": data.get("total_guesses_count"),
+            "metadata": data.get("metadata")
+        }
+        
+        # Remove None values
+        event_data = {k: v for k, v in event_data.items() if v is not None}
+        
+        response = supabase.table("events").insert(event_data).execute()
         
         return {"status": "success", "data": response.data}
     
     except Exception as e:
+        import traceback
+        print(traceback.format_exc())
         return {"status": "error", "message": str(e)}
 
 @app.get("/api/stats")
