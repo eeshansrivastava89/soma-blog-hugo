@@ -502,15 +502,15 @@ async function fetchVariantComparison() {
       const otherName = userVariant === 'A' ? 'B' : 'A';
       
       if (diff < 0) {
-        comparisonHTML += `⚡ ${diffAbs.toFixed(1)}s faster than ${variantName}`;
+        comparisonHTML += `⚡ ${diffAbs.toFixed(1)}s faster than variant ${variantName} average`;
       } else if (diff > 0) {
-        comparisonHTML += `${diffAbs.toFixed(1)}s slower than ${variantName}`;
+        comparisonHTML += `${diffAbs.toFixed(1)}s slower than variant ${variantName} average`;
       } else {
-        comparisonHTML += `Matched ${variantName} average!`;
+        comparisonHTML += `Matched variant ${variantName} average!`;
       }
       
       if (otherVariantAvg) {
-        comparisonHTML += ` <span style="margin: 0 0.5rem; color: #999;">|</span> ${otherName} avg: ${otherVariantAvg.toFixed(1)}s`;
+        comparisonHTML += ` <span style="margin: 0 0.5rem; color: #999;">|</span> Variant ${otherName} avg: ${otherVariantAvg.toFixed(1)}s`;
       }
     }
     
