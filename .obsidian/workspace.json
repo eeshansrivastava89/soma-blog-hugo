@@ -171,6 +171,7 @@
   },
   "active": "7314b01c11338a3b",
   "lastOpenFiles": [
+    "layouts/_default/baseof.html",
     "package-lock.json",
     "package.json",
     "node_modules/@vercel/speed-insights/package.json",
@@ -182,7 +183,6 @@
     "node_modules/@vercel/speed-insights/tsup.config.js",
     "node_modules/@vercel/speed-insights/tsconfig.json",
     "node_modules/@vercel/speed-insights/LICENSE",
-    "node_modules/@vercel/speed-insights/dist/vue/index.mjs.map",
     "phase-2-implementation-roadmap.md",
     "phase-2-implementation-roadmap_2.md",
     "content/experiments/ab-test-simulator.md",
