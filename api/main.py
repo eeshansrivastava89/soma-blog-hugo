@@ -111,7 +111,24 @@ async def get_stats(experiment_id: str = Query(...)):
         np.random.seed(42)
         a_samples = np.random.beta(a_alpha, a_beta, 10000)
         b_samples = np.random.beta(b_alpha, b_beta, 10000)
-        prob_b_better = float((b_samples > b_samples).mean())
+        prob_b_better = float((b_samples > a_samples).mean())
+        
+        # Calculate average completion times
+        a_completed = variant_a[variant_a['action_type'] == 'completed']
+        b_completed = variant_b[variant_b['action_type'] == 'completed']
+        
+        a_avg_time = None
+        b_avg_time = None
+        
+        if len(a_completed) > 0 and 'completion_time' in a_completed.columns:
+            a_times = a_completed['completion_time'].dropna()
+            if len(a_times) > 0:
+                a_avg_time = float(a_times.mean())
+        
+        if len(b_completed) > 0 and 'completion_time' in b_completed.columns:
+            b_times = b_completed['completion_time'].dropna()
+            if len(b_times) > 0:
+                b_avg_time = float(b_times.mean())
         
         return {
             "status": "success",
@@ -119,13 +136,15 @@ async def get_stats(experiment_id: str = Query(...)):
                 "n_users": int(a_total),
                 "conversions": int(a_conversions),
                 "conversion_rate": round(a_rate, 4),
-                "credible_interval": [round(float(x), 4) for x in a_ci]
+                "credible_interval": [round(float(x), 4) for x in a_ci],
+                "avg_completion_time": round(a_avg_time, 2) if a_avg_time else None
             },
             "variant_b": {
                 "n_users": int(b_total),
                 "conversions": int(b_conversions),
                 "conversion_rate": round(b_rate, 4),
-                "credible_interval": [round(float(x), 4) for x in b_ci]
+                "credible_interval": [round(float(x), 4) for x in b_ci],
+                "avg_completion_time": round(b_avg_time, 2) if b_avg_time else None
             },
             "frequentist": {
                 "p_value": round(float(p_value), 4) if p_value else None,
