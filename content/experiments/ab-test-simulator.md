@@ -192,5 +192,5 @@ b_avg_time = b_completed['completion_time'].mean()
   <p>The 95% credible interval means: "We're 95% confident the true value is in this range."</p>
 </div>
 
-<link rel="stylesheet" href="/css/ab-simulator.css">
-<script src="/js/ab-simulator.js"></script>
+<link rel="stylesheet" href="/css/ab-simulator.css?v=1.1">
+<script src="/js/ab-simulator.js?v=1.1"></script>
