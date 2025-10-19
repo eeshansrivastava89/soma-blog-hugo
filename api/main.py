@@ -93,11 +93,19 @@ async def get_stats(experiment_id: str = Query(...)):
         p_value = None
         significant = False
         
-        if a_total >= 5 and b_total >= 5:
-            contingency = [[int(a_conversions), int(a_total - a_conversions)],
-                           [int(b_conversions), int(b_total - b_conversions)]]
-            chi2, p_value, dof, expected = scipy_stats.chi2_contingency(contingency)
-            significant = bool(p_value < 0.05)
+        # Need at least 5 in each cell for chi-square
+        if (a_total >= 5 and b_total >= 5 and 
+            a_conversions > 0 and b_conversions > 0 and
+            (a_total - a_conversions) > 0 and (b_total - b_conversions) > 0):
+            try:
+                contingency = [[int(a_conversions), int(a_total - a_conversions)],
+                               [int(b_conversions), int(b_total - b_conversions)]]
+                chi2, p_value, dof, expected = scipy_stats.chi2_contingency(contingency)
+                significant = bool(p_value < 0.05)
+            except Exception as e:
+                print(f"Chi-square test failed: {e}")
+                p_value = None
+                significant = False
         
         alpha, beta = 1, 1
         a_alpha = alpha + a_conversions
