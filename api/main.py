@@ -138,6 +138,22 @@ async def get_stats(experiment_id: str = Query(...)):
             if len(b_times) > 0:
                 b_avg_time = float(b_times.mean())
         
+        # Calculate funnel metrics
+        a_started = len(variant_a[variant_a['action_type'] == 'started'])
+        a_completed_count = len(variant_a[variant_a['action_type'] == 'completed'])
+        a_repeated = len(variant_a[variant_a['action_type'] == 'repeated'])
+        
+        b_started = len(variant_b[variant_b['action_type'] == 'started'])
+        b_completed_count = len(variant_b[variant_b['action_type'] == 'completed'])
+        b_repeated = len(variant_b[variant_b['action_type'] == 'repeated'])
+        
+        # Calculate rates
+        a_completion_rate_funnel = (a_completed_count / a_started * 100) if a_started > 0 else 0
+        a_repeat_rate = (a_repeated / a_completed_count * 100) if a_completed_count > 0 else 0
+        
+        b_completion_rate_funnel = (b_completed_count / b_started * 100) if b_started > 0 else 0
+        b_repeat_rate = (b_repeated / b_completed_count * 100) if b_completed_count > 0 else 0
+
         return {
             "status": "success",
             "variant_a": {
@@ -145,14 +161,28 @@ async def get_stats(experiment_id: str = Query(...)):
                 "conversions": int(a_conversions),
                 "conversion_rate": round(a_rate, 4),
                 "credible_interval": [round(float(x), 4) for x in a_ci],
-                "avg_completion_time": round(a_avg_time, 2) if a_avg_time else None
+                "avg_completion_time": round(a_avg_time, 2) if a_avg_time else None,
+                "funnel": {
+                    "started": int(a_started),
+                    "completed": int(a_completed_count),
+                    "repeated": int(a_repeated),
+                    "completion_rate": round(a_completion_rate_funnel, 1),
+                    "repeat_rate": round(a_repeat_rate, 1)
+                }
             },
             "variant_b": {
                 "n_users": int(b_total),
                 "conversions": int(b_conversions),
                 "conversion_rate": round(b_rate, 4),
                 "credible_interval": [round(float(x), 4) for x in b_ci],
-                "avg_completion_time": round(b_avg_time, 2) if b_avg_time else None
+                "avg_completion_time": round(b_avg_time, 2) if b_avg_time else None,
+                "funnel": {
+                    "started": int(b_started),
+                    "completed": int(b_completed_count),
+                    "repeated": int(b_repeated),
+                    "completion_rate": round(b_completion_rate_funnel, 1),
+                    "repeat_rate": round(b_repeat_rate, 1)
+                }
             },
             "frequentist": {
                 "p_value": round(float(p_value), 4) if p_value else None,

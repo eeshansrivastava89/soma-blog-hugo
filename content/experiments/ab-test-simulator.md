@@ -87,6 +87,55 @@ Welcome! This is an interactive simulator where you can see A/B testing and stat
     </div>
   </div>
   
+  <h4 style="margin-top: 2rem;">User Funnel</h4>
+  <div class="funnel-container">
+    <div class="funnel-variant">
+      <h5>Variant A</h5>
+      <div class="funnel-bar">
+        <div class="funnel-label">Started</div>
+        <div class="funnel-bar-fill" id="funnel-a-started" style="width: 0%; background-color: #3498db;">
+          <span class="funnel-count">0</span>
+        </div>
+      </div>
+      <div class="funnel-bar">
+        <div class="funnel-label">Completed</div>
+        <div class="funnel-bar-fill" id="funnel-a-completed" style="width: 0%; background-color: #27ae60;">
+          <span class="funnel-count">0</span>
+        </div>
+      </div>
+      <div class="funnel-bar">
+        <div class="funnel-label">Repeated</div>
+        <div class="funnel-bar-fill" id="funnel-a-repeated" style="width: 0%; background-color: #f39c12;">
+          <span class="funnel-count">0</span>
+        </div>
+      </div>
+      <p class="funnel-rates" id="funnel-a-rates">Completion: -% | Repeat: -%</p>
+    </div>
+    <!-- Funnel Visualization -->
+    <div class="funnel-variant">
+      <h5>Variant B</h5>
+      <div class="funnel-bar">
+        <div class="funnel-label">Started</div>
+        <div class="funnel-bar-fill" id="funnel-b-started" style="width: 0%; background-color: #3498db;">
+          <span class="funnel-count">0</span>
+        </div>
+      </div>
+      <div class="funnel-bar">
+        <div class="funnel-label">Completed</div>
+        <div class="funnel-bar-fill" id="funnel-b-completed" style="width: 0%; background-color: #27ae60;">
+          <span class="funnel-count">0</span>
+        </div>
+      </div>
+      <div class="funnel-bar">
+        <div class="funnel-label">Repeated</div>
+        <div class="funnel-bar-fill" id="funnel-b-repeated" style="width: 0%; background-color: #f39c12;">
+          <span class="funnel-count">0</span>
+        </div>
+      </div>
+      <p class="funnel-rates" id="funnel-b-rates">Completion: -% | Repeat: -%</p>
+    </div>
+  </div>
+  
   <p class="last-updated">Last updated: <span id="last-updated">never</span></p>
 </div>
 

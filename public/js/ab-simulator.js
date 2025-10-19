@@ -91,8 +91,8 @@ function setupPuzzle() {
   // Setup event listeners
   document.getElementById('start-button').addEventListener('click', startChallenge);
   document.getElementById('reset-button').addEventListener('click', resetPuzzle);
-  document.getElementById('try-again-button').addEventListener('click', resetPuzzle);
-  document.getElementById('try-again-failure-button').addEventListener('click', resetPuzzle);
+  document.getElementById('try-again-button').addEventListener('click', () => resetPuzzle(true));
+  document.getElementById('try-again-failure-button').addEventListener('click', () => resetPuzzle(true));
   document.getElementById('word-input').addEventListener('keypress', handleWordInput);
   
   document.getElementById('puzzle-container').style.display = 'block';
@@ -111,6 +111,9 @@ function startChallenge() {
   
   // Start timer
   puzzleState.timerInterval = setInterval(updateTimer, 100);
+
+  // Track "started" event
+  trackStarted();
 }
 
 function updateTimer() {
@@ -241,7 +244,7 @@ async function failChallenge() {
   await trackFailure();
 }
 
-function resetPuzzle() {
+function resetPuzzle(isRepeat = false) {
   puzzleState.isRunning = false;
   clearInterval(puzzleState.timerInterval);
   puzzleState.startTime = null;
@@ -262,6 +265,11 @@ function resetPuzzle() {
   const leaderboardDiv = document.getElementById('leaderboard-display');
   if (leaderboardDiv) {
     leaderboardDiv.style.display = 'none';
+  }
+  
+  // Track "repeated" event if this was triggered by Try Again button
+  if (isRepeat) {
+    trackRepeated();
   }
 }
 
@@ -343,6 +351,74 @@ async function trackFailure() {
     }
   } catch (error) {
     console.error('Error tracking failure:', error);
+  }
+}
+
+async function trackStarted() {
+  try {
+    const variant = puzzleState.variant;
+    const userId = localStorage.getItem('simulator_user_id');
+    
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost:8000/api/track'
+      : 'https://soma-blog-hugo.vercel.app/api/track';
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        experiment_id: EXPERIMENT_ID,
+        user_id: userId,
+        variant: variant,
+        converted: false,  // Started but not completed yet
+        action_type: 'started',
+        metadata: {
+          puzzle_type: 'word_search'
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      console.error('Error tracking started:', response.status);
+    }
+  } catch (error) {
+    console.error('Error tracking started:', error);
+  }
+}
+
+async function trackRepeated() {
+  try {
+    const variant = puzzleState.variant;
+    const userId = localStorage.getItem('simulator_user_id');
+    
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost:8000/api/track'
+      : 'https://soma-blog-hugo.vercel.app/api/track';
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        experiment_id: EXPERIMENT_ID,
+        user_id: userId,
+        variant: variant,
+        converted: false,  // Repeated attempt
+        action_type: 'repeated',
+        metadata: {
+          puzzle_type: 'word_search'
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      console.error('Error tracking repeated:', response.status);
+    }
+  } catch (error) {
+    console.error('Error tracking repeated:', error);
   }
 }
 
@@ -602,6 +678,44 @@ async function updateDashboard() {
         data.variant_b.avg_completion_time ? data.variant_b.avg_completion_time.toFixed(1) + 's' : '-';
       document.getElementById('variant-b-success-rate').textContent = 
         (data.variant_b.conversion_rate * 100).toFixed(1) + '%';
+
+      // Update funnel for both variants (using same scale)
+      if (data.variant_a.funnel && data.variant_b.funnel) {
+        const aFunnel = data.variant_a.funnel;
+        const bFunnel = data.variant_b.funnel;
+        
+        // Calculate max for each step across both variants
+        const maxStarted = Math.max(aFunnel.started, bFunnel.started, 1);
+        const maxCompleted = Math.max(aFunnel.completed, bFunnel.completed, 1);
+        const maxRepeated = Math.max(aFunnel.repeated, bFunnel.repeated, 1);
+        
+        // Update Variant A funnel
+        document.getElementById('funnel-a-started').style.width = ((aFunnel.started / maxStarted) * 100) + '%';
+        document.getElementById('funnel-a-started').querySelector('.funnel-count').textContent = aFunnel.started;
+        
+        document.getElementById('funnel-a-completed').style.width = ((aFunnel.completed / maxCompleted) * 100) + '%';
+        document.getElementById('funnel-a-completed').querySelector('.funnel-count').textContent = aFunnel.completed;
+        
+        document.getElementById('funnel-a-repeated').style.width = ((aFunnel.repeated / maxRepeated) * 100) + '%';
+        document.getElementById('funnel-a-repeated').querySelector('.funnel-count').textContent = aFunnel.repeated;
+        
+        document.getElementById('funnel-a-rates').textContent = 
+          `Completion: ${aFunnel.completion_rate}% | Repeat: ${aFunnel.repeat_rate}%`;
+        
+        // Update Variant B funnel
+        document.getElementById('funnel-b-started').style.width = ((bFunnel.started / maxStarted) * 100) + '%';
+        document.getElementById('funnel-b-started').querySelector('.funnel-count').textContent = bFunnel.started;
+        
+        document.getElementById('funnel-b-completed').style.width = ((bFunnel.completed / maxCompleted) * 100) + '%';
+        document.getElementById('funnel-b-completed').querySelector('.funnel-count').textContent = bFunnel.completed;
+        
+        document.getElementById('funnel-b-repeated').style.width = ((bFunnel.repeated / maxRepeated) * 100) + '%';
+        document.getElementById('funnel-b-repeated').querySelector('.funnel-count').textContent = bFunnel.repeated;
+        
+        document.getElementById('funnel-b-rates').textContent = 
+          `Completion: ${bFunnel.completion_rate}% | Repeat: ${bFunnel.repeat_rate}%`;
+      }
+      
       
       const now = new Date();
       document.getElementById('last-updated').textContent = now.toLocaleTimeString();

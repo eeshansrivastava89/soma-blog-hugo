@@ -216,3 +216,61 @@
     flex-direction: column;
   }
 }
+
+.funnel-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin: 1.5rem 0;
+}
+
+.funnel-variant {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.funnel-variant h5 {
+  margin: 0 0 1rem 0;
+  color: #333;
+}
+
+.funnel-bar {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.funnel-label {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.funnel-bar-fill {
+  height: 30px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding-left: 0.5rem;
+  transition: width 0.3s ease;
+  min-width: 40px;
+}
+
+.funnel-count {
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.funnel-rates {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .funnel-container {
+    grid-template-columns: 1fr;
+  }
+}
