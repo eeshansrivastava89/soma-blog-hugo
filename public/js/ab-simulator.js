@@ -1,0 +1,464 @@
+const EXPERIMENT_ID = '83cac599-f4bb-4d68-8b12-04458801a22b';
+let pollingInterval = null;
+let isPolling = false;
+
+// Puzzle configuration
+const PUZZLE_CONFIG = {
+  A: {
+    letters: ['M', 'A', 'T', 'H', 'E', 'M', 'A', 'T', 'I', 'C', 'S', 'L', 'O', 'W'],
+    targetWords: ['MATH', 'THEM', 'MACE'],
+    difficulty: 3,
+    targetCount: 3
+  },
+  B: {
+    letters: ['C', 'O', 'M', 'P', 'U', 'T', 'E', 'R', 'S', 'C', 'I', 'E', 'N', 'C', 'E', 'D', 'A', 'T', 'A'],
+    targetWords: ['COMP', 'PURE', 'ENCE', 'DATA'],
+    difficulty: 5,
+    targetCount: 4
+  }
+};
+
+// Fun username generator
+const ADJECTIVES = ['Lightning', 'Swift', 'Quick', 'Speedy', 'Rapid', 'Fast', 'Blazing', 'Turbo', 'Sonic', 'Flash'];
+const ANIMALS = ['Leopard', 'Cheetah', 'Falcon', 'Hawk', 'Fox', 'Wolf', 'Tiger', 'Eagle', 'Panther', 'Gazelle'];
+
+function generateUsername() {
+  const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+  const animal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+  return `${adj} ${animal}`;
+}
+
+let puzzleState = {
+  variant: null,
+  startTime: null,
+  isRunning: false,
+  guessedWords: [],
+  foundWords: [],
+  timerInterval: null,
+  completionTime: null
+};
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  initializeVariant();
+  displayVariant();
+  setupPuzzle();
+  setupPollingToggle();
+});
+
+function initializeVariant() {
+  if (!localStorage.getItem('simulator_variant')) {
+    const variant = Math.random() < 0.5 ? 'A' : 'B';
+    localStorage.setItem('simulator_variant', variant);
+    
+    const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('simulator_user_id', userId);
+  }
+  
+  // Always ensure username exists
+  if (!localStorage.getItem('simulator_username')) {
+    const username = generateUsername();
+    localStorage.setItem('simulator_username', username);
+  }
+}
+
+function displayVariant() {
+  const variant = localStorage.getItem('simulator_variant');
+  puzzleState.variant = variant;
+  
+  document.getElementById('user-variant').textContent = 'Variant ' + variant;
+  
+  const difficulty = PUZZLE_CONFIG[variant].difficulty;
+  document.getElementById('difficulty-display').textContent = `Difficulty: ${difficulty}/10`;
+  document.getElementById('target-word-count').textContent = PUZZLE_CONFIG[variant].targetCount;
+}
+
+function setupPuzzle() {
+  const variant = puzzleState.variant;
+  const config = PUZZLE_CONFIG[variant];
+  
+  // Display letter grid
+  const grid = document.getElementById('letter-grid');
+  grid.innerHTML = '';
+  
+  // Create grid
+  const gridHTML = config.letters.map((letter, idx) => {
+    return `<div class="letter">${letter}</div>`;
+  }).join('');
+  
+  grid.innerHTML = gridHTML;
+  
+  // Setup event listeners
+  document.getElementById('start-button').addEventListener('click', startChallenge);
+  document.getElementById('reset-button').addEventListener('click', resetPuzzle);
+  document.getElementById('try-again-button').addEventListener('click', resetPuzzle);
+  document.getElementById('word-input').addEventListener('keypress', handleWordInput);
+  
+  document.getElementById('puzzle-container').style.display = 'block';
+}
+
+function startChallenge() {
+  puzzleState.startTime = Date.now();
+  puzzleState.isRunning = true;
+  puzzleState.guessedWords = [];
+  puzzleState.foundWords = [];
+  
+  document.getElementById('start-button').style.display = 'none';
+  document.getElementById('reset-button').style.display = 'inline-block';
+  document.getElementById('word-input').style.display = 'block';
+  document.getElementById('word-input').focus();
+  
+  // Start timer
+  puzzleState.timerInterval = setInterval(updateTimer, 100);
+}
+
+function updateTimer() {
+  const elapsed = Date.now() - puzzleState.startTime;
+  const minutes = Math.floor(elapsed / 60000);
+  const seconds = Math.floor((elapsed % 60000) / 1000);
+  const milliseconds = Math.floor((elapsed % 1000) / 10);
+  
+  const display = 
+    String(minutes).padStart(2, '0') + ':' +
+    String(seconds).padStart(2, '0') + ':' +
+    String(milliseconds).padStart(2, '0');
+  
+  document.getElementById('timer').textContent = display;
+}
+
+function handleWordInput(event) {
+  if (event.key !== 'Enter') return;
+  
+  const word = event.target.value.toUpperCase().trim();
+  event.target.value = '';
+  
+  if (!word) return;
+  
+  const variant = puzzleState.variant;
+  const config = PUZZLE_CONFIG[variant];
+  
+  // Track guessed word
+  puzzleState.guessedWords.push(word);
+  
+  // Check if word is in target list and not already found
+  if (config.targetWords.includes(word) && !puzzleState.foundWords.includes(word)) {
+    puzzleState.foundWords.push(word);
+    updateFoundWordsList();
+    
+    // Check if all words found
+    if (puzzleState.foundWords.length === config.targetCount) {
+      completeChallenge();
+    }
+  }
+}
+
+function updateFoundWordsList() {
+  const list = puzzleState.foundWords.join(', ');
+  document.getElementById('found-words-list').textContent = list || '(none yet)';
+}
+
+async function completeChallenge() {
+  puzzleState.isRunning = false;
+  clearInterval(puzzleState.timerInterval);
+  
+  puzzleState.completionTime = Date.now() - puzzleState.startTime;
+  
+  document.getElementById('word-input').style.display = 'none';
+  document.getElementById('reset-button').style.display = 'none';
+  
+  // Format time for display
+  const minutes = Math.floor(puzzleState.completionTime / 60000);
+  const seconds = Math.floor((puzzleState.completionTime % 60000) / 1000);
+  const milliseconds = Math.floor((puzzleState.completionTime % 1000) / 10);
+  
+  const timeDisplay = 
+    String(minutes).padStart(2, '0') + ':' +
+    String(seconds).padStart(2, '0') + ':' +
+    String(milliseconds).padStart(2, '0');
+  
+  // Update completion message
+  document.getElementById('completion-time-display').textContent = timeDisplay;
+  document.getElementById('completion-guesses').textContent = puzzleState.guessedWords.length;
+  
+  // Show completion message
+  document.getElementById('completion-message').style.display = 'block';
+  
+  // Update leaderboard
+  updateLeaderboard(puzzleState.completionTime);
+  
+  // Track completion first
+  await trackCompletion();
+  
+  // Then fetch variant comparison
+  await fetchVariantComparison();
+}
+
+function resetPuzzle() {
+  puzzleState.isRunning = false;
+  clearInterval(puzzleState.timerInterval);
+  puzzleState.startTime = null;
+  puzzleState.guessedWords = [];
+  puzzleState.foundWords = [];
+  puzzleState.completionTime = null;
+  
+  document.getElementById('timer').textContent = '00:00:00';
+  document.getElementById('start-button').style.display = 'inline-block';
+  document.getElementById('reset-button').style.display = 'none';
+  document.getElementById('word-input').style.display = 'none';
+  document.getElementById('word-input').value = '';
+  document.getElementById('found-words-list').textContent = '(none yet)';
+  document.getElementById('completion-message').style.display = 'none';
+  
+  // Hide leaderboard
+  const leaderboardDiv = document.getElementById('leaderboard-display');
+  if (leaderboardDiv) {
+    leaderboardDiv.style.display = 'none';
+  }
+}
+
+async function trackCompletion() {
+  try {
+    const variant = puzzleState.variant;
+    const userId = localStorage.getItem('simulator_user_id');
+    
+    const completionTimeSeconds = (puzzleState.completionTime / 1000).toFixed(3);
+    
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost:8000/api/track'
+      : 'https://soma-blog-hugo.vercel.app/api/track';
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        experiment_id: EXPERIMENT_ID,
+        user_id: userId,
+        variant: variant,
+        converted: true,
+        action_type: 'completed',
+        completion_time: parseFloat(completionTimeSeconds),
+        success: true,
+        correct_words_count: puzzleState.foundWords.length,
+        total_guesses_count: puzzleState.guessedWords.length,
+        metadata: {
+          found_words: puzzleState.foundWords,
+          puzzle_type: 'word_search'
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      console.error('Error tracking completion:', response.status);
+    }
+  } catch (error) {
+    console.error('Error tracking completion:', error);
+  }
+}
+
+async function fetchVariantComparison() {
+  try {
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost:8000/api/stats?experiment_id=' + EXPERIMENT_ID
+      : 'https://soma-blog-hugo.vercel.app/api/stats?experiment_id=' + EXPERIMENT_ID;
+    
+    const response = await fetch(apiUrl);
+    
+    if (!response.ok) {
+      document.getElementById('comparison-text').textContent = 
+        'Comparison data unavailable. Try again!';
+      return;
+    }
+    
+    const data = await response.json();
+    
+    if (data.status !== 'success') {
+      document.getElementById('comparison-text').textContent = 
+        'Not enough data yet for comparison.';
+      return;
+    }
+    
+    const userVariant = puzzleState.variant;
+    const userTime = puzzleState.completionTime / 1000; // convert to seconds
+    
+    let avgTime, otherVariantAvg, variantName;
+    
+    if (userVariant === 'A') {
+      avgTime = data.variant_a.avg_completion_time;
+      otherVariantAvg = data.variant_b.avg_completion_time;
+      variantName = 'A';
+    } else {
+      avgTime = data.variant_b.avg_completion_time;
+      otherVariantAvg = data.variant_a.avg_completion_time;
+      variantName = 'B';
+    }
+    
+    let comparisonHTML = '';
+    
+    if (avgTime) {
+      const diff = userTime - avgTime;
+      const diffAbs = Math.abs(diff);
+      const otherName = userVariant === 'A' ? 'B' : 'A';
+      
+      if (diff < 0) {
+        comparisonHTML += `⚡ ${diffAbs.toFixed(1)}s faster than ${variantName}`;
+      } else if (diff > 0) {
+        comparisonHTML += `${diffAbs.toFixed(1)}s slower than ${variantName}`;
+      } else {
+        comparisonHTML += `Matched ${variantName} average!`;
+      }
+      
+      if (otherVariantAvg) {
+        comparisonHTML += ` <span style="margin: 0 0.5rem; color: #999;">|</span> ${otherName} avg: ${otherVariantAvg.toFixed(1)}s`;
+      }
+    }
+    
+    if (comparisonHTML) {
+      document.getElementById('comparison-text').innerHTML = comparisonHTML;
+    } else {
+      document.getElementById('comparison-text').textContent = 
+        'Great job completing the challenge!';
+    }
+    
+  } catch (error) {
+    console.error('Error fetching comparison:', error);
+    document.getElementById('comparison-text').textContent = 
+      'Comparison unavailable. Nice work!';
+  }
+}
+
+function updateLeaderboard(completionTime) {
+  const username = localStorage.getItem('simulator_username');
+  const variant = puzzleState.variant;
+  
+  // Get existing leaderboard or create new one
+  let leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+  
+  // Add new entry
+  leaderboard.push({
+    username: username,
+    time: completionTime / 1000, // convert to seconds
+    variant: variant,
+    timestamp: Date.now()
+  });
+  
+  // Sort by time (fastest first)
+  leaderboard.sort((a, b) => a.time - b.time);
+  
+  // Keep only top 50
+  leaderboard = leaderboard.slice(0, 50);
+  
+  // Save back to localStorage
+  localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+  
+  // Display leaderboard
+  displayLeaderboard();
+}
+
+function displayLeaderboard() {
+  const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+  const username = localStorage.getItem('simulator_username');
+  
+  if (leaderboard.length === 0) {
+    return; // No data yet
+  }
+  
+  // Get top 10
+  const top10 = leaderboard.slice(0, 10);
+  
+  let html = '<div style="margin-top: 2rem; padding: 1.5rem; background-color: #f0f0f0; border-radius: 8px;">';
+  html += '<h4 style="margin: 0 0 1rem 0; color: #333;">🏆 Leaderboard (Top 10)</h4>';
+  html += '<div style="font-size: 0.9rem;">';
+  
+  top10.forEach((entry, index) => {
+    const isCurrentUser = entry.username === username;
+    const bgColor = isCurrentUser ? '#fff3cd' : 'white';
+    const fontWeight = isCurrentUser ? 'bold' : 'normal';
+    
+    html += `<div style="display: flex; justify-content: space-between; padding: 0.5rem; margin-bottom: 0.25rem; background-color: ${bgColor}; border-radius: 4px; font-weight: ${fontWeight};">`;
+    html += `<span>${index + 1}. ${entry.username}</span>`;
+    html += `<span>${entry.time.toFixed(1)}s (${entry.variant})</span>`;
+    html += `</div>`;
+  });
+  
+  html += '</div></div>';
+  
+  // Insert after completion message
+  const completionMsg = document.getElementById('completion-message');
+  let leaderboardDiv = document.getElementById('leaderboard-display');
+  
+  if (!leaderboardDiv) {
+    leaderboardDiv = document.createElement('div');
+    leaderboardDiv.id = 'leaderboard-display';
+    completionMsg.parentNode.insertBefore(leaderboardDiv, completionMsg.nextSibling);
+  }
+  
+  leaderboardDiv.innerHTML = html;
+  leaderboardDiv.style.display = 'block';
+}
+
+function setupPollingToggle() {
+  const toggleBtn = document.getElementById('polling-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', togglePolling);
+  }
+}
+
+function togglePolling() {
+  const toggleBtn = document.getElementById('polling-toggle');
+  
+  if (isPolling) {
+    clearInterval(pollingInterval);
+    isPolling = false;
+    toggleBtn.textContent = '▶ Enable Live Refresh';
+    toggleBtn.style.backgroundColor = '#666';
+  } else {
+    isPolling = true;
+    toggleBtn.textContent = '⏸ Disable Live Refresh';
+    toggleBtn.style.backgroundColor = '#27ae60';
+    
+    updateDashboard();
+    pollingInterval = setInterval(updateDashboard, 10000);
+  }
+}
+
+async function updateDashboard() {
+  try {
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost:8000/api/stats?experiment_id=' + EXPERIMENT_ID
+      : 'https://soma-blog-hugo.vercel.app/api/stats?experiment_id=' + EXPERIMENT_ID;
+    
+    const response = await fetch(apiUrl);
+    
+    if (!response.ok) {
+      console.error('Error fetching stats:', response.status);
+      return;
+    }
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      // Update variant A
+      document.getElementById('variant-a-users').textContent = data.variant_a.n_users;
+      document.getElementById('variant-a-completions').textContent = data.variant_a.conversions;
+      document.getElementById('variant-a-avg-time').textContent = 
+        data.variant_a.avg_completion_time ? data.variant_a.avg_completion_time.toFixed(1) + 's' : '-';
+      document.getElementById('variant-a-success-rate').textContent = 
+        (data.variant_a.conversion_rate * 100).toFixed(1) + '%';
+      
+      // Update variant B
+      document.getElementById('variant-b-users').textContent = data.variant_b.n_users;
+      document.getElementById('variant-b-completions').textContent = data.variant_b.conversions;
+      document.getElementById('variant-b-avg-time').textContent = 
+        data.variant_b.avg_completion_time ? data.variant_b.avg_completion_time.toFixed(1) + 's' : '-';
+      document.getElementById('variant-b-success-rate').textContent = 
+        (data.variant_b.conversion_rate * 100).toFixed(1) + '%';
+      
+      const now = new Date();
+      document.getElementById('last-updated').textContent = now.toLocaleTimeString();
+    }
+  } catch (error) {
+    console.error('Error updating dashboard:', error);
+  }
+}
