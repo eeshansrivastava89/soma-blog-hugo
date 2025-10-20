@@ -1,13 +1,14 @@
 services:
   # Service 1: The Hugo Static Site (Frontend)
-  - type: static_site
+  - type: web
     name: hugo-frontend
+    runtime: static
     buildCommand: hugo --gc --minify
     staticPublishPath: public
     routes:
       - type: rewrite
         source: /api/*
-        destination: /api/*
+        destination: http://python-api:10000/api/*
 
   # Service 2: The Python API (Backend)
   - type: web
@@ -15,7 +16,7 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install -r api/requirements.txt
-    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port 10000
     healthCheckPath: /api/health
     envVars:
       - key: PYTHON_VERSION
