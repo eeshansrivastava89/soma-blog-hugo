@@ -1,5 +1,7 @@
 {
-  "builder": "python",
+  "setup": {
+    "packages": ["python@3.11", "pip"]
+  },
   "build": {
     "command": "pip install -r api/requirements.txt"
   },
