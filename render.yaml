@@ -8,7 +8,7 @@ services:
     routes:
       - type: rewrite
         source: /api/*
-        destination: https://python-api-nj0d.onrender.com/*
+        destination: https://python-api-nj0d.onrender.com/api/*
 
   # Service 2: The Python API (Backend)
   - type: web
