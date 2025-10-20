@@ -1,8 +1,7 @@
 services:
   # Service 1: The Hugo Static Site (Frontend)
-  - type: static
+  - type: static_site
     name: hugo-frontend
-    env: static
     buildCommand: hugo --gc --minify
     staticPublishPath: public
     routes:
@@ -13,7 +12,6 @@ services:
   # Service 2: The Python API (Backend)
   - type: web
     name: python-api
-    env: python
     runtime: python
     plan: free
     buildCommand: pip install -r api/requirements.txt
