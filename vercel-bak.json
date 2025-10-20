@@ -15,3 +15,15 @@
     }
   ]
 }
+
+// {
+//   "$schema": "https://openapi.vercel.sh/vercel.json",
+//   "buildCommand": "chmod a+x build.sh && ./build.sh",
+//   "outputDirectory": "public",
+//   "rewrites": [
+//     {
+//       "source": "/api/(.*)",
+//       "destination": "/api/main.py"
+//     }
+//   ]
+// }
