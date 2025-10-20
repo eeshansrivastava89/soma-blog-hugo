@@ -12,6 +12,7 @@ Welcome! This is an interactive simulator where you can see A/B testing and stat
 <div id="puzzle-section" class="simulator-section">
   <h3>Your Challenge</h3>
   <p>You are in: <strong id="user-variant">Loading...</strong></p>
+  <p>Username: <strong id="user-username">Loading...</strong></p>
   <p id="difficulty-display"></p>
   
   <div id="puzzle-container" style="display: none;">

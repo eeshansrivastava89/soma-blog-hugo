@@ -60,17 +60,22 @@ function initializeVariant() {
     const username = generateUsername();
     localStorage.setItem('simulator_username', username);
   }
+
 }
 
 function displayVariant() {
+
   const variant = localStorage.getItem('simulator_variant');
   puzzleState.variant = variant;
   
-  document.getElementById('user-variant').textContent = 'Variant ' + variant;
-  
+  const username = localStorage.getItem('simulator_username');
   const difficulty = PUZZLE_CONFIG[variant].difficulty;
+  
+  document.getElementById('user-variant').textContent = 'Variant ' + variant;
+  document.getElementById('user-username').textContent = username || 'Loading...';
   document.getElementById('difficulty-display').textContent = `Difficulty: ${difficulty}/10`;
   document.getElementById('target-word-count').textContent = PUZZLE_CONFIG[variant].targetCount;
+
 }
 
 function setupPuzzle() {
