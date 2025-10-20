@@ -4,7 +4,6 @@
   "outputDirectory": "public",
   "functions": {
     "api/**/*.py": {
-      "runtime": "python@3.11",
       "excludeFiles": "{public,content,themes,static,resources,.git,.github,node_modules,*.md,*.cache}/**"
     }
   },
