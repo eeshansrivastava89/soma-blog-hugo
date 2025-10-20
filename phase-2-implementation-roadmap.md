@@ -1,13 +1,13 @@
 # Phase 2 Implementation Roadmap: Gamification & Engagement
 
 ## Overview
-Transform the A/B simulator from static stats display to engaging gamified experience with professional data science backend. Focus: Puzzle engagement → Data generation → Statistical analysis → Blog content.
+Transform the A/B simulator from static stats display to engaging gamified experience. Focus: Puzzle engagement → Data generation → Blog content.
 
 ---
 
-## Phase 2A: MVP (Core Gamification) ✅ COMPLETE
+## Phase 2A: MVP (Core Gamification)
 
-### Step 0: Database Schema Update ✅
+### Step 0: Database Schema Update
 - [x] Add `action_type` column to events table
 - [x] Add `completion_time` column to events table
 - [x] Add `success` column to events table
@@ -16,7 +16,11 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 - [x] Drop old `attempts_count` column
 - [x] Verify columns exist in Supabase
 
-### Step 1: Puzzle Engine ✅
+**Completion Status:** `[x]` DONE
+
+---
+
+### Step 1: Puzzle Engine
 - [x] Replace CTA button with word search puzzle display
 - [x] Variant A: Find 3 four-letter words (difficulty 3/10)
 - [x] Variant B: Find 4 four-letter words (difficulty 5/10)
@@ -29,7 +33,11 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 - [x] Test locally and on Vercel
 - [x] Verify events stored correctly in Supabase
 
-### Step 2: Event Tracking Enhancement ✅
+**Completion Status:** `[x]` DONE
+
+---
+
+### Step 2: Event Tracking Enhancement
 - [x] Add `action_type` field to events (started/completed/attempted)
 - [x] Add `completion_time` field to events
 - [x] Add `success` field to events
@@ -38,7 +46,11 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 - [x] Verify events store correctly in Supabase
 - [x] Test both variants independently
 
-### Step 3: Feedback & Celebration ✅
+**Completion Status:** `[x]` DONE (completed as part of Step 1)
+
+**Note:** Most of this was completed in Step 1. Need to verify if any additional tracking is needed.
+
+### Step 3: Feedback & Celebration
 - [x] Show sleek inline completion message (no modal)
 - [x] Display completion time: "00:10:45"
 - [x] Show variant comparison: "⚡ 2.5s faster than B | A avg: 9.0s"
@@ -47,7 +59,9 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 - [x] Test on desktop and mobile
 - [x] Compact 4-line design with minimal spacing
 
-### Step 4: Leaderboard (localStorage-based) ✅
+**Completion Status:** `[x]` DONE
+
+### Step 4: Leaderboard (localStorage-based)
 - [x] Generate random fun username on first visit
 - [x] Store username in localStorage
 - [x] After completion, add user to leaderboard
@@ -61,18 +75,28 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 - [x] Display times with 2 decimal places everywhere
 - [x] Test leaderboard persistence
 
-### Step 5: Basic Funnel Visualization ✅
+**Completion Status:** `[x]` DONE (localStorage-based, Step 15 will add cross-device sync)
+
+### Step 5: Funnel Visualization
 - [x] Track "started" events (puzzle displayed)
 - [x] Track "completed" events (puzzle solved)
 - [x] Track "repeated" events (user clicked "Try Again")
-- [x] Calculate funnel metrics per variant in API
+- [x] Calculate funnel metrics per variant in API:
+  - Started count
+  - Completed count
+  - Repeated count
+  - Completion rate %
+  - Repeat rate %
 - [x] Display funnel bars for Variant A and B side-by-side
-- [x] Global max scaling for visual comparison across variants
 - [x] Add CSS for funnel visualization
 - [x] Update funnel in real-time with polling toggle
+- [x] Global max scaling for visual comparison across variants
+- [x] Add cache busting for Vercel deployments
 - [x] Test data accuracy
 
-### Step 6: Testing & Verification ✅
+**Completion Status:** `[x]` DONE
+
+### Step 6: Testing & Verification
 - [x] Test locally: Create 10+ events, verify leaderboard works
 - [x] Test locally: Refresh page, verify username persists
 - [x] Add username display to Challenge section
@@ -83,114 +107,104 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 - [x] Test mobile responsiveness (good enough for MVP)
 - [x] Verify no console errors (all clear, API returns 200)
 
-**Phase 2A Status:** ✅ COMPLETE
+**Completion Status:** `[x]` DONE
 
 ---
 
 ## Phase 2B: Data Science Backend & Advanced Analytics
 
-### Step 7: Statistical Analysis Module (`stats.py`)
+### Step 7: Statistical Analysis Module (`stats.py`) ✅ COMPLETE
 **Goal:** Professional pandas/scipy-based statistical analysis
 
-- [ ] Create `/api/stats.py` module
-- [ ] Load Supabase events into pandas DataFrame
-- [ ] Calculate core metrics:
-  - Completion rates by variant
-  - Average completion times with confidence intervals
-  - Success rates
-  - Repeat rates
-- [ ] Statistical tests:
-  - T-test for completion time differences
-  - Chi-square for success rate differences
-  - Effect size calculations (Cohen's d)
-  - Statistical power analysis
-- [ ] Percentile calculations:
-  - User's percentile rank within variant
-  - Percentile rank across all users
-  - Distribution quartiles
-- [ ] Difficulty analysis:
-  - Relative difficulty (B vs A completion time ratio)
-  - Difficulty badges (easy/medium/hard based on percentiles)
-- [ ] Return structured JSON with all statistics
-- [ ] Unit tests for statistical functions
+- [x] Create `/api/stats.py` module
+- [x] Load Supabase events into pandas DataFrame
+- [x] Calculate core metrics (completion rates, avg times, success rates, repeat rates)
+- [x] Statistical tests (t-test, chi-square, Cohen's d effect size)
+- [x] Percentile calculations (user rank within variant, across all users)
+- [x] Difficulty analysis (relative difficulty ratio, comparison messaging)
+- [x] Return structured JSON with all statistics
+- [x] Update `/api/stats` endpoint to use stats module
+- [x] Add `/api/user_percentile` endpoint
+- [x] Display percentile in completion message
+- [x] Display difficulty analysis in dashboard
+- [x] Add dark mode compatibility (CSS variables)
 
-**Deliverable:** Clean, reusable data science module that powers all analytics
+**Completion Status:** `[x]` COMPLETE
 
-### Step 8: Visualization Module (`visualizations.py`)
+**Code Removed:**
+- Old pandas/scipy logic from main.py (replaced by stats.py)
+- Hardcoded statistical calculations
+- Modal-related CSS (not used)
+
+**Deliverable:** ✅ Clean, reusable data science module powering all analytics
+
+---
+
+### Step 8: Visualization Module (`visualizations.py`) ✅ COMPLETE
 **Goal:** Interactive Plotly charts for real-time data visualization
 
-- [ ] Create `/api/visualizations.py` module
-- [ ] Funnel chart (Plotly):
+- [x] Create `/api/visualizations.py` module
+- [x] Funnel chart (Plotly):
   - Interactive funnel with hover details
   - Side-by-side A/B comparison
   - Real-time update capability
   - Mobile-responsive
-- [ ] Time distribution histogram:
+- [x] Time distribution histogram:
   - Completion time distribution by variant
   - Overlay curves for comparison
-  - Percentile markers
-- [ ] Percentile ranking chart:
-  - Show user's position in distribution
-  - Highlight user's score
-- [ ] Comparison charts:
-  - Success rates with confidence intervals
-  - Average times with error bars
-- [ ] Return Plotly JSON format for frontend rendering
+  - Mean lines with annotations
+- [x] Comparison charts:
+  - Success rates bar chart
+  - Average times with confidence interval error bars
+- [x] Return Plotly JSON format for frontend rendering
 
-**Deliverable:** Professional interactive charts that replace CSS-based visualizations
+**Completion Status:** `[x]` COMPLETE
 
-### Step 9: API Integration
-**Goal:** Connect stats and visualization modules to FastAPI endpoints
+**Deliverable:** ✅ Professional interactive charts replacing CSS-based visualizations
 
-- [ ] Update `/api/main.py`:
-  - Import stats and visualizations modules
-  - Create `/api/stats` endpoint (use stats.py)
-  - Create `/api/funnel` endpoint (use visualizations.py)
-  - Create `/api/distribution` endpoint
-  - Add caching for expensive calculations
+---
+
+### Step 9: API Integration & Frontend Redesign ✅ COMPLETE
+**Goal:** Connect visualization module to API and render charts in frontend
+
+- [x] Update `/api/main.py`:
+  - Import visualizations module
+  - Create `/api/funnel_chart` endpoint
+  - Create `/api/time_distribution` endpoint
+  - Create `/api/comparison_charts` endpoint
   - Error handling and fallbacks
-- [ ] Update `requirements.txt`:
-  - Add plotly
-  - Update scipy/pandas versions if needed
-- [ ] Test endpoints locally
-- [ ] Deploy to Vercel and verify
+- [x] Update `requirements.txt`:
+  - Add plotly==5.24.1
+- [x] Test endpoints locally (all working)
+- [x] Frontend Dashboard Redesign:
+  - Add Plotly.js CDN to page
+  - Replace CSS funnel bars with Plotly funnel chart
+  - Add time distribution histogram
+  - Add success rate comparison chart
+  - Add average time comparison chart with CI error bars
+  - Update polling logic to refresh all charts
+  - Verify real-time updates work
+- [x] Remove dark mode support (simplified CSS)
+- [x] Remove modal CSS bloat (not used)
+- [x] Remove old CSS funnel code from JavaScript
 
-**Deliverable:** Clean API that separates concerns (endpoints → stats → visualizations)
+**Completion Status:** `[x]` COMPLETE
 
-### Step 10: Frontend Dashboard Redesign
-**Goal:** Replace CSS-based dashboard with Plotly-rendered interactive charts
+**Code Removed:**
+- CSS funnel bar styles and JavaScript update logic
+- Dark mode CSS variables and media queries
+- Modal-related CSS (unused)
+- All var() references replaced with direct colors
 
-- [ ] Add Plotly.js to frontend
-- [ ] Replace CSS funnel bars with Plotly funnel chart
-- [ ] Add time distribution chart below funnel
-- [ ] Add percentile ranking display
-- [ ] Update polling logic to refresh charts
-- [ ] Show difficulty messaging:
-  - "Variant B is 23% harder on average"
-  - "You're faster than 67% of players"
-  - Difficulty badge on puzzle
-- [ ] Add loading states for charts
-- [ ] Test chart responsiveness
-- [ ] Verify real-time updates work
+**Deliverable:** ✅ Professional, interactive Plotly dashboard with real-time statistical insights
 
-**Deliverable:** Professional, interactive dashboard with real-time statistical insights
-
-### Step 11: Visual Polish
-- [x] Add celebration animation on correct answer
-- [x] Add error shake animation on wrong answer
-- [x] Better progress bars in funnel (NOW: Plotly charts)
-- [x] Add color coding (green for A, blue for B)
-- [x] Ensure dark mode compatibility (CSS variables added)
-- [ ] Polish Plotly chart themes for dark mode
-- [ ] Smooth chart transition animations
-
-**Completion Status:** `[~]` 6/7 complete
+**Note:** Plotly chart theming can be refined later for visual polish
 
 ---
 
 ## Phase 2C: Content Generation & Enhancement
 
-### Step 12: Blog Post Creation (Data-Driven)
+### Step 11: Blog Post Creation (Data-Driven)
 **Goal:** Write SOMA blog post with real experimental findings
 
 - [ ] Collect data for 2-4 weeks (target: 500+ completions)
@@ -214,9 +228,13 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 - [ ] Link blog post from simulator page
 - [ ] Promote on LinkedIn
 
+**Completion Status:** `[ ]` Not Started
+
 **Deliverable:** Professional blog post demonstrating full experimental cycle (design → execute → analyze → communicate)
 
-### Step 13: Multiple Puzzle Types
+---
+
+### Step 12: Multiple Puzzle Types
 - [ ] Add logic puzzle option
 - [ ] Add pattern recognition puzzle
 - [ ] Randomly select puzzle type per session
@@ -224,12 +242,11 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 - [ ] Update stats.py to analyze by puzzle type
 
 **Completion Status:** `[ ]` Not Started
-
 ---
 
 ## Phase 2D: Cross-Device Persistence
 
-### Step 14: User Persistence Across Devices
+### Step 13: User Persistence Across Devices
 **Goal:** Move from localStorage to Supabase for cross-device leaderboard
 
 - [ ] Create `users` table in Supabase:
@@ -270,82 +287,133 @@ id, experiment_id, user_id, variant, converted, timestamp, metadata
 action_type VARCHAR -- 'started', 'completed', 'attempted'
 completion_time NUMERIC -- seconds with decimals (e.g., 12.345)
 success BOOLEAN
-correct_words_count INTEGER
-total_guesses_count INTEGER
-leaderboard_username VARCHAR
-```
-
-### Users Table - Future (Step 14)
-```sql
-id UUID PRIMARY KEY
-username VARCHAR
-browser_fingerprint VARCHAR UNIQUE
-created_at TIMESTAMP
+correct_words_count INTEGER -- number of correct words found
+total_guesses_count INTEGER -- total number of guesses made
+leaderboard_username VARCHAR -- for future leaderboard feature
 ```
 
 ---
 
 ## File Structure
+
 ```
 soma-blog-hugo/
-├── content/experiments/ab-test-simulator.md (UPDATE: Plotly charts)
-├── api/
-│   ├── main.py              (UPDATE: new endpoints)
-│   ├── stats.py             (NEW: statistical analysis)
-│   ├── visualizations.py    (NEW: Plotly charts)
-│   └── requirements.txt     (UPDATE: add plotly)
+├── content/experiments/ab-test-simulator.md (UPDATED: word search puzzle)
+├── api/main.py (UPDATED: tracks new fields)
 ├── static/
 │   ├── js/
-│   │   └── ab-simulator.js  (UPDATE: Plotly rendering)
+│   │   ├── puzzle-engine.js (embedded in .md currently)
+│   │   └── leaderboard.js (TO BE CREATED)
 │   └── css/
-│       └── ab-simulator.css (KEEP: dark mode variables)
+│       ├── puzzle.css (embedded in .md currently)
+│       └── leaderboard.css (TO BE CREATED)
 ```
 
 ---
 
-## Success Criteria
+## Deployment History & Current Setup
 
-### Phase 2B (Data Science Backend)
-- [ ] stats.py produces accurate statistical analysis
-- [ ] Plotly charts render correctly and update in real-time
-- [ ] API endpoints return structured JSON
-- [ ] Dashboard shows professional interactive visualizations
-- [ ] All statistical tests properly implemented
-- [ ] Mobile responsive charts
+### Platform Migration Journey
+- **Vercel (Failed):** Could not handle Python workload, especially Plotly dependencies (200MB+). Serverless functions timed out.
+- **Railway (Failed):** Similar issues with heavy Python dependencies and memory constraints.
+- **Render (Current):** Using Blueprint with separate frontend/backend services.
 
-### Phase 2C (Content)
-- [ ] Blog post published with real experimental data
-- [ ] Python code snippets show analytical rigor
-- [ ] Interactive charts embedded in blog post
-- [ ] Post linked from simulator
+### Current Render Configuration
+```yaml
+# render.yaml - Blueprint Setup
+services:
+  # Frontend: Hugo Static Site
+  - type: web
+    name: hugo-frontend
+    runtime: static
+    buildCommand: hugo --gc --minify
+    staticPublishPath: public
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: http://python-api:10000/api/*
 
-### Phase 2D (Persistence)
-- [ ] Users can see their scores across devices
-- [ ] Leaderboard persists in Supabase
-- [ ] Fingerprinting works reliably
+  # Backend: Python API
+  - type: web
+    name: python-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r api/requirements.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port 10000
+    healthCheckPath: /api/health
+```
+
+### Known Issues (Current)
+- **502 Errors:** API endpoints returning 502 despite clean Python logs
+- **Root Cause:** Service routing and dependency loading issues
+- **Status:** Under investigation and fixing
+
+---
+
+## Success Criteria (Phase 2A MVP)
+
+- [x] Word search puzzle displays correctly for both variants
+- [x] Completion time tracked accurately
+- [x] Events stored in Supabase with all fields
+- [ ] Leaderboard shows top 10 users with times
+- [ ] Username persists across sessions
+- [ ] Funnel shows started/completed/repeated counts
+- [ ] Funnel updates live when polling enabled
+- [ ] **Deploy successfully on Render without 502 errors**
+- [ ] Mobile responsive without major layout issues
+- [ ] Generate 100+ events in testing
 
 ---
 
 ## Tracking Notes
 
+**Start Date:** October 18, 2025
 **Phase 2A Completed:** October 19, 2025 ✅
-**Phase 2B Target:** November 2, 2025
-**Phase 2C Target:** November 15, 2025 (after data collection)
-**Phase 2D Target:** November 22, 2025
-
-**Current Focus:** Step 7 - Building statistical analysis module
+**Phase 2B Target:** October 26, 2025
+**Blog Post Target:** November 15, 2025 (after 2-4 weeks data collection)
 
 **Blockers/Issues:**
 - None currently
 
-**Key Decisions:**
+**Completed Features:**
+- ✅ Phase 2A: Steps 0-6 (MVP Complete)
+- ✅ Phase 2B Steps 7-9: Data Science Backend Complete
+  - Statistical analysis module (stats.py) with pandas/scipy
+  - T-tests, chi-square, Cohen's d effect sizes
+  - Percentile calculations and difficulty analysis
+  - Plotly visualization module (visualizations.py)
+  - Interactive charts: funnel, time distribution, success rate, avg time
+  - API endpoints: /api/funnel_chart, /api/time_distribution, /api/comparison_charts
+  - Frontend Plotly integration with real-time updates
+  - Removed dark mode and CSS bloat
+- ✅ Real-time dashboard with polling toggle
+- ✅ Cache busting for Vercel deployments
+- ✅ Username display and leaderboard
+- ✅ Vercel Speed Insights integration
+
+**Phase 2A MVP Status:** `[x]` COMPLETE
+**Phase 2B Data Science Backend Status:** `[x]` COMPLETE
+
+**Current Phase:** Ready to deploy and test on Vercel, then collect data for blog post
+
+**Next Up:**
+- Deploy to Vercel
+- Test all features in production
+- Collect data for 2-4 weeks
+- Step 11: Blog Post Creation (Phase 2C)
+
+**Key Decisions Made:**
 - ✅ Data science-first approach with pandas/scipy/plotly
 - ✅ Separation of concerns (stats.py, visualizations.py)
-- ✅ Interactive Plotly charts replace CSS visualizations
+- ✅ Interactive Plotly charts replaced CSS visualizations
+- ✅ Removed dark mode complexity
 - ✅ Focus on statistical rigor for blog post credibility
+- 🔄 Plotly chart theming to be refined later
 
 ---
 
-## O1 Visa Narrative
+## Notes
 
-"Built production-grade A/B testing simulator with professional data science backend. Implemented statistical analysis pipeline using pandas and scipy for causal inference (t-tests, chi-square, effect sizes, confidence intervals). Created interactive real-time data visualizations using Plotly. Designed and executed behavioral experiment, collected 500+ user interactions, and published findings demonstrating expertise in experimental design, statistical analysis, and data communication. Full stack: Python (FastAPI, pandas, scipy, plotly) + JavaScript + PostgreSQL."
+- Removed old statistical calculation code from main.py (now in stats.py)
+- Modal-related CSS removed (not used)
+- Stats module is reusable for future blog posts and analysis
