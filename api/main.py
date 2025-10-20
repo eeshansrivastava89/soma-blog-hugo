@@ -28,6 +28,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint"""
+    return {"status": "ok"}
+
 @app.post("/api/track")
 async def track_event(request: Request):
     """Track user conversion event"""
