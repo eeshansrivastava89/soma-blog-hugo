@@ -1,0 +1,44 @@
+name: Deploy to Fly.io
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-hugo:
+    name: Deploy Hugo Site
+    runs-on: ubuntu-latest
+    # Only run if Hugo files changed
+    if: |
+      contains(github.event.head_commit.modified, 'content/') ||
+      contains(github.event.head_commit.modified, 'static/') ||
+      contains(github.event.head_commit.modified, 'hugo.toml') ||
+      contains(github.event.head_commit.modified, 'Dockerfile')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      
+      - name: Deploy Hugo
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  deploy-api:
+    name: Deploy Python API
+    runs-on: ubuntu-latest
+    # Only run if API files changed
+    if: contains(github.event.head_commit.modified, 'api/')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      
+      - name: Deploy API
+        run: |
+          cd api
+          flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
