@@ -8,6 +8,13 @@ from scipy import stats as scipy_stats
 import numpy as np
 from dotenv import load_dotenv
 
+import os
+import sys
+
+# Add api directory to path for Railway
+if os.getenv('RAILWAY_ENVIRONMENT'):
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 load_dotenv()
 
 app = FastAPI()
@@ -66,11 +73,12 @@ async def get_stats(experiment_id: str = Query(...)):
         SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
         supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
         
-        # Import with try/except for local vs Vercel compatibility
         try:
-            from .stats import ExperimentStats  # Vercel (relative import)
+            from .stats import ExperimentStats
+            from .visualizations import ExperimentVisualizations
         except ImportError:
-            from stats import ExperimentStats  # Local (absolute import)
+            from stats import ExperimentStats
+            from visualizations import ExperimentVisualizations
         
         # Create analyzer and get complete analysis
         analyzer = ExperimentStats(supabase, experiment_id)
@@ -136,8 +144,10 @@ async def get_user_percentile(
         # Import with compatibility
         try:
             from .stats import ExperimentStats
+            from .visualizations import ExperimentVisualizations
         except ImportError:
             from stats import ExperimentStats
+            from visualizations import ExperimentVisualizations
         
         analyzer = ExperimentStats(supabase, experiment_id)
         analyzer.load_data()
