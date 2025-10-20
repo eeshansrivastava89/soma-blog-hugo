@@ -313,7 +313,7 @@ async function trackCompletion() {
     
     const apiUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:8000/api/track'
-      : 'https://soma-blog-hugo.vercel.app/api/track';
+      : '/api/track';
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -352,7 +352,7 @@ async function trackFailure() {
     
     const apiUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:8000/api/track'
-      : 'https://soma-blog-hugo.vercel.app/api/track';
+      : '/api/track';
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -392,7 +392,7 @@ async function trackStarted() {
     
     const apiUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:8000/api/track'
-      : 'https://soma-blog-hugo.vercel.app/api/track';
+      : '/api/track';
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -426,7 +426,7 @@ async function trackRepeated() {
     
     const apiUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:8000/api/track'
-      : 'https://soma-blog-hugo.vercel.app/api/track';
+      : '/api/track';
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -457,7 +457,7 @@ async function fetchVariantComparison() {
   try {
     const apiUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:8000/api/stats?experiment_id=' + EXPERIMENT_ID
-      : 'https://soma-blog-hugo.vercel.app/api/stats?experiment_id=' + EXPERIMENT_ID;
+      : '/api/stats?experiment_id=' + EXPERIMENT_ID;
     
     const response = await fetch(apiUrl);
     
@@ -660,7 +660,7 @@ async function fetchUserPercentile() {
     
     const apiUrl = window.location.hostname === 'localhost' 
       ? `http://localhost:8000/api/user_percentile?experiment_id=${EXPERIMENT_ID}&user_time=${userTime}&variant=${variant}`
-      : `https://soma-blog-hugo.vercel.app/api/user_percentile?experiment_id=${EXPERIMENT_ID}&user_time=${userTime}&variant=${variant}`;
+      : `/api/user_percentile?experiment_id=${EXPERIMENT_ID}&user_time=${userTime}&variant=${variant}`;
     
     const response = await fetch(apiUrl);
     
@@ -716,7 +716,7 @@ async function updateDashboard() {
   try {
     const apiUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:8000/api/stats?experiment_id=' + EXPERIMENT_ID
-      : 'https://soma-blog-hugo.vercel.app/api/stats?experiment_id=' + EXPERIMENT_ID;
+      : '/api/stats?experiment_id=' + EXPERIMENT_ID;
     
     const response = await fetch(apiUrl);
     
@@ -776,7 +776,7 @@ async function updateDashboard() {
 async function loadPlotlyCharts() {
   const apiBase = window.location.hostname === 'localhost' 
     ? 'http://localhost:8000'
-    : 'https://soma-blog-hugo.vercel.app';
+    : '';
   
   try {
     // Load funnel chart

@@ -5,9 +5,7 @@ services:
     runtime: python
     plan: free
     buildCommand: |
-      # Build Hugo site (using Render's built-in Hugo)
       hugo --gc --minify
-      # Install Python dependencies
       pip install -r api/requirements.txt
     startCommand: uvicorn api.main:app --host 0.0.0.0 --port 10000
     healthCheckPath: /api/health

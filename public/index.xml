@@ -2,31 +2,31 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Eeshan S.</title>
-    <link>http://localhost:1313/</link>
+    <link>http://localhost:53260/</link>
     <description>Recent content on Eeshan S.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 17 Oct 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:53260/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>First Post</title>
-      <link>http://localhost:1313/posts/first-post/</link>
+      <link>http://localhost:53260/posts/first-post/</link>
       <pubDate>Thu, 16 Oct 2025 00:19:19 -0700</pubDate>
-      <guid>http://localhost:1313/posts/first-post/</guid>
+      <guid>http://localhost:53260/posts/first-post/</guid>
       <description>&lt;h2 id=&#34;why-should-i-write-this&#34;&gt;Why Should I write this&lt;/h2&gt;&#xA;&lt;p&gt;This is my first post. Testing the blog setup.&lt;/p&gt;&#xA;&lt;h2 id=&#34;what-to-expect&#34;&gt;What to expect&lt;/h2&gt;&#xA;&lt;p&gt;More content coming soon about marketing analytics and experimentation.&lt;/p&gt;</description>
     </item>
     <item>
       <title>A/B Testing Simulator</title>
-      <link>http://localhost:1313/experiments/ab-test-simulator/</link>
+      <link>http://localhost:53260/experiments/ab-test-simulator/</link>
       <pubDate>Fri, 17 Oct 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/experiments/ab-test-simulator/</guid>
+      <guid>http://localhost:53260/experiments/ab-test-simulator/</guid>
       <description>&lt;p&gt;Welcome! This is an interactive simulator where you can see A/B testing and statistical analysis in action.&lt;/p&gt;&#xA;&lt;h2 id=&#34;section-1-word-search-challenge&#34;&gt;Section 1: Word Search Challenge&lt;/h2&gt;&#xA;&lt;div id=&#34;puzzle-section&#34; class=&#34;simulator-section&#34;&gt;&#xA;  &lt;h3&gt;Your Challenge&lt;/h3&gt;&#xA;  &lt;p&gt;You are in: &lt;strong id=&#34;user-variant&#34;&gt;Loading...&lt;/strong&gt;&lt;/p&gt;&#xA;  &lt;p&gt;Username: &lt;strong id=&#34;user-username&#34;&gt;Loading...&lt;/strong&gt;&lt;/p&gt;&#xA;  &lt;p id=&#34;difficulty-display&#34;&gt;&lt;/p&gt;&#xA;  &lt;div id=&#34;puzzle-container&#34; style=&#34;display: none;&#34;&gt;&#xA;    &lt;div id=&#34;letter-grid&#34; class=&#34;letter-grid&#34;&gt;&lt;/div&gt;&#xA;    &lt;div style=&#34;margin: 1.5rem 0;&#34;&gt;&#xA;      &lt;p&gt;&lt;strong&gt;Words to find: &lt;span id=&#34;target-word-count&#34;&gt;0&lt;/span&gt;&lt;/strong&gt;&lt;/p&gt;&#xA;      &lt;p id=&#34;timer&#34; style=&#34;font-size: 2rem; font-weight: bold; color: #0066cc; font-family: monospace;&#34;&gt;00:60:00&lt;/p&gt;&#xA;      &lt;button id=&#34;start-button&#34; class=&#34;puzzle-button&#34;&gt;▶ Start Challenge&lt;/button&gt;&#xA;      &lt;button id=&#34;reset-button&#34; class=&#34;puzzle-button&#34; style=&#34;display: none;&#34;&gt;↻ Reset&lt;/button&gt;&#xA;    &lt;/div&gt;&#xA;    &lt;div style=&#34;margin: 1rem 0;&#34;&gt;&#xA;      &lt;input type=&#34;text&#34; id=&#34;word-input&#34; placeholder=&#34;Type a 4-letter word and press Enter&#34; style=&#34;display: none; padding: 8px; width: 100%; font-size: 1rem; border: 1px solid #ddd; border-radius: 4px;&#34;&gt;&#xA;      &lt;div id=&#34;guessed-words&#34; style=&#34;margin-top: 1rem; min-height: 2rem;&#34;&gt;&#xA;        &lt;p style=&#34;font-size: 0.9rem; color: #666;&#34;&gt;Found words: &lt;span id=&#34;found-words-list&#34; style=&#34;font-weight: bold;&#34;&gt;&lt;/span&gt;&lt;/p&gt;</description>
     </item>
     <item>
       <title>Search</title>
-      <link>http://localhost:1313/search/</link>
+      <link>http://localhost:53260/search/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/search/</guid>
+      <guid>http://localhost:53260/search/</guid>
       <description>&lt;h1 id=&#34;search&#34;&gt;Search&lt;/h1&gt;&#xA;&lt;p&gt;Search through posts, topics, and content on Science of Marketing Analytics.&lt;/p&gt;&#xA;&lt;p class=&#34;hidden&#34;&gt;It&#39;s necessary to enable Javascript&lt;/p&gt;&#xA;&lt;p class=&#34;search-loading hidden&#34;&gt;Loading...&lt;/p&gt;&#xA;&lt;form id=&#34;search-form&#34; class=&#34;search-form&#34; action=&#34;#&#34; method=&#34;post&#34; accept-charset=&#34;UTF-8&#34; role=&#34;search&#34;&gt;&#xA;  &lt;div class=&#34;search-bar&#34;&gt;&#xA;    &lt;label for=&#34;query&#34; class=&#34;hidden&#34;&gt;Search&lt;/label&gt;&#xA;    &lt;input id=&#34;query&#34; class=&#34;search-text&#34; type=&#34;text&#34; placeholder=&#34;Search...&#34;/&gt;&#xA;  &lt;/div&gt;&#xA;&lt;/form&gt;&#xA;&lt;div class=&#34;search-results&#34;&gt;&lt;/div&gt;&#xA;&lt;template&gt;&#xA;  &lt;article class=&#34;search-result list-view&#34;&gt;&#xA;    &lt;header&gt;&#xA;      &lt;h2 class=&#34;title&#34;&gt;&lt;a href=&#34;#&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;      &lt;div class=&#34;submitted&#34;&gt;&#xA;        &lt;time class=&#34;created-date&#34;&gt;&lt;/time&gt;&#xA;      &lt;/div&gt;&#xA;    &lt;/header&gt;&#xA;    &lt;p class=&#34;content&#34;&gt;&lt;/p&gt;&#xA;  &lt;/article&gt;&#xA;&lt;/template&gt;</description>
     </item>
   </channel>
