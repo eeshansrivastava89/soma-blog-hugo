@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 import os
 import sys
 
-# Auto-deploy check
+# Auto-deploy check#2
 
 # Add api directory to path for Railway
 if os.getenv('RAILWAY_ENVIRONMENT'):
