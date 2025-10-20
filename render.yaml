@@ -5,11 +5,8 @@ services:
     runtime: python
     plan: free
     buildCommand: |
-      # Install Hugo
-      curl -L https://github.com/gohugoio/hugo/releases/download/v0.133.1/hugo_extended_0.133.1_linux-amd64.tar.gz | tar -xz
-      chmod +x hugo
-      # Build Hugo site
-      ./hugo --gc --minify
+      # Build Hugo site (using Render's built-in Hugo)
+      hugo --gc --minify
       # Install Python dependencies
       pip install -r api/requirements.txt
     startCommand: uvicorn api.main:app --host 0.0.0.0 --port 10000
