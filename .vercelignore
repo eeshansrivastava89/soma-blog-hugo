@@ -1,4 +1,0 @@
-api/__pycache__
-api/*.pyc
-api/.pytest_cache
-*.egg-info

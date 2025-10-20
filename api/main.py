@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from supabase import create_client, Client
 import os
 from datetime import datetime
@@ -8,16 +10,43 @@ from scipy import stats as scipy_stats
 import numpy as np
 from dotenv import load_dotenv
 
-# import os
-# import sys
+import os
+import sys
 
-# # Add api directory to path for Railway
-# if os.getenv('RAILWAY_ENVIRONMENT'):
-#     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add api directory to path for Railway
+if os.getenv('RAILWAY_ENVIRONMENT'):
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 load_dotenv()
 
 app = FastAPI()
+
+# Mount static files (Hugo build output)
+app.mount("/static", StaticFiles(directory="public"), name="static")
+
+# Serve Hugo static files for all non-API routes
+@app.get("/{full_path:path}")
+async def serve_hugo_site(full_path: str):
+    """Serve Hugo static site files, fallback to index.html for SPA routing"""
+    if full_path.startswith("api/"):
+        # This shouldn't happen as API routes are defined explicitly
+        return {"error": "API route not found"}, 404
+    
+    # Try to serve the requested file
+    if full_path == "" or full_path == "/":
+        return FileResponse("public/index.html")
+    
+    file_path = f"public/{full_path}"
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        return FileResponse(file_path)
+    
+    # For Hugo, try with .html extension
+    html_path = f"public/{full_path}.html"
+    if os.path.exists(html_path):
+        return FileResponse(html_path)
+    
+    # Fallback to index.html for SPA-style routing
+    return FileResponse("public/index.html")
 
 # Add CORS middleware
 app.add_middleware(
@@ -30,7 +59,7 @@ app.add_middleware(
 
 @app.get("/api/health")
 async def health_check():
-    """Health check endpoint"""
+    """Health check endpoint for Render"""
     return {"status": "ok"}
 
 @app.post("/api/track")
