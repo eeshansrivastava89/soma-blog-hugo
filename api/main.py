@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from supabase import create_client, Client
 import os
@@ -23,8 +22,6 @@ load_dotenv()
 
 app = FastAPI()
 
-# Mount static files (Hugo build output)
-app.mount("/static", StaticFiles(directory="public"), name="static")
 
 # Serve Hugo static files for all non-API routes
 @app.get("/{full_path:path}")
@@ -53,7 +50,11 @@ async def serve_hugo_site(full_path: str):
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://soma-blog-hugo-shy-bird-7985.fly.dev",
+        "http://localhost:8080",
+        "http://localhost:1313"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
