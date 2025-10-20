@@ -1,4 +1,0 @@
-[deploy]
-restartPolicyType = "always"
-healthcheckPath = "/api/stats?experiment_id=83cac599-f4bb-4d68-8b12-04458801a22b"
-healthcheckTimeout = 100

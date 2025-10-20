@@ -8,12 +8,12 @@ from scipy import stats as scipy_stats
 import numpy as np
 from dotenv import load_dotenv
 
-# import os
-# import sys
+import os
+import sys
 
-# # Add api directory to path for Railway
-# if os.getenv('RAILWAY_ENVIRONMENT'):
-#     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add api directory to path for Railway
+if os.getenv('RAILWAY_ENVIRONMENT'):
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 load_dotenv()
 
