@@ -82,6 +82,16 @@ function setupPuzzle() {
   const variant = puzzleState.variant;
   const config = PUZZLE_CONFIG[variant];
   
+  // Apply variant color theme
+  const puzzleSection = document.getElementById('puzzle-section');
+  if (variant === 'A') {
+    puzzleSection.classList.add('variant-a-theme');
+    puzzleSection.classList.remove('variant-b-theme');
+  } else {
+    puzzleSection.classList.add('variant-b-theme');
+    puzzleSection.classList.remove('variant-a-theme');
+  }
+
   // Display letter grid
   const grid = document.getElementById('letter-grid');
   grid.innerHTML = '';
@@ -147,7 +157,8 @@ function handleWordInput(event) {
   if (event.key !== 'Enter') return;
   
   const word = event.target.value.toUpperCase().trim();
-  event.target.value = '';
+  const inputField = event.target;
+  inputField.value = '';
   
   if (!word) return;
   
@@ -166,6 +177,12 @@ function handleWordInput(event) {
     if (puzzleState.foundWords.length === config.targetCount) {
       completeChallenge();
     }
+  } else {
+    // Wrong answer - shake animation
+    inputField.classList.add('shake-animate');
+    setTimeout(() => {
+      inputField.classList.remove('shake-animate');
+    }, 500);
   }
 }
 
@@ -204,8 +221,15 @@ async function completeChallenge() {
       document.getElementById('comparison-text').innerHTML;
   }
   
-  // Show completion message
-  document.getElementById('completion-message').style.display = 'block';
+  // Show completion message with animation
+  const completionMsg = document.getElementById('completion-message');
+  completionMsg.style.display = 'block';
+  completionMsg.classList.add('celebration-animate');
+  
+  // Remove animation class after it completes so it can replay next time
+  setTimeout(() => {
+    completionMsg.classList.remove('celebration-animate');
+  }, 1000);
   
   // Update leaderboard
   updateLeaderboard(puzzleState.completionTime);
