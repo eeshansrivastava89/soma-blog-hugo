@@ -7,8 +7,8 @@ services:
     staticPublishPath: public
     routes:
       - type: rewrite
-        source: /api/:path*
-        destination: https://python-api-nj0d.onrender.com/api/:path*
+        source: /api/*
+        destination: http://python-api:10000/*
 
   # Service 2: The Python API (Backend)
   - type: web
