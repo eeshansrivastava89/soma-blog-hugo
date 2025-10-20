@@ -1,4 +1,5 @@
 {
+  "builder": "python",
   "build": {
     "command": "pip install -r api/requirements.txt"
   },
