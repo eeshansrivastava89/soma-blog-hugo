@@ -1,21 +1,17 @@
 services:
-  # Service 1: The Hugo Static Site (Frontend)
+  # Single Full-Stack Service (Hugo + Python API)
   - type: web
-    name: hugo-frontend
-    runtime: static
-    buildCommand: hugo --gc --minify
-    staticPublishPath: public
-    routes:
-      - type: rewrite
-        source: /api/*
-        destination: https://python-api-nj0d.onrender.com/api/*
-
-  # Service 2: The Python API (Backend)
-  - type: web
-    name: python-api
+    name: soma-blog
     runtime: python
     plan: free
-    buildCommand: pip install -r api/requirements.txt
+    buildCommand: |
+      # Install Hugo
+      curl -L https://github.com/gohugoio/hugo/releases/download/v0.133.1/hugo_extended_0.133.1_linux-amd64.tar.gz | tar -xz
+      chmod +x hugo
+      # Build Hugo site
+      ./hugo --gc --minify
+      # Install Python dependencies
+      pip install -r api/requirements.txt
     startCommand: uvicorn api.main:app --host 0.0.0.0 --port 10000
     healthCheckPath: /api/health
     envVars:
