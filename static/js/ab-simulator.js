@@ -1,4 +1,9 @@
 const EXPERIMENT_ID = '83cac599-f4bb-4d68-8b12-04458801a22b';
+
+const API_BASE_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:8000'
+  : 'https://api-spring-night-5744.fly.dev';
+
 let pollingInterval = null;
 let isPolling = false;
 
@@ -311,11 +316,7 @@ async function trackCompletion() {
     
     const completionTimeSeconds = (puzzleState.completionTime / 1000).toFixed(3);
     
-    const apiUrl = window.location.hostname === 'localhost' 
-      ? 'http://localhost:8000/api/track'
-      : '/api/track';
-    
-    const response = await fetch(apiUrl, {
+    const response = await fetch(`${API_BASE_URL}/api/track`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -350,11 +351,7 @@ async function trackFailure() {
     const variant = puzzleState.variant;
     const userId = localStorage.getItem('simulator_user_id');
     
-    const apiUrl = window.location.hostname === 'localhost' 
-      ? 'http://localhost:8000/api/track'
-      : '/api/track';
-    
-    const response = await fetch(apiUrl, {
+    const response = await fetch(`${API_BASE_URL}/api/track`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -390,11 +387,7 @@ async function trackStarted() {
     const variant = puzzleState.variant;
     const userId = localStorage.getItem('simulator_user_id');
     
-    const apiUrl = window.location.hostname === 'localhost' 
-      ? 'http://localhost:8000/api/track'
-      : '/api/track';
-    
-    const response = await fetch(apiUrl, {
+    const response = await fetch(`${API_BASE_URL}/api/track`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -424,11 +417,7 @@ async function trackRepeated() {
     const variant = puzzleState.variant;
     const userId = localStorage.getItem('simulator_user_id');
     
-    const apiUrl = window.location.hostname === 'localhost' 
-      ? 'http://localhost:8000/api/track'
-      : '/api/track';
-    
-    const response = await fetch(apiUrl, {
+    const response = await fetch(`${API_BASE_URL}/api/track`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -455,11 +444,8 @@ async function trackRepeated() {
 
 async function fetchVariantComparison() {
   try {
-    const apiUrl = window.location.hostname === 'localhost' 
-      ? 'http://localhost:8000/api/stats?experiment_id=' + EXPERIMENT_ID
-      : '/api/stats?experiment_id=' + EXPERIMENT_ID;
-    
-    const response = await fetch(apiUrl);
+
+    const response = await fetch(`${API_BASE_URL}/api/stats?experiment_id=${EXPERIMENT_ID}`);
     
     if (!response.ok) {
       document.getElementById('comparison-text').textContent = 
@@ -657,12 +643,8 @@ async function fetchUserPercentile() {
   try {
     const userTime = puzzleState.completionTime / 1000; // convert to seconds
     const variant = puzzleState.variant;
-    
-    const apiUrl = window.location.hostname === 'localhost' 
-      ? `http://localhost:8000/api/user_percentile?experiment_id=${EXPERIMENT_ID}&user_time=${userTime}&variant=${variant}`
-      : `/api/user_percentile?experiment_id=${EXPERIMENT_ID}&user_time=${userTime}&variant=${variant}`;
-    
-    const response = await fetch(apiUrl);
+
+    const response = await fetch(`${API_BASE_URL}/api/user_percentile?experiment_id=${EXPERIMENT_ID}&user_time=${userTime}&variant=${variant}`);
     
     if (!response.ok) {
       return; // Silently fail if not enough data
@@ -714,11 +696,8 @@ function togglePolling() {
 
 async function updateDashboard() {
   try {
-    const apiUrl = window.location.hostname === 'localhost' 
-      ? 'http://localhost:8000/api/stats?experiment_id=' + EXPERIMENT_ID
-      : '/api/stats?experiment_id=' + EXPERIMENT_ID;
     
-    const response = await fetch(apiUrl);
+    const response = await fetch(`${API_BASE_URL}/api/stats?experiment_id=${EXPERIMENT_ID}`);
     
     if (!response.ok) {
       console.error('Error fetching stats:', response.status);
@@ -774,13 +753,10 @@ async function updateDashboard() {
 
 // Plotly Chart Rendering Functions
 async function loadPlotlyCharts() {
-  const apiBase = window.location.hostname === 'localhost' 
-    ? 'http://localhost:8000'
-    : '';
-  
+
   try {
     // Load funnel chart
-    const funnelResponse = await fetch(`${apiBase}/api/funnel_chart?experiment_id=${EXPERIMENT_ID}`);
+    const funnelResponse = await fetch(`${API_BASE_URL}/api/funnel_chart?experiment_id=${EXPERIMENT_ID}`);
     if (funnelResponse.ok) {
       const funnelData = await funnelResponse.json();
       if (funnelData.status === 'success') {
@@ -790,7 +766,7 @@ async function loadPlotlyCharts() {
     }
     
     // Load time distribution
-    const timeResponse = await fetch(`${apiBase}/api/time_distribution?experiment_id=${EXPERIMENT_ID}`);
+    const timeResponse = await fetch(`${API_BASE_URL}/api/time_distribution?experiment_id=${EXPERIMENT_ID}`);
     if (timeResponse.ok) {
       const timeData = await timeResponse.json();
       if (timeData.status === 'success') {
@@ -800,7 +776,7 @@ async function loadPlotlyCharts() {
     }
     
     // Load comparison charts
-    const compResponse = await fetch(`${apiBase}/api/comparison_charts?experiment_id=${EXPERIMENT_ID}`);
+    const compResponse = await fetch(`${API_BASE_URL}/api/comparison_charts?experiment_id=${EXPERIMENT_ID}`);
     if (compResponse.ok) {
       const compData = await compResponse.json();
       if (compData.status === 'success') {
