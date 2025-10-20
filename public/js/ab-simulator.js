@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
   displayVariant();
   setupPuzzle();
   setupPollingToggle();
+  loadPlotlyCharts(); // Load charts on page load
 });
 
 function initializeVariant() {
@@ -237,8 +238,9 @@ async function completeChallenge() {
   // Track completion first
   await trackCompletion();
   
-  // Then fetch variant comparison
+  // Then fetch variant comparison and percentile
   await fetchVariantComparison();
+  await fetchUserPercentile();
 }
 
 async function failChallenge() {
@@ -651,6 +653,40 @@ function displayLeaderboard(currentAttemptTime = null) {
   leaderboardDiv.style.display = 'block';
 }
 
+async function fetchUserPercentile() {
+  try {
+    const userTime = puzzleState.completionTime / 1000; // convert to seconds
+    const variant = puzzleState.variant;
+    
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? `http://localhost:8000/api/user_percentile?experiment_id=${EXPERIMENT_ID}&user_time=${userTime}&variant=${variant}`
+      : `https://soma-blog-hugo.vercel.app/api/user_percentile?experiment_id=${EXPERIMENT_ID}&user_time=${userTime}&variant=${variant}`;
+    
+    const response = await fetch(apiUrl);
+    
+    if (!response.ok) {
+      return; // Silently fail if not enough data
+    }
+    
+    const data = await response.json();
+    
+    if (data.status !== 'success') {
+      return;
+    }
+    
+    // Add percentile info to comparison text
+    const comparisonElem = document.getElementById('comparison-text');
+    const currentText = comparisonElem.innerHTML;
+    
+    comparisonElem.innerHTML = currentText + 
+      ` <span style="margin: 0 0.5rem; color: #999;">|</span> ` +
+      `Faster than ${data.variant_percentile}% of ${variant} players`;
+    
+  } catch (error) {
+    console.error('Error fetching percentile:', error);
+  }
+}
+
 function setupPollingToggle() {
   const toggleBtn = document.getElementById('polling-toggle');
   if (toggleBtn) {
@@ -707,51 +743,75 @@ async function updateDashboard() {
         data.variant_b.avg_completion_time ? data.variant_b.avg_completion_time.toFixed(1) + 's' : '-';
       document.getElementById('variant-b-success-rate').textContent = 
         (data.variant_b.conversion_rate * 100).toFixed(1) + '%';
-
-      // Update funnel for both variants (using same scale across ALL bars)
-      if (data.variant_a.funnel && data.variant_b.funnel) {
-        const aFunnel = data.variant_a.funnel;
-        const bFunnel = data.variant_b.funnel;
-        
-        // Calculate GLOBAL max across all steps and both variants
-        const globalMax = Math.max(
-          aFunnel.started, aFunnel.completed, aFunnel.repeated,
-          bFunnel.started, bFunnel.completed, bFunnel.repeated,
-          1  // Minimum of 1 to avoid division by zero
-        );
-        
-        // Update Variant A funnel
-        document.getElementById('funnel-a-started').style.width = ((aFunnel.started / globalMax) * 100) + '%';
-        document.getElementById('funnel-a-started').querySelector('.funnel-count').textContent = aFunnel.started;
-        
-        document.getElementById('funnel-a-completed').style.width = ((aFunnel.completed / globalMax) * 100) + '%';
-        document.getElementById('funnel-a-completed').querySelector('.funnel-count').textContent = aFunnel.completed;
-        
-        document.getElementById('funnel-a-repeated').style.width = ((aFunnel.repeated / globalMax) * 100) + '%';
-        document.getElementById('funnel-a-repeated').querySelector('.funnel-count').textContent = aFunnel.repeated;
-        
-        document.getElementById('funnel-a-rates').textContent = 
-          `Completion: ${aFunnel.completion_rate}% | Repeat: ${aFunnel.repeat_rate}%`;
-        
-        // Update Variant B funnel
-        document.getElementById('funnel-b-started').style.width = ((bFunnel.started / globalMax) * 100) + '%';
-        document.getElementById('funnel-b-started').querySelector('.funnel-count').textContent = bFunnel.started;
-        
-        document.getElementById('funnel-b-completed').style.width = ((bFunnel.completed / globalMax) * 100) + '%';
-        document.getElementById('funnel-b-completed').querySelector('.funnel-count').textContent = bFunnel.completed;
-        
-        document.getElementById('funnel-b-repeated').style.width = ((bFunnel.repeated / globalMax) * 100) + '%';
-        document.getElementById('funnel-b-repeated').querySelector('.funnel-count').textContent = bFunnel.repeated;
-        
-        document.getElementById('funnel-b-rates').textContent = 
-          `Completion: ${bFunnel.completion_rate}% | Repeat: ${bFunnel.repeat_rate}%`;
-      }
       
+      // Update difficulty analysis
+      if (data.difficulty_analysis) {
+        const diff = data.difficulty_analysis;
+        let diffText = `<strong>${diff.difficulty_label}</strong>`;
+        
+        if (diff.variant_a_avg_time && diff.variant_b_avg_time) {
+          diffText += ` (A: ${diff.variant_a_avg_time}s avg, B: ${diff.variant_b_avg_time}s avg)`;
+        }
+        
+        if (diff.success_rate_difference !== undefined) {
+          diffText += ` | Success rates: A ${diff.variant_a_success_rate}%, B ${diff.variant_b_success_rate}%`;
+        }
+        
+        document.getElementById('difficulty-comparison').innerHTML = diffText;
+      }
       
       const now = new Date();
       document.getElementById('last-updated').textContent = now.toLocaleTimeString();
+
+      // Reload Plotly charts
+      loadPlotlyCharts();
     }
   } catch (error) {
     console.error('Error updating dashboard:', error);
+  }
+}
+
+
+// Plotly Chart Rendering Functions
+async function loadPlotlyCharts() {
+  const apiBase = window.location.hostname === 'localhost' 
+    ? 'http://localhost:8000'
+    : 'https://soma-blog-hugo.vercel.app';
+  
+  try {
+    // Load funnel chart
+    const funnelResponse = await fetch(`${apiBase}/api/funnel_chart?experiment_id=${EXPERIMENT_ID}`);
+    if (funnelResponse.ok) {
+      const funnelData = await funnelResponse.json();
+      if (funnelData.status === 'success') {
+        const funnelJson = JSON.parse(funnelData.chart);
+        Plotly.newPlot('funnel-chart', funnelJson.data, funnelJson.layout, {responsive: true});
+      }
+    }
+    
+    // Load time distribution
+    const timeResponse = await fetch(`${apiBase}/api/time_distribution?experiment_id=${EXPERIMENT_ID}`);
+    if (timeResponse.ok) {
+      const timeData = await timeResponse.json();
+      if (timeData.status === 'success') {
+        const timeJson = JSON.parse(timeData.chart);
+        Plotly.newPlot('time-distribution-chart', timeJson.data, timeJson.layout, {responsive: true});
+      }
+    }
+    
+    // Load comparison charts
+    const compResponse = await fetch(`${apiBase}/api/comparison_charts?experiment_id=${EXPERIMENT_ID}`);
+    if (compResponse.ok) {
+      const compData = await compResponse.json();
+      if (compData.status === 'success') {
+        const successJson = JSON.parse(compData.success_rate_chart);
+        Plotly.newPlot('success-rate-chart', successJson.data, successJson.layout, {responsive: true});
+        
+        const timeJson = JSON.parse(compData.avg_time_chart);
+        Plotly.newPlot('avg-time-chart', timeJson.data, timeJson.layout, {responsive: true});
+      }
+    }
+  } catch (error) {
+    console.error('Error loading Plotly charts:', error);
   }
 }

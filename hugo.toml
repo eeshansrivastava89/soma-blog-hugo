@@ -58,6 +58,7 @@ hugo = "https://gohugo.io/"
 sidePane = true
 countPageItems = 10
 searchPath = "/search"
+enableDarkMode = false
 
 [params.rtwt.home]
 showBio = true

@@ -88,53 +88,23 @@ Welcome! This is an interactive simulator where you can see A/B testing and stat
     </div>
   </div>
   
-  <h4 style="margin-top: 2rem;">User Funnel</h4>
-  <div class="funnel-container">
-    <div class="funnel-variant">
-      <h5>Variant A</h5>
-      <div class="funnel-bar">
-        <div class="funnel-label">Started</div>
-        <div class="funnel-bar-fill" id="funnel-a-started" style="width: 0%; background-color: #3498db;">
-          <span class="funnel-count">0</span>
-        </div>
-      </div>
-      <div class="funnel-bar">
-        <div class="funnel-label">Completed</div>
-        <div class="funnel-bar-fill" id="funnel-a-completed" style="width: 0%; background-color: #27ae60;">
-          <span class="funnel-count">0</span>
-        </div>
-      </div>
-      <div class="funnel-bar">
-        <div class="funnel-label">Repeated</div>
-        <div class="funnel-bar-fill" id="funnel-a-repeated" style="width: 0%; background-color: #f39c12;">
-          <span class="funnel-count">0</span>
-        </div>
-      </div>
-      <p class="funnel-rates" id="funnel-a-rates">Completion: -% | Repeat: -%</p>
-    </div>
-    <!-- Funnel Visualization -->
-    <div class="funnel-variant">
-      <h5>Variant B</h5>
-      <div class="funnel-bar">
-        <div class="funnel-label">Started</div>
-        <div class="funnel-bar-fill" id="funnel-b-started" style="width: 0%; background-color: #3498db;">
-          <span class="funnel-count">0</span>
-        </div>
-      </div>
-      <div class="funnel-bar">
-        <div class="funnel-label">Completed</div>
-        <div class="funnel-bar-fill" id="funnel-b-completed" style="width: 0%; background-color: #27ae60;">
-          <span class="funnel-count">0</span>
-        </div>
-      </div>
-      <div class="funnel-bar">
-        <div class="funnel-label">Repeated</div>
-        <div class="funnel-bar-fill" id="funnel-b-repeated" style="width: 0%; background-color: #f39c12;">
-          <span class="funnel-count">0</span>
-        </div>
-      </div>
-      <p class="funnel-rates" id="funnel-b-rates">Completion: -% | Repeat: -%</p>
-    </div>
+  <h4 style="margin-top: 2rem;">Difficulty Analysis</h4>
+  <div style="padding: 1rem; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 1rem;">
+    <p id="difficulty-comparison" style="margin: 0; color: #333; font-size: 0.95rem;">Loading difficulty analysis...</p>
+  </div>
+  
+  <h4 style="margin-top: 2rem;">Interactive Visualizations</h4>
+  
+  <!-- Funnel Chart -->
+  <div id="funnel-chart" style="width: 100%; height: 450px; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 1rem;"></div>
+  
+  <!-- Time Distribution -->
+  <div id="time-distribution-chart" style="width: 100%; height: 450px; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 1rem;"></div>
+  
+  <!-- Comparison Charts -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+    <div id="success-rate-chart" style="width: 100%; height: 400px; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px;"></div>
+    <div id="avg-time-chart" style="width: 100%; height: 400px; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px;"></div>
   </div>
   
   <p class="last-updated">Last updated: <span id="last-updated">never</span></p>
@@ -193,5 +163,6 @@ b_avg_time = b_completed['completion_time'].mean()
   <p>The 95% credible interval means: "We're 95% confident the true value is in this range."</p>
 </div>
 
-<link rel="stylesheet" href="/css/ab-simulator.css?v=1.1">
-<script src="/js/ab-simulator.js?v=1.1"></script>
+<link rel="stylesheet" href="/css/ab-simulator.css?v=1.2">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script src="/js/ab-simulator.js?v=1.2"></script>

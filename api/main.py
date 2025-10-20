@@ -60,137 +60,219 @@ async def track_event(request: Request):
 
 @app.get("/api/stats")
 async def get_stats(experiment_id: str = Query(...)):
-    """Get experiment statistics"""
+    """Get experiment statistics using stats module"""
     try:
         SUPABASE_URL = os.environ.get("SUPABASE_URL")
         SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
         supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
         
-        response = supabase.table("events").select("*").eq("experiment_id", experiment_id).execute()
-        events = response.data
+        # Import with try/except for local vs Vercel compatibility
+        try:
+            from .stats import ExperimentStats  # Vercel (relative import)
+        except ImportError:
+            from stats import ExperimentStats  # Local (absolute import)
         
-        if not events or len(events) == 0:
-            return {"status": "error", "message": "No events found"}
+        # Create analyzer and get complete analysis
+        analyzer = ExperimentStats(supabase, experiment_id)
+        result = analyzer.get_complete_analysis()
         
-        df = pd.DataFrame(events)
-        # Convert to native Python bool
-        df['converted'] = df['converted'].astype(bool).apply(bool)
+        # Add backwards compatibility for old frontend code
+        if result['status'] == 'success':
+            # Keep the old format for funnel data
+            result['variant_a']['funnel'] = {
+                'started': result['variant_a']['n_started'],
+                'completed': result['variant_a']['n_completed'],
+                'repeated': result['variant_a']['n_repeated'],
+                'completion_rate': round(result['variant_a']['completion_rate'], 1),
+                'repeat_rate': round(result['variant_a']['repeat_rate'], 1)
+            }
+            
+            result['variant_b']['funnel'] = {
+                'started': result['variant_b']['n_started'],
+                'completed': result['variant_b']['n_completed'],
+                'repeated': result['variant_b']['n_repeated'],
+                'completion_rate': round(result['variant_b']['completion_rate'], 1),
+                'repeat_rate': round(result['variant_b']['repeat_rate'], 1)
+            }
+            
+            # Add avg_completion_time for backwards compatibility
+            if result['variant_a'].get('time_stats'):
+                result['variant_a']['avg_completion_time'] = result['variant_a']['time_stats']['mean']
+            
+            if result['variant_b'].get('time_stats'):
+                result['variant_b']['avg_completion_time'] = result['variant_b']['time_stats']['mean']
+            
+            # Keep old frequentist and bayesian format
+            result['frequentist'] = {
+                'p_value': result['statistical_tests'].get('success_rate', {}).get('p_value'),
+                'significant': result['statistical_tests'].get('success_rate', {}).get('significant', False)
+            }
+            
+            # Simple Bayesian placeholder (we can enhance this later)
+            result['bayesian'] = {
+                'prob_b_better': 0.5  # Placeholder
+            }
         
-        variant_a = df[df['variant'] == 'A']
-        variant_b = df[df['variant'] == 'B']
-        
-        a_conversions = int(variant_a['converted'].sum())
-        b_conversions = int(variant_b['converted'].sum())
-        a_total = len(variant_a)
-        b_total = len(variant_b)
-        
-        if a_total == 0 or b_total == 0:
-            return {"status": "error", "message": "Need data from both variants"}
-        
-        a_rate = float(a_conversions) / float(a_total)
-        b_rate = float(b_conversions) / float(b_total)
-        
-        p_value = None
-        significant = False
-        
-        # Need at least 5 in each cell for chi-square
-        if (a_total >= 5 and b_total >= 5 and 
-            a_conversions > 0 and b_conversions > 0 and
-            (a_total - a_conversions) > 0 and (b_total - b_conversions) > 0):
-            try:
-                contingency = [[int(a_conversions), int(a_total - a_conversions)],
-                               [int(b_conversions), int(b_total - b_conversions)]]
-                chi2, p_value, dof, expected = scipy_stats.chi2_contingency(contingency)
-                significant = bool(p_value < 0.05)
-            except Exception as e:
-                print(f"Chi-square test failed: {e}")
-                p_value = None
-                significant = False
-        
-        alpha, beta = 1, 1
-        a_alpha = alpha + a_conversions
-        a_beta = beta + (a_total - a_conversions)
-        b_alpha = alpha + b_conversions
-        b_beta = beta + (b_total - b_conversions)
-        
-        a_ci = scipy_stats.beta.ppf([0.025, 0.975], a_alpha, a_beta).tolist()
-        b_ci = scipy_stats.beta.ppf([0.025, 0.975], b_alpha, b_beta).tolist()
-        
-        np.random.seed(42)
-        a_samples = np.random.beta(a_alpha, a_beta, 10000)
-        b_samples = np.random.beta(b_alpha, b_beta, 10000)
-        prob_b_better = float((b_samples > a_samples).mean())
-        
-        # Calculate average completion times
-        a_completed = variant_a[variant_a['action_type'] == 'completed']
-        b_completed = variant_b[variant_b['action_type'] == 'completed']
-        
-        a_avg_time = None
-        b_avg_time = None
-        
-        if len(a_completed) > 0 and 'completion_time' in a_completed.columns:
-            a_times = a_completed['completion_time'].dropna()
-            if len(a_times) > 0:
-                a_avg_time = float(a_times.mean())
-        
-        if len(b_completed) > 0 and 'completion_time' in b_completed.columns:
-            b_times = b_completed['completion_time'].dropna()
-            if len(b_times) > 0:
-                b_avg_time = float(b_times.mean())
-        
-        # Calculate funnel metrics
-        a_started = len(variant_a[variant_a['action_type'] == 'started'])
-        a_completed_count = len(variant_a[variant_a['action_type'] == 'completed'])
-        a_repeated = len(variant_a[variant_a['action_type'] == 'repeated'])
-        
-        b_started = len(variant_b[variant_b['action_type'] == 'started'])
-        b_completed_count = len(variant_b[variant_b['action_type'] == 'completed'])
-        b_repeated = len(variant_b[variant_b['action_type'] == 'repeated'])
-        
-        # Calculate rates
-        a_completion_rate_funnel = (a_completed_count / a_started * 100) if a_started > 0 else 0
-        a_repeat_rate = (a_repeated / a_completed_count * 100) if a_completed_count > 0 else 0
-        
-        b_completion_rate_funnel = (b_completed_count / b_started * 100) if b_started > 0 else 0
-        b_repeat_rate = (b_repeated / b_completed_count * 100) if b_completed_count > 0 else 0
+        return result
+    
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        return {"status": "error", "message": str(e)}
+    
 
+@app.get("/api/user_percentile")
+async def get_user_percentile(
+    experiment_id: str = Query(...),
+    user_time: float = Query(...),
+    variant: str = Query(...)
+):
+    """Get user's percentile ranking"""
+    try:
+        SUPABASE_URL = os.environ.get("SUPABASE_URL")
+        SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        
+        # Import with compatibility
+        try:
+            from .stats import ExperimentStats
+        except ImportError:
+            from stats import ExperimentStats
+        
+        analyzer = ExperimentStats(supabase, experiment_id)
+        analyzer.load_data()
+        
+        percentile_data = analyzer.calculate_user_percentile(user_time, variant)
+        
+        if not percentile_data:
+            return {"status": "error", "message": "Not enough data for percentile calculation"}
+        
         return {
             "status": "success",
-            "variant_a": {
-                "n_users": int(a_total),
-                "conversions": int(a_conversions),
-                "conversion_rate": round(a_rate, 4),
-                "credible_interval": [round(float(x), 4) for x in a_ci],
-                "avg_completion_time": round(a_avg_time, 2) if a_avg_time else None,
-                "funnel": {
-                    "started": int(a_started),
-                    "completed": int(a_completed_count),
-                    "repeated": int(a_repeated),
-                    "completion_rate": round(a_completion_rate_funnel, 1),
-                    "repeat_rate": round(a_repeat_rate, 1)
-                }
-            },
-            "variant_b": {
-                "n_users": int(b_total),
-                "conversions": int(b_conversions),
-                "conversion_rate": round(b_rate, 4),
-                "credible_interval": [round(float(x), 4) for x in b_ci],
-                "avg_completion_time": round(b_avg_time, 2) if b_avg_time else None,
-                "funnel": {
-                    "started": int(b_started),
-                    "completed": int(b_completed_count),
-                    "repeated": int(b_repeated),
-                    "completion_rate": round(b_completion_rate_funnel, 1),
-                    "repeat_rate": round(b_repeat_rate, 1)
-                }
-            },
-            "frequentist": {
-                "p_value": round(float(p_value), 4) if p_value else None,
-                "significant": significant
-            },
-            "bayesian": {
-                "prob_b_better": round(prob_b_better, 4)
-            }
+            **percentile_data
+        }
+    
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        return {"status": "error", "message": str(e)}
+    
+
+@app.get("/api/funnel_chart")
+async def get_funnel_chart(experiment_id: str = Query(...)):
+    """Get Plotly funnel chart JSON"""
+    try:
+        SUPABASE_URL = os.environ.get("SUPABASE_URL")
+        SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        
+        # Import modules
+        try:
+            from .stats import ExperimentStats
+            from .visualizations import ExperimentVisualizations
+        except ImportError:
+            from stats import ExperimentStats
+            from visualizations import ExperimentVisualizations
+        
+        # Get data
+        analyzer = ExperimentStats(supabase, experiment_id)
+        result = analyzer.get_complete_analysis()
+        
+        if result['status'] != 'success':
+            return {"status": "error", "message": "Not enough data"}
+        
+        # Create chart
+        viz = ExperimentVisualizations()
+        chart_json = viz.create_funnel_chart(
+            result['variant_a'],
+            result['variant_b']
+        )
+        
+        return {
+            "status": "success",
+            "chart": chart_json
+        }
+    
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        return {"status": "error", "message": str(e)}
+
+@app.get("/api/time_distribution")
+async def get_time_distribution(experiment_id: str = Query(...)):
+    """Get Plotly time distribution histogram JSON"""
+    try:
+        SUPABASE_URL = os.environ.get("SUPABASE_URL")
+        SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        
+        # Import modules
+        try:
+            from .stats import ExperimentStats
+            from .visualizations import ExperimentVisualizations
+        except ImportError:
+            from stats import ExperimentStats
+            from visualizations import ExperimentVisualizations
+        
+        # Get data
+        analyzer = ExperimentStats(supabase, experiment_id)
+        analyzer.load_data()
+        
+        if analyzer.df is None or len(analyzer.df) == 0:
+            return {"status": "error", "message": "No data available"}
+        
+        # Create chart
+        viz = ExperimentVisualizations()
+        chart_json = viz.create_time_distribution(analyzer.df)
+        
+        return {
+            "status": "success",
+            "chart": chart_json
+        }
+    
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        return {"status": "error", "message": str(e)}
+
+@app.get("/api/comparison_charts")
+async def get_comparison_charts(experiment_id: str = Query(...)):
+    """Get Plotly comparison charts (success rate and avg time) JSON"""
+    try:
+        SUPABASE_URL = os.environ.get("SUPABASE_URL")
+        SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        
+        # Import modules
+        try:
+            from .stats import ExperimentStats
+            from .visualizations import ExperimentVisualizations
+        except ImportError:
+            from stats import ExperimentStats
+            from visualizations import ExperimentVisualizations
+        
+        # Get data
+        analyzer = ExperimentStats(supabase, experiment_id)
+        result = analyzer.get_complete_analysis()
+        
+        if result['status'] != 'success':
+            return {"status": "error", "message": "Not enough data"}
+        
+        # Create charts
+        viz = ExperimentVisualizations()
+        success_chart = viz.create_success_rate_comparison(
+            result['variant_a'],
+            result['variant_b']
+        )
+        time_chart = viz.create_avg_time_comparison(
+            result['variant_a'],
+            result['variant_b']
+        )
+        
+        return {
+            "status": "success",
+            "success_rate_chart": success_chart,
+            "avg_time_chart": time_chart
         }
     
     except Exception as e:
