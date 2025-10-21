@@ -1,13 +1,169 @@
 # Phase 2 Implementation Roadmap: Gamification & Engagement
 
+## 🎉 DEPLOYMENT COMPLETE - Phase 2A & 2B DONE!
+
+---
+
+## Tech Stack & Deployment
+
+### Architecture
+```
+┌─────────────────────────────────────────┐
+│  Frontend: Hugo Static Site             │
+│  https://soma-blog-hugo-shy-bird-7985   │
+│           .fly.dev                      │
+│  - Content delivery                     │
+│  - User interface                       │
+│  - Client-side JavaScript               │
+└──────────────┬──────────────────────────┘
+               │
+               │ HTTPS API Calls
+               │
+               ▼
+┌─────────────────────────────────────────┐
+│  Backend: Python FastAPI                │
+│  https://api-spring-night-5744.fly.dev  │
+│  - Data science (pandas, scipy, numpy)  │
+│  - Statistical analysis                 │
+│  - Plotly visualizations                │
+│  - Event tracking                       │
+└──────────────┬──────────────────────────┘
+               │
+               │ SQL Queries
+               │
+               ▼
+┌─────────────────────────────────────────┐
+│  Database: Supabase (PostgreSQL)        │
+│  - User events storage                  │
+│  - Experiment data                      │
+│  - Real-time analytics                  │
+└─────────────────────────────────────────┘
+```
+
+### Deployment Details
+
+**Frontend (Hugo Site)**
+- Platform: Fly.io
+- App Name: `soma-blog-hugo-shy-bird-7985`
+- URL: https://soma-blog-hugo-shy-bird-7985.fly.dev
+- Region: Dallas (dfw)
+- Memory: 256MB
+- Auto-scaling: Yes (0 min machines)
+- Build: Docker (Hugo 0.151.0 + nginx)
+
+**Backend (Python API)**
+- Platform: Fly.io
+- App Name: `api-spring-night-5744`
+- URL: https://api-spring-night-5744.fly.dev
+- Region: Dallas (dfw)
+- Memory: 512MB
+- Auto-scaling: Yes (0 min machines)
+- Runtime: Python 3.11
+- Key Dependencies: FastAPI, pandas, scipy, numpy, plotly, supabase
+
+**Database**
+- Platform: Supabase (managed PostgreSQL)
+- Access: Via environment variables (SUPABASE_URL, SUPABASE_KEY)
+
+**CI/CD**
+- GitHub Actions workflow: `.github/workflows/deploy.yml`
+- Auto-deploy on push to `main` branch
+- Path-based filtering:
+  - Hugo files changed → Deploy frontend only
+  - API files changed → Deploy backend only
+  - Both changed → Deploy both
+
+**Environment Variables**
+- Set via: `flyctl secrets set KEY=value`
+- Required for API:
+  - `SUPABASE_URL`
+  - `SUPABASE_KEY`
+
+---
+
+## Local Development Setup
+
+### Prerequisites
+```bash
+# Install Hugo
+brew install hugo
+
+# Install Python 3.11+
+brew install python@3.11
+
+# Install Fly.io CLI
+brew install flyctl
+```
+
+### Running Locally
+
+**Frontend (Hugo):**
+```bash
+# From project root
+hugo server
+
+# Visit: http://localhost:1313
+```
+
+**Backend (API):**
+```bash
+# From api/ directory
+cd api/
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+
+# Visit: http://localhost:8000/api/health
+```
+
+**Full Stack Testing:**
+- Run both Hugo and API locally
+- Hugo will call localhost:8000 for API requests
+- Database: Uses production Supabase (shared)
+
+---
+
+## Deployment Workflow
+
+### One-Time Setup (✅ COMPLETE)
+1. ✅ Created Fly.io account
+2. ✅ Installed flyctl CLI
+3. ✅ Created two Fly.io apps (Hugo + API)
+4. ✅ Set up GitHub Actions auto-deploy
+5. ✅ Configured CORS and environment variables
+
+### Daily Workflow
+```bash
+# 1. Make changes locally
+# 2. Test locally (hugo server + uvicorn)
+# 3. Commit and push
+git add .
+git commit -m "your message"
+git push
+
+# 4. Auto-deploy happens via GitHub Actions (2-3 min)
+# 5. Visit production URL to verify
+```
+
+### Manual Deploy (if needed)
+```bash
+# Deploy Hugo site
+flyctl deploy  # from project root
+
+# Deploy API
+cd api/
+flyctl deploy
+```
+
+---
+
 ## Overview
 Transform the A/B simulator from static stats display to engaging gamified experience. Focus: Puzzle engagement → Data generation → Blog content.
 
 ---
 
-## Phase 2A: MVP (Core Gamification)
+## Phase 2A: MVP (Core Gamification) ✅ COMPLETE
 
-### Step 0: Database Schema Update
+### Step 0: Database Schema Update ✅ DONE
 - [x] Add `action_type` column to events table
 - [x] Add `completion_time` column to events table
 - [x] Add `success` column to events table
@@ -20,7 +176,7 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 
 ---
 
-### Step 1: Puzzle Engine
+### Step 1: Puzzle Engine ✅ DONE
 - [x] Replace CTA button with word search puzzle display
 - [x] Variant A: Find 3 four-letter words (difficulty 3/10)
 - [x] Variant B: Find 4 four-letter words (difficulty 5/10)
@@ -37,7 +193,7 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 
 ---
 
-### Step 2: Event Tracking Enhancement
+### Step 2: Event Tracking Enhancement ✅ DONE
 - [x] Add `action_type` field to events (started/completed/attempted)
 - [x] Add `completion_time` field to events
 - [x] Add `success` field to events
@@ -48,9 +204,9 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 
 **Completion Status:** `[x]` DONE (completed as part of Step 1)
 
-**Note:** Most of this was completed in Step 1. Need to verify if any additional tracking is needed.
+---
 
-### Step 3: Feedback & Celebration
+### Step 3: Feedback & Celebration ✅ DONE
 - [x] Show sleek inline completion message (no modal)
 - [x] Display completion time: "00:10:45"
 - [x] Show variant comparison: "⚡ 2.5s faster than B | A avg: 9.0s"
@@ -61,7 +217,9 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 
 **Completion Status:** `[x]` DONE
 
-### Step 4: Leaderboard (localStorage-based)
+---
+
+### Step 4: Leaderboard (localStorage-based) ✅ DONE
 - [x] Generate random fun username on first visit
 - [x] Store username in localStorage
 - [x] After completion, add user to leaderboard
@@ -77,7 +235,9 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 
 **Completion Status:** `[x]` DONE (localStorage-based, Step 15 will add cross-device sync)
 
-### Step 5: Funnel Visualization
+---
+
+### Step 5: Funnel Visualization ✅ DONE
 - [x] Track "started" events (puzzle displayed)
 - [x] Track "completed" events (puzzle solved)
 - [x] Track "repeated" events (user clicked "Try Again")
@@ -96,14 +256,16 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 
 **Completion Status:** `[x]` DONE
 
-### Step 6: Testing & Verification
+---
+
+### Step 6: Testing & Verification ✅ DONE
 - [x] Test locally: Create 10+ events, verify leaderboard works
 - [x] Test locally: Refresh page, verify username persists
 - [x] Add username display to Challenge section
-- [x] Test Vercel: Click puzzle, record completion
-- [x] Test Vercel: Check Supabase events table
-- [x] Test Vercel: Enable live refresh, watch funnel update
-- [x] Test Vercel: Click 5+ times, verify leaderboard ranking
+- [x] Test production: Click puzzle, record completion
+- [x] Test production: Check Supabase events table
+- [x] Test production: Enable live refresh, watch funnel update
+- [x] Test production: Click 5+ times, verify leaderboard ranking
 - [x] Test mobile responsiveness (good enough for MVP)
 - [x] Verify no console errors (all clear, API returns 200)
 
@@ -111,7 +273,7 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 
 ---
 
-## Phase 2B: Data Science Backend & Advanced Analytics
+## Phase 2B: Data Science Backend & Advanced Analytics ✅ COMPLETE
 
 ### Step 7: Statistical Analysis Module (`stats.py`) ✅ COMPLETE
 **Goal:** Professional pandas/scipy-based statistical analysis
@@ -127,14 +289,8 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 - [x] Add `/api/user_percentile` endpoint
 - [x] Display percentile in completion message
 - [x] Display difficulty analysis in dashboard
-- [x] Add dark mode compatibility (CSS variables)
 
 **Completion Status:** `[x]` COMPLETE
-
-**Code Removed:**
-- Old pandas/scipy logic from main.py (replaced by stats.py)
-- Hardcoded statistical calculations
-- Modal-related CSS (not used)
 
 **Deliverable:** ✅ Clean, reusable data science module powering all analytics
 
@@ -184,21 +340,14 @@ Transform the A/B simulator from static stats display to engaging gamified exper
   - Add average time comparison chart with CI error bars
   - Update polling logic to refresh all charts
   - Verify real-time updates work
-- [x] Remove dark mode support (simplified CSS)
-- [x] Remove modal CSS bloat (not used)
-- [x] Remove old CSS funnel code from JavaScript
+- [x] Deployment fixes:
+  - Remove catch-all route from API
+  - Fix CORS configuration
+  - Deploy to Fly.io successfully
 
 **Completion Status:** `[x]` COMPLETE
 
-**Code Removed:**
-- CSS funnel bar styles and JavaScript update logic
-- Dark mode CSS variables and media queries
-- Modal-related CSS (unused)
-- All var() references replaced with direct colors
-
 **Deliverable:** ✅ Professional, interactive Plotly dashboard with real-time statistical insights
-
-**Note:** Plotly chart theming can be refined later for visual polish
 
 ---
 
@@ -230,6 +379,8 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 
 **Completion Status:** `[ ]` Not Started
 
+**Target Date:** November 15, 2025 (after 2-4 weeks data collection)
+
 **Deliverable:** Professional blog post demonstrating full experimental cycle (design → execute → analyze → communicate)
 
 ---
@@ -242,6 +393,7 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 - [ ] Update stats.py to analyze by puzzle type
 
 **Completion Status:** `[ ]` Not Started
+
 ---
 
 ## Phase 2D: Cross-Device Persistence
@@ -295,73 +447,57 @@ leaderboard_username VARCHAR -- for future leaderboard feature
 ---
 
 ## File Structure
-
 ```
-soma-blog-hugo/
-├── content/experiments/ab-test-simulator.md (UPDATED: word search puzzle)
-├── api/main.py (UPDATED: tracks new fields)
+project-root/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml          # ✅ Auto-deploy configuration
+├── api/
+│   ├── main.py                 # ✅ FastAPI app
+│   ├── stats.py                # ✅ Statistical analysis module
+│   ├── visualizations.py       # ✅ Plotly charts module
+│   ├── requirements.txt        # ✅ Python dependencies
+│   ├── Dockerfile              # ✅ Docker build for API
+│   └── fly.toml                # ✅ Fly.io config for API
+├── content/
+│   └── experiments/
+│       └── ab-test-simulator.md # ✅ Main simulator page
 ├── static/
 │   ├── js/
-│   │   ├── puzzle-engine.js (embedded in .md currently)
-│   │   └── leaderboard.js (TO BE CREATED)
+│   │   └── ab-simulator.js     # ✅ Frontend logic (updated for production)
 │   └── css/
-│       ├── puzzle.css (embedded in .md currently)
-│       └── leaderboard.css (TO BE CREATED)
+│       └── ab-simulator.css    # ✅ Styles (cleaned up)
+├── Dockerfile                   # ✅ Docker build for Hugo
+├── fly.toml                     # ✅ Fly.io config for Hugo
+├── hugo.toml                    # ✅ Hugo configuration
+└── .env                         # 🔒 Local environment variables (not in git)
 ```
 
 ---
 
-## Deployment History & Current Setup
+## Success Criteria
 
-### Platform Migration Journey
-- **Vercel (Failed):** Could not handle Python workload, especially Plotly dependencies (200MB+). Serverless functions timed out.
-- **Railway (Failed):** Similar issues with heavy Python dependencies and memory constraints.
-- **Render (Current):** Using Blueprint with separate frontend/backend services.
-
-### Current Render Configuration
-```yaml
-# render.yaml - Blueprint Setup
-services:
-  # Frontend: Hugo Static Site
-  - type: web
-    name: hugo-frontend
-    runtime: static
-    buildCommand: hugo --gc --minify
-    staticPublishPath: public
-    routes:
-      - type: rewrite
-        source: /api/*
-        destination: http://python-api:10000/api/*
-
-  # Backend: Python API
-  - type: web
-    name: python-api
-    runtime: python
-    plan: free
-    buildCommand: pip install -r api/requirements.txt
-    startCommand: uvicorn api.main:app --host 0.0.0.0 --port 10000
-    healthCheckPath: /api/health
-```
-
-### Known Issues (Current)
-- **502 Errors:** API endpoints returning 502 despite clean Python logs
-- **Root Cause:** Service routing and dependency loading issues
-- **Status:** Under investigation and fixing
-
----
-
-## Success Criteria (Phase 2A MVP)
-
+### Phase 2A MVP ✅ COMPLETE
 - [x] Word search puzzle displays correctly for both variants
 - [x] Completion time tracked accurately
 - [x] Events stored in Supabase with all fields
-- [ ] Leaderboard shows top 10 users with times
-- [ ] Username persists across sessions
-- [ ] Funnel shows started/completed/repeated counts
-- [ ] Funnel updates live when polling enabled
-- [ ] **Deploy successfully on Render without 502 errors**
-- [ ] Mobile responsive without major layout issues
-- [ ] Generate 100+ events in testing
+- [x] Leaderboard shows top 10 users with times
+- [x] Username persists across sessions
+- [x] Funnel shows started/completed/repeated counts
+- [x] Funnel updates live when polling enabled
+- [x] No console errors on local or production
+- [x] Mobile responsive without major layout issues
+- [x] Generated 100+ events in testing
+
+### Phase 2B Data Science Backend ✅ COMPLETE
+- [x] Statistical analysis module with pandas/scipy
+- [x] T-tests, chi-square, Cohen's d effect sizes
+- [x] Percentile calculations and difficulty analysis
+- [x] Interactive Plotly charts (funnel, time distribution, comparisons)
+- [x] Real-time dashboard updates
+- [x] Production deployment working (Fly.io)
+- [x] CORS configured correctly
+- [x] API health check responding
 
 ---
 
@@ -369,7 +505,8 @@ services:
 
 **Start Date:** October 18, 2025
 **Phase 2A Completed:** October 19, 2025 ✅
-**Phase 2B Target:** October 26, 2025
+**Phase 2B Completed:** October 20, 2025 ✅
+**Deployment to Fly.io Completed:** October 20, 2025 ✅
 **Blog Post Target:** November 15, 2025 (after 2-4 weeks data collection)
 
 **Blockers/Issues:**
@@ -385,35 +522,40 @@ services:
   - Interactive charts: funnel, time distribution, success rate, avg time
   - API endpoints: /api/funnel_chart, /api/time_distribution, /api/comparison_charts
   - Frontend Plotly integration with real-time updates
-  - Removed dark mode and CSS bloat
+- ✅ Deployment to Fly.io
+  - Hugo static site deployed
+  - Python API deployed
+  - GitHub Actions auto-deploy configured
+  - CORS and environment variables configured
 - ✅ Real-time dashboard with polling toggle
-- ✅ Cache busting for Vercel deployments
 - ✅ Username display and leaderboard
-- ✅ Vercel Speed Insights integration
+- ✅ Production testing verified
 
-**Phase 2A MVP Status:** `[x]` COMPLETE
-**Phase 2B Data Science Backend Status:** `[x]` COMPLETE
+**Phase 2A & 2B Status:** `[x]` COMPLETE
 
-**Current Phase:** Ready to deploy and test on Vercel, then collect data for blog post
+**Current Phase:** Ready to collect data for 2-4 weeks, then move to Phase 2C (Blog Post Creation)
 
 **Next Up:**
-- Deploy to Vercel
-- Test all features in production
-- Collect data for 2-4 weeks
+- Collect data for 2-4 weeks (target: 500+ completions)
 - Step 11: Blog Post Creation (Phase 2C)
+- Optional: Step 13: Cross-device persistence (Phase 2D)
 
 **Key Decisions Made:**
 - ✅ Data science-first approach with pandas/scipy/plotly
 - ✅ Separation of concerns (stats.py, visualizations.py)
 - ✅ Interactive Plotly charts replaced CSS visualizations
-- ✅ Removed dark mode complexity
 - ✅ Focus on statistical rigor for blog post credibility
-- 🔄 Plotly chart theming to be refined later
+- ✅ Deployed to Fly.io for better Python/data science support
+- ✅ Auto-deploy via GitHub Actions with path filtering
+- ✅ Removed deployment complexity (one workflow, Docker-based)
 
 ---
 
 ## Notes
 
-- Removed old statistical calculation code from main.py (now in stats.py)
-- Modal-related CSS removed (not used)
 - Stats module is reusable for future blog posts and analysis
+- Plotly charts can be themed/styled further for visual polish
+- Fly.io provides room to scale (can add workers, background jobs, ML models)
+- Docker ensures same environment local and production
+- Auto-deploy workflow ensures GitHub is always in sync with production
+- Ready to focus on data collection and content creation
