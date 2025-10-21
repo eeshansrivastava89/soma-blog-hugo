@@ -1,3 +1,104 @@
+/* Unified card styling for all sections */
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+/* Leaderboard - ultra compact */
+.leaderboard-card {
+  background-color: #fff;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.leaderboard-card h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.leaderboard-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  margin: 0.35rem 0;
+  border-radius: 6px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  font-size: 0.9rem;
+}
+
+.leaderboard-entry.current-user {
+  background-color: #fef3c7;
+  border: 2px solid #fbbf24;
+  font-weight: 600;
+}
+
+.leaderboard-entry.current-attempt {
+  background-color: #dbeafe;
+  border: 2px solid #3b82f6;
+  font-weight: 500;
+}
+
+/* Ultra-compact two-column layout */
+.puzzle-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.puzzle-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.puzzle-right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: #fff;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+
+/* Mobile */
+@media (max-width: 768px) {
+  .puzzle-layout {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .letter-grid {
+    max-width: 100%;
+  }
+  
+  .letter {
+    font-size: 0.85rem;
+    padding: 0.4rem;
+  }
+}
+
 .simulator-section {
   border: 1px solid #e0e0e0;
   padding: 2rem;
@@ -18,22 +119,48 @@
   color: #333;
 }
 
+/* Letter grid - more compact */
 .letter-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 0.5rem;
-  margin: 1.5rem 0;
+  gap: 0.3rem;
+  margin: 0.75rem 0 0 0;
+  max-width: 350px;
 }
 
 .letter {
-  background-color: #0066cc;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
-  padding: 0.75rem;
-  border-radius: 8px;
+  padding: 0.5rem;
+  border-radius: 6px;
   text-align: center;
-  font-size: 1rem;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.letter:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.letter.selected {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  transform: scale(0.95);
+}
+
+.letter.variant-a {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.letter.variant-b {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
 }
 
 .puzzle-button {
@@ -216,3 +343,4 @@
 .variant-b-theme #user-variant {
   color: #3498db;
 }
+

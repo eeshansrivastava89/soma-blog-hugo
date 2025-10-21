@@ -416,6 +416,104 @@ Transform the A/B simulator from static stats display to engaging gamified exper
 
 **Completion Status:** `[ ]` Not Started
 
+## Phase 2E: UI/UX Polish & Layout Optimization ✅ COMPLETE
+
+### Compact Two-Column Layout (October 20, 2025) ✅
+**Goal:** Fit entire puzzle experience above the fold without scrolling
+
+**Completed:**
+- [x] Two-column grid layout (letter grid left, controls right)
+- [x] Moved challenge header to left column above grid
+- [x] Unified white card styling across all sections
+- [x] Reduced letter grid size (350px max-width, 0.3rem gap)
+- [x] Compact letter buttons (0.5rem padding, 0.95rem font)
+- [x] Tightened spacing throughout (margins, padding reduced 30%)
+- [x] Smaller timer display (2.25rem from 3rem)
+- [x] Compact success/failure messages (inline in right column)
+- [x] Leaderboard always visible (no toggle needed)
+- [x] Show top 5 leaderboard (reduced from 10 for compactness)
+- [x] Current attempt shown at bottom of leaderboard card
+- [x] Mobile responsive (stacks vertically on <768px)
+- [x] Professional typography (SF Mono for timer, proper weights)
+- [x] Gradient buttons with hover effects
+- [x] Consistent border-radius (6-10px throughout)
+- [x] Box shadows for depth (0 1px 3px rgba)
+- [x] Color palette: Green (#10b981) for success, Blue (#3b82f6) for primary, Red (#ef4444) for failure
+
+**Layout Specifications:**
+```
+Desktop (>768px):
+├─ Left Column (50%)
+│  ├─ Challenge header (variant, username, difficulty)
+│  └─ 7x2 letter grid (350px max)
+└─ Right Column (50%)
+   ├─ Find X words
+   ├─ Timer (large, monospace)
+   ├─ Start/Reset buttons
+   ├─ Input field
+   ├─ Found words list
+   └─ Success/failure message (compact)
+
+Below:
+└─ Leaderboard (top 5 + current attempt if outside top 5)
+
+Total Height: ~550px (fits in 768px viewport with room to spare)
+```
+
+**Visual Improvements:**
+- ✅ Consistent spacing system (0.25rem, 0.5rem, 0.75rem, 1rem increments)
+- ✅ Professional color gradients on buttons and letters
+- ✅ Proper visual hierarchy (font sizes: 0.8-2.25rem range)
+- ✅ Clean separation with subtle dividers
+- ✅ Hover states on interactive elements
+- ✅ Success green (#10b981), Primary blue (#3b82f6), Danger red (#ef4444)
+- ✅ Neutral grays for secondary text (#6b7280, #9ca3af)
+
+**Technical Details:**
+- CSS Grid for two-column layout
+- Flexbox for internal component layouts
+- Media query breakpoint: 768px
+- localStorage for leaderboard persistence
+- Always-visible leaderboard (no display toggle logic)
+- Current attempt appended to leaderboard HTML (simplified code)
+
+**Files Modified:**
+- `static/css/ab-simulator.css` - Added compact layout styles
+- `content/experiments/ab-test-simulator.md` - Restructured HTML layout
+- `static/js/ab-simulator.js` - Updated leaderboard to show top 5 + current attempt
+
+**Completion Status:** `[x]` COMPLETE (October 20, 2025)
+
+**Result:** Entire puzzle experience fits above the fold on standard desktop viewport (1440x900+), significantly improved user experience with no scrolling required during gameplay.
+
+---
+
+## Next Phase Options
+
+### Option 1: Username Animation & Polish 🎨
+- Typewriter effect for username reveal
+- Color pulse animation
+- Celebration confetti on completion
+- Smooth transitions throughout
+
+### Option 2: Data Collection & Blog Post 📊 (Phase 2C - Priority)
+- Collect data for 2-4 weeks (target: 500+ completions)
+- Statistical analysis using stats.py
+- Write "We Built an A/B Test Simulator" blog post
+- **Target Date:** November 15, 2025
+
+### Option 3: Cross-Device Leaderboard (Phase 2D)
+- Migrate from localStorage to Supabase
+- Browser fingerprinting for user persistence
+- Cross-device leaderboard sync
+
+### Option 4: Additional Polish (Tomorrow)
+- More styling refinements
+- Animation improvements
+- Accessibility enhancements
+- Performance optimizations
+
+
 ---
 
 ## Nice to Have (Future Phase)

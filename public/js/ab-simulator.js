@@ -115,8 +115,7 @@ function setupPuzzle() {
   document.getElementById('try-again-button').addEventListener('click', () => resetPuzzle(true));
   document.getElementById('try-again-failure-button').addEventListener('click', () => resetPuzzle(true));
   document.getElementById('word-input').addEventListener('keypress', handleWordInput);
-  
-  document.getElementById('puzzle-container').style.display = 'block';
+
 }
 
 function startChallenge() {
@@ -510,55 +509,55 @@ async function fetchVariantComparison() {
   }
 }
 
-function updateLeaderboard(completionTime) {
-  const username = localStorage.getItem('simulator_username');
-  const variant = puzzleState.variant;
+function updateLeaderboard(currentTime = null, currentVariant = null) {
+  const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+  const leaderboardList = document.getElementById('leaderboard-list');
   
-  // Get existing leaderboard or create new one
-  let leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-  
-  const newTime = completionTime / 1000;
-  
-  // Check if user already has a best score
-  const userBestIndex = leaderboard.findIndex(entry => entry.username === username);
-  
-  let isPersonalBest = false;
-  
-  if (userBestIndex !== -1) {
-    // User exists - only update if new time is better (faster)
-    const oldBestTime = leaderboard[userBestIndex].time;
-    if (newTime < oldBestTime) {
-      leaderboard[userBestIndex].time = newTime;
-      leaderboard[userBestIndex].variant = variant;
-      leaderboard[userBestIndex].timestamp = Date.now();
-      isPersonalBest = true; // Beat previous best
-    }
-    // If slower, don't update and don't mark as personal best
-  } else {
-    // New user - add to leaderboard
-    leaderboard.push({
-      username: username,
-      time: newTime,
-      variant: variant,
-      timestamp: Date.now()
-    });
-    isPersonalBest = true; // First time completing
+  if (leaderboard.length === 0) {
+    leaderboardList.innerHTML = '<p style="text-align: center; color: #9ca3af; font-style: italic; font-size: 0.85rem; margin: 0;">Complete a challenge to appear here</p>';
+    return;
   }
   
-  // Store in puzzleState for display
-  puzzleState.isPersonalBest = isPersonalBest;
-  
-  // Sort by time (fastest first)
+  // Sort by time
   leaderboard.sort((a, b) => a.time - b.time);
   
-  // Keep only top 50
-  leaderboard = leaderboard.slice(0, 50);
+  // Get top 5 (reduced from 10)
+  const top5 = leaderboard.slice(0, 10);
   
-  // Save back to localStorage
-  localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+  let html = '';
   
-  // Display leaderboard
-  displayLeaderboard(newTime);
+  // Show top 5
+  top5.forEach((entry, index) => {
+    const isCurrentUser = entry.username === localStorage.getItem('username');
+    const classes = isCurrentUser ? 'leaderboard-entry current-user' : 'leaderboard-entry';
+    const badge = isCurrentUser ? ' 🌟' : '';
+    
+    html += `
+      <div class="${classes}">
+        <span style="font-weight: 600; color: #1f2937;">${index + 1}. ${entry.username}${badge}</span>
+        <span style="font-weight: 700; color: #3b82f6;">${entry.time.toFixed(2)}s</span>
+      </div>
+    `;
+  });
+  
+  // Current attempt if not in top 5
+  if (currentTime && currentVariant) {
+    const currentUsername = localStorage.getItem('username');
+    const userBestIndex = leaderboard.findIndex(e => e.username === currentUsername);
+    
+    if (userBestIndex >= 10 || (userBestIndex >= 0 && currentTime > leaderboard[userBestIndex].time)) {
+      html += `
+        <div style="border-top: 2px dashed #d1d5db; margin: 0.65rem 0 0.35rem 0;"></div>
+        <div class="leaderboard-entry current-attempt">
+          <span style="font-weight: 600; color: #1f2937;">Now: ${currentUsername}</span>
+          <span style="font-weight: 700; color: #3b82f6;">${currentTime.toFixed(2)}s</span>
+        </div>
+        ${userBestIndex >= 0 ? `<p style="text-align: center; font-size: 0.8rem; color: #6b7280; margin: 0.35rem 0 0 0;">Your best: #${userBestIndex + 1}</p>` : ''}
+      `;
+    }
+  }
+  
+  leaderboardList.innerHTML = html;
 }
 
 function displayLeaderboard(currentAttemptTime = null) {
