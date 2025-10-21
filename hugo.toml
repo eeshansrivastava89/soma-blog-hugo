@@ -1,4 +1,4 @@
-baseURL = "https://hugo-frontend.onrender.com/"
+baseURL = "https://soma-blog-hugo-shy-bird-7985.fly.dev/"
 languageCode = "en-us"
 title = "Eeshan S."
 theme = "rusty-typewriter"

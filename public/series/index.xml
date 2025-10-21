@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Series on Eeshan S.</title>
-    <link>http://localhost:53260/series/</link>
+    <link>http://localhost:1313/series/</link>
     <description>Recent content in Series on Eeshan S.</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 16 Oct 2025 00:19:19 -0700</lastBuildDate>
-    <atom:link href="http://localhost:53260/series/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/series/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Getting-Started</title>
-      <link>http://localhost:53260/series/getting-started/</link>
+      <link>http://localhost:1313/series/getting-started/</link>
       <pubDate>Thu, 16 Oct 2025 00:19:19 -0700</pubDate>
-      <guid>http://localhost:53260/series/getting-started/</guid>
+      <guid>http://localhost:1313/series/getting-started/</guid>
       <description></description>
     </item>
   </channel>
