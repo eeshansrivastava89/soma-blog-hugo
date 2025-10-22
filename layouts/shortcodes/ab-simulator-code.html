@@ -1,0 +1,34 @@
+<div id="code-section" class="simulator-section">
+  <h3>How We Calculate It</h3>
+  <p>This is the actual Python code powering the analysis:</p>
+  
+  <pre><code class="language-python">import pandas as pd
+from scipy import stats as scipy_stats
+import numpy as np
+
+# Load experiment data
+df = pd.read_csv('events.csv')
+
+# Split by variant
+a = df[df['variant'] == 'A']['converted']
+b = df[df['variant'] == 'B']['converted']
+
+# Frequentist: Chi-square test
+contingency = [[a.sum(), len(a)-a.sum()],
+              [b.sum(), len(b)-b.sum()]]
+chi2, p_value, dof, expected = scipy_stats.chi2_contingency(contingency)
+
+# Bayesian: Beta-Binomial credible intervals
+alpha, beta = 1, 1  # Uniform priors
+a_alpha = alpha + a.sum()
+a_beta = beta + (len(a) - a.sum())
+a_ci = scipy_stats.beta.ppf([0.025, 0.975], a_alpha, a_beta)
+
+# Calculate average completion times
+a_completed = df[(df['variant'] == 'A') & (df['action_type'] == 'completed')]
+b_completed = df[(df['variant'] == 'B') & (df['action_type'] == 'completed')]
+
+a_avg_time = a_completed['completion_time'].mean()
+b_avg_time = b_completed['completion_time'].mean()
+  </code></pre>
+</div>

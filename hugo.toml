@@ -58,7 +58,7 @@ hugo = "https://gohugo.io/"
 sidePane = true
 countPageItems = 10
 searchPath = "/search"
-enableDarkMode = false
+enableDarkMode = true
 
 [params.rtwt.home]
 showBio = true
@@ -74,6 +74,7 @@ taxonomies = ["tags", "series"]
 countTaxonomy = 8
 
 [params.rtwt.side.single]
+sidePane = false
 sidePaneSticky = true
 showDetails = true
 showTableOfContents = true
@@ -92,3 +93,4 @@ unsafe = true
 wrapStandAloneImageWithinParagraph = false
 attribute.block = true
 attribute.title = true
+

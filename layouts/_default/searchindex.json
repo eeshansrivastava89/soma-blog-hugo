@@ -1,6 +1,6 @@
 [
 {{- range $index, $page := .Site.RegularPages -}}
-  {{- if and (ne .Params.indexable false) (ne .Kind "taxonomyTerm") -}}
+  {{- if and (ne .Params.indexable false) (ne .Kind "taxonomyTerm") (eq .Draft false) -}}
     {{- if $index -}},{{- end }}
     {
       "id": {{ $index }},

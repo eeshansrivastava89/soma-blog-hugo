@@ -4,6 +4,8 @@ const API_BASE_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:8000'
   : 'https://api-spring-night-5744.fly.dev';
 
+const POLLING_INTERVAL_MS = 10000; // 10 seconds - change this to adjust refresh rate
+
 let pollingInterval = null;
 let isPolling = false;
 
@@ -48,8 +50,9 @@ document.addEventListener('DOMContentLoaded', function() {
   initializeVariant();
   displayVariant();
   setupPuzzle();
-  setupPollingToggle();
-  loadPlotlyCharts(); // Load charts on page load
+  loadPlotlyCharts();
+  updateLeaderboard();
+  startAutoRefresh(); // Start auto-refresh immediately
 });
 
 function initializeVariant() {
@@ -237,7 +240,7 @@ async function completeChallenge() {
   }, 1000);
   
   // Update leaderboard
-  updateLeaderboard(puzzleState.completionTime);
+  updateLeaderboard(puzzleState.completionTime, puzzleState.variant);
   
   // Track completion first
   await trackCompletion();
@@ -295,12 +298,6 @@ function resetPuzzle(isRepeat = false) {
   document.getElementById('found-words-list').textContent = '(none yet)';
   document.getElementById('completion-message').style.display = 'none';
   document.getElementById('failure-message').style.display = 'none';
-
-  // Hide leaderboard
-  const leaderboardDiv = document.getElementById('leaderboard-display');
-  if (leaderboardDiv) {
-    leaderboardDiv.style.display = 'none';
-  }
   
   // Track "repeated" event if this was triggered by Try Again button
   if (isRepeat) {
@@ -513,130 +510,68 @@ function updateLeaderboard(currentTime = null, currentVariant = null) {
   const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
   const leaderboardList = document.getElementById('leaderboard-list');
   
+  // Save new completion if provided
+  if (currentTime && currentVariant) {
+    const username = localStorage.getItem('simulator_username');
+    const timeInSeconds = currentTime / 1000;
+    
+    const existingIndex = leaderboard.findIndex(e => e.username === username);
+    
+    if (existingIndex >= 0) {
+      if (timeInSeconds < leaderboard[existingIndex].time) {
+        leaderboard[existingIndex] = { username, time: timeInSeconds, variant: currentVariant };
+      }
+    } else {
+      leaderboard.push({ username, time: timeInSeconds, variant: currentVariant });
+    }
+    
+    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+  }
+  
+  // Display leaderboard
   if (leaderboard.length === 0) {
     leaderboardList.innerHTML = '<p style="text-align: center; color: #9ca3af; font-style: italic; font-size: 0.85rem; margin: 0;">Complete a challenge to appear here</p>';
     return;
   }
   
-  // Sort by time
   leaderboard.sort((a, b) => a.time - b.time);
   
-  // Get top 5 (reduced from 10)
-  const top5 = leaderboard.slice(0, 10);
+  const username = localStorage.getItem('simulator_username');
+  const top5 = leaderboard.slice(0, 5);
   
-  let html = '';
-  
-  // Show top 5
-  top5.forEach((entry, index) => {
-    const isCurrentUser = entry.username === localStorage.getItem('username');
+  let html = top5.map((entry, index) => {
+    const isCurrentUser = entry.username === username;
     const classes = isCurrentUser ? 'leaderboard-entry current-user' : 'leaderboard-entry';
     const badge = isCurrentUser ? ' 🌟' : '';
     
-    html += `
+    return `
       <div class="${classes}">
         <span style="font-weight: 600; color: #1f2937;">${index + 1}. ${entry.username}${badge}</span>
         <span style="font-weight: 700; color: #3b82f6;">${entry.time.toFixed(2)}s</span>
       </div>
     `;
-  });
+  }).join('');
   
-  // Current attempt if not in top 5
-  if (currentTime && currentVariant) {
-    const currentUsername = localStorage.getItem('username');
-    const userBestIndex = leaderboard.findIndex(e => e.username === currentUsername);
+  // Show current attempt if it's slower than personal best
+  if (currentTime) {
+    const timeInSeconds = currentTime / 1000;
+    const userBest = leaderboard.find(e => e.username === username);
     
-    if (userBestIndex >= 10 || (userBestIndex >= 0 && currentTime > leaderboard[userBestIndex].time)) {
+    if (userBest && timeInSeconds > userBest.time) {
       html += `
         <div style="border-top: 2px dashed #d1d5db; margin: 0.65rem 0 0.35rem 0;"></div>
         <div class="leaderboard-entry current-attempt">
-          <span style="font-weight: 600; color: #1f2937;">Now: ${currentUsername}</span>
-          <span style="font-weight: 700; color: #3b82f6;">${currentTime.toFixed(2)}s</span>
+          <span style="font-weight: 600; color: #1f2937;">This attempt: ${timeInSeconds.toFixed(2)}s</span>
+          <span style="font-size: 0.8rem; color: #6b7280;">Your Best: ${userBest.time.toFixed(2)}s</span>
         </div>
-        ${userBestIndex >= 0 ? `<p style="text-align: center; font-size: 0.8rem; color: #6b7280; margin: 0.35rem 0 0 0;">Your best: #${userBestIndex + 1}</p>` : ''}
       `;
     }
   }
   
   leaderboardList.innerHTML = html;
+  document.getElementById('leaderboard-display').style.display = 'block';
 }
 
-function displayLeaderboard(currentAttemptTime = null) {
-  const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-  const username = localStorage.getItem('simulator_username');
-  
-  if (leaderboard.length === 0) {
-    return; // No data yet
-  }
-  
-  // Get top 10
-  const top10 = leaderboard.slice(0, 10);
-  
-  let html = '<div style="margin-top: 2rem; padding: 1.5rem; background-color: #f0f0f0; border-radius: 8px;">';
-  html += '<h4 style="margin: 0 0 1rem 0; color: #333;">🏆 Leaderboard (Top 10)</h4>';
-  html += '<div style="font-size: 0.9rem;">';
-  
-  top10.forEach((entry, index) => {
-    const isCurrentUser = entry.username === username;
-    const bgColor = isCurrentUser ? '#fff3cd' : 'white';
-    const fontWeight = isCurrentUser ? 'bold' : 'normal';
-    
-    html += `<div style="display: flex; justify-content: space-between; padding: 0.5rem; margin-bottom: 0.25rem; background-color: ${bgColor}; border-radius: 4px; font-weight: ${fontWeight};">`;
-    html += `<span>${index + 1}. ${entry.username}</span>`;
-    html += `<span>${entry.time.toFixed(2)}s (${entry.variant})</span>`;
-    html += `</div>`;
-  });
-  
-  html += '</div></div>';  
-
-  html += '</div>';
-  
-  html += '</div>';
-  
-  // Always show current attempt info
-  const userEntry = leaderboard.find(entry => entry.username === username);
-  if (userEntry) {
-    const userPosition = leaderboard.findIndex(entry => entry.username === username) + 1;
-    //const currentAttemptTime = puzzleState.completionTime / 1000; // Current attempt
-    
-    // Show current attempt if it's different from best (and user is in top 10)
-    if (userPosition <= 10 && currentAttemptTime !== userEntry.time) {
-      html += '<div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed #ccc;">';
-      html += '<p style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">This Attempt:</p>';
-      html += `<div style="display: flex; justify-content: space-between; padding: 0.5rem; background-color: #f0f0f0; border-radius: 4px;">`;
-      html += `<span>${username}</span>`;
-      html += `<span>${currentAttemptTime.toFixed(2)}s (${puzzleState.variant})</span>`;
-      html += `</div>`;
-      html += '<p style="font-size: 0.8rem; color: #999; margin-top: 0.25rem;">Your best: #' + userPosition + ' - ' + userEntry.time.toFixed(2) + 's</p>';
-      html += '</div>';
-    }
-    
-    // Show position if outside top 10
-    if (userPosition > 10) {
-      html += '<div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed #ccc;">';
-      html += '<p style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">Your Position:</p>';
-      html += `<div style="display: flex; justify-content: space-between; padding: 0.5rem; background-color: #fff3cd; border-radius: 4px; font-weight: bold;">`;
-      html += `<span>${userPosition}. ${userEntry.username}</span>`;
-      html += `<span>${userEntry.time.toFixed(2)}s (${userEntry.variant})</span>`;
-      html += `</div>`;
-      html += '</div>';
-    }
-  }
-  
-  html += '</div>';
-
-  // Insert after completion message
-  const completionMsg = document.getElementById('completion-message');
-  let leaderboardDiv = document.getElementById('leaderboard-display');
-  
-  if (!leaderboardDiv) {
-    leaderboardDiv = document.createElement('div');
-    leaderboardDiv.id = 'leaderboard-display';
-    completionMsg.parentNode.insertBefore(leaderboardDiv, completionMsg.nextSibling);
-  }
-  
-  leaderboardDiv.innerHTML = html;
-  leaderboardDiv.style.display = 'block';
-}
 
 async function fetchUserPercentile() {
   try {
@@ -668,29 +603,9 @@ async function fetchUserPercentile() {
   }
 }
 
-function setupPollingToggle() {
-  const toggleBtn = document.getElementById('polling-toggle');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', togglePolling);
-  }
-}
-
-function togglePolling() {
-  const toggleBtn = document.getElementById('polling-toggle');
-  
-  if (isPolling) {
-    clearInterval(pollingInterval);
-    isPolling = false;
-    toggleBtn.textContent = '▶ Enable Live Refresh';
-    toggleBtn.style.backgroundColor = '#666';
-  } else {
-    isPolling = true;
-    toggleBtn.textContent = '⏸ Disable Live Refresh';
-    toggleBtn.style.backgroundColor = '#27ae60';
-    
-    updateDashboard();
-    pollingInterval = setInterval(updateDashboard, 10000);
-  }
+function startAutoRefresh() {
+  updateDashboard(); // Initial update
+  pollingInterval = setInterval(updateDashboard, POLLING_INTERVAL_MS);
 }
 
 async function updateDashboard() {
