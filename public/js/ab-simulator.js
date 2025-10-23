@@ -56,20 +56,25 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeVariant() {
-  if (!localStorage.getItem('simulator_variant')) {
-    const variant = Math.random() < 0.5 ? 'A' : 'B';
-    localStorage.setItem('simulator_variant', variant);
-    
-    const userId = 'user_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('simulator_user_id', userId);
+  // Get variant from PostHog feature flag
+  const posthogVariant = posthog.getFeatureFlag('word_search_difficulty');
+  
+  let variant;
+  if (posthogVariant === '4-words') {
+    variant = 'B';  // 4 words = Variant B
+  } else {
+    variant = 'A';  // control = Variant A (3 words)
   }
   
-  // Always ensure username exists
+  localStorage.setItem('simulator_variant', variant);
+  
+  const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+  localStorage.setItem('simulator_user_id', userId);
+  
   if (!localStorage.getItem('simulator_username')) {
     const username = generateUsername();
     localStorage.setItem('simulator_username', username);
   }
-
 }
 
 function displayVariant() {
@@ -312,6 +317,15 @@ async function trackCompletion() {
     
     const completionTimeSeconds = (puzzleState.completionTime / 1000).toFixed(3);
     
+    // Send to PostHog
+    posthog.capture('puzzle_completed', {
+      variant: variant,
+      completion_time_seconds: parseFloat(completionTimeSeconds),
+      correct_words_count: puzzleState.foundWords.length,
+      total_guesses_count: puzzleState.guessedWords.length,
+      user_id: userId
+    });
+
     const response = await fetch(`${API_BASE_URL}/api/track`, {
       method: 'POST',
       headers: {
@@ -347,6 +361,13 @@ async function trackFailure() {
     const variant = puzzleState.variant;
     const userId = localStorage.getItem('simulator_user_id');
     
+    posthog.capture('puzzle_failed', {
+      variant: puzzleState.variant,
+      correct_words_count: puzzleState.foundWords.length,
+      total_guesses_count: puzzleState.guessedWords.length,
+      user_id: localStorage.getItem('simulator_user_id')
+    });
+
     const response = await fetch(`${API_BASE_URL}/api/track`, {
       method: 'POST',
       headers: {
