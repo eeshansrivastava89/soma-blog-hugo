@@ -1,6 +1,7 @@
 const EXPERIMENT_ID = '83cac599-f4bb-4d68-8b12-04458801a22b';
+const FEATURE_FLAG_KEY = 'word_search_difficulty_v2';
 
-const API_BASE_URL = window.location.hostname === 'localhost' 
+const API_BASE_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:8000'
   : 'https://api-spring-night-5744.fly.dev';
 
@@ -47,35 +48,43 @@ let puzzleState = {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-  initializeVariant();
-  displayVariant();
-  setupPuzzle();
-  loadPlotlyCharts();
-  updateLeaderboard();
-  startAutoRefresh(); // Start auto-refresh immediately
+  // Wait for PostHog feature flags to load before initializing
+  posthog.onFeatureFlags(function() {
+    initializeVariant();
+    displayVariant();
+    setupPuzzle();
+    loadPlotlyCharts();
+    updateLeaderboard();
+    startAutoRefresh(); // Start auto-refresh immediately
+  });
 });
 
 function initializeVariant() {
   // Get variant from PostHog feature flag
-  const posthogVariant = posthog.getFeatureFlag('word_search_difficulty');
-  
+  const posthogVariant = posthog.getFeatureFlag(FEATURE_FLAG_KEY);
+
   let variant;
   if (posthogVariant === '4-words') {
     variant = 'B';  // 4 words = Variant B
-  } else {
+  } else if (posthogVariant === 'control') {
     variant = 'A';  // control = Variant A (3 words)
+  } else {
+    // Fallback if feature flag didn't load
+    variant = Math.random() < 0.5 ? 'A' : 'B';
+    console.warn('PostHog feature flag not loaded, using random assignment. Got:', posthogVariant);
   }
-  
+
   localStorage.setItem('simulator_variant', variant);
-  
+
   const userId = 'user_' + Math.random().toString(36).substr(2, 9);
   localStorage.setItem('simulator_user_id', userId);
-  
+
   if (!localStorage.getItem('simulator_username')) {
     const username = generateUsername();
     localStorage.setItem('simulator_username', username);
   }
 }
+
 
 function displayVariant() {
 
@@ -314,16 +323,18 @@ async function trackCompletion() {
   try {
     const variant = puzzleState.variant;
     const userId = localStorage.getItem('simulator_user_id');
-    
+
     const completionTimeSeconds = (puzzleState.completionTime / 1000).toFixed(3);
-    
-    // Send to PostHog
+
+    // Send to PostHog with feature flag property
     posthog.capture('puzzle_completed', {
       variant: variant,
       completion_time_seconds: parseFloat(completionTimeSeconds),
       correct_words_count: puzzleState.foundWords.length,
       total_guesses_count: puzzleState.guessedWords.length,
-      user_id: userId
+      user_id: userId,
+      $feature_flag: FEATURE_FLAG_KEY,
+      $feature_flag_response: posthog.getFeatureFlag(FEATURE_FLAG_KEY)
     });
 
     const response = await fetch(`${API_BASE_URL}/api/track`, {
@@ -360,12 +371,14 @@ async function trackFailure() {
   try {
     const variant = puzzleState.variant;
     const userId = localStorage.getItem('simulator_user_id');
-    
+
     posthog.capture('puzzle_failed', {
-      variant: puzzleState.variant,
+      variant: variant,
       correct_words_count: puzzleState.foundWords.length,
       total_guesses_count: puzzleState.guessedWords.length,
-      user_id: localStorage.getItem('simulator_user_id')
+      user_id: userId,
+      $feature_flag: FEATURE_FLAG_KEY,
+      $feature_flag_response: posthog.getFeatureFlag(FEATURE_FLAG_KEY)
     });
 
     const response = await fetch(`${API_BASE_URL}/api/track`, {
@@ -403,7 +416,16 @@ async function trackStarted() {
   try {
     const variant = puzzleState.variant;
     const userId = localStorage.getItem('simulator_user_id');
-    
+
+    // Send to PostHog with feature flag property
+    posthog.capture('puzzle_started', {
+      variant: variant,
+      user_id: userId,
+      difficulty: variant === 'A' ? 3 : 4,
+      $feature_flag: FEATURE_FLAG_KEY,
+      $feature_flag_response: posthog.getFeatureFlag(FEATURE_FLAG_KEY)
+    });
+
     const response = await fetch(`${API_BASE_URL}/api/track`, {
       method: 'POST',
       headers: {
@@ -420,7 +442,7 @@ async function trackStarted() {
         }
       })
     });
-    
+
     if (!response.ok) {
       console.error('Error tracking started:', response.status);
     }

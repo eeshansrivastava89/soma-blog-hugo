@@ -1,5 +1,30 @@
 # PostHog + Supabase + Streamlit Migration Plan
 
+## 🚀 Quick Status
+
+**Last Updated:** 2025-10-25
+
+| Chunk | Status | Date Completed |
+|-------|--------|----------------|
+| 1. PostHog Setup & Event Tracking | ✅ DONE | 2025-10-25 |
+| 2. PostHog → Supabase Data Pipeline | ✅ DONE | 2025-10-25 |
+| 3. Build Streamlit Dashboard | 🔲 TODO | - |
+| 4. Embed Streamlit in Hugo | 🔲 TODO | - |
+| 5. Test End-to-End Flow | 🔲 TODO | - |
+| 6. Cleanup & Remove FastAPI | 🔲 TODO | - |
+| 7. Documentation & Polish | 🔲 TODO | - |
+
+**Useful Debug Commands:**
+```javascript
+// Reset PostHog variant assignment (use in browser console)
+localStorage.clear();
+posthog.reset();
+posthog.reloadFeatureFlags();
+location.reload();
+```
+
+---
+
 ## Context for Future Claude Sessions
 
 ### Project Overview
@@ -153,323 +178,246 @@ events table:
 ## Migration Plan: Chunked Implementation
 
 ### Prerequisites Checklist
-- [ ] PostHog account created (posthog.com/signup)
+- [x] PostHog account created (posthog.com/signup)
 - [ ] Streamlit Community Cloud account (share.streamlit.io)
 - [ ] GitHub repo for Streamlit app created
-- [ ] Supabase connection string ready
-- [ ] PostHog API key obtained
+- [x] Supabase connection string ready
+- [x] PostHog API key obtained
 
 ---
 
-## CHUNK 1: PostHog Setup & Event Tracking
+## ✅ CHUNK 1: PostHog Setup & Event Tracking (COMPLETED)
 
-**Goal:** Replace localStorage variant assignment with PostHog experiments. Keep everything else working.
+**Status:** ✅ DONE
+**Actual Time:** ~2 hours
+**Date Completed:** 2025-10-25
 
-**Time Estimate:** 1-2 hours
+### What We Did
 
-### Steps
+#### 1.1: ✅ Created PostHog Account & Experiment
+- **Account:** Created at posthog.com
+- **Project:** "Exp_Word_Searchv2_10_24_25"
+- **Feature Flag Key:** `word_search_difficulty_v2`
+- **Variants:**
+  - `control` → Variant A (3 words) - 50%
+  - `4-words` → Variant B (4 words) - 50%
+- **API Key:** `phc_zfue5Ca8VaxypRHPCi9j2h2R3Qy1eytEHt3TMPWlOOS`
+- **Host:** `https://us.i.posthog.com`
 
-#### 1.1: Create PostHog Account & Project
-```
-1. Go to posthog.com/signup
-2. Create free account
-3. Create project: "SOMA Blog A/B Simulator"
-4. Note down:
-   - Project API Key
-   - Host URL (usually: https://app.posthog.com)
-```
+#### 1.2: ✅ Added PostHog SDK to Hugo
+**File:** `layouts/_default/baseof.html` (lines 5-12)
 
-#### 1.2: Add PostHog SDK to Hugo
-**File:** `layouts/shortcodes/ab-simulator-puzzle.html`
-
-Add before closing `</div>` of `#puzzle-section`:
-
-```html
-<!-- PostHog SDK -->
-<script>
-  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-  
-  posthog.init('YOUR_PROJECT_API_KEY', {
-    api_host: 'https://app.posthog.com',
+Installed PostHog SDK in base template with:
+```javascript
+posthog.init('phc_zfue5Ca8VaxypRHPCi9j2h2R3Qy1eytEHt3TMPWlOOS', {
+    api_host: 'https://us.i.posthog.com',
+    defaults: '2025-05-24',
     person_profiles: 'identified_only'
-  });
-</script>
+})
 ```
 
-**Replace:** `YOUR_PROJECT_API_KEY` with actual key from PostHog
-
-#### 1.3: Create PostHog Experiment
-```
-1. In PostHog dashboard: Go to "Experiments"
-2. Click "New experiment"
-3. Name: "Word Search Difficulty"
-4. Key: "word-search-difficulty"
-5. Variants:
-   - Control (A): "3-words" (50%)
-   - Test (B): "4-words" (50%)
-6. Click "Save as draft" (don't launch yet)
-```
-
-#### 1.4: Update Variant Assignment Logic
+#### 1.3: ✅ Updated Variant Assignment with Proper Timing
 **File:** `static/js/ab-simulator.js`
 
-**Find the `initializeVariant()` function and replace:**
+**Key Changes:**
+1. Added constant: `const FEATURE_FLAG_KEY = 'word_search_difficulty_v2';` (line 2)
+2. Wrapped initialization in `posthog.onFeatureFlags()` callback to wait for flags to load (lines 51-58)
+3. Updated variant mapping to match PostHog values:
+   - `'control'` → Variant A
+   - `'4-words'` → Variant B
+   - Fallback to random if flag doesn't load (lines 62-85)
 
-```javascript
-function initializeVariant() {
-  // OLD CODE (DELETE):
-  // let variant = localStorage.getItem('simulator_variant');
-  // if (!variant) {
-  //   variant = Math.random() < 0.5 ? 'A' : 'B';
-  //   localStorage.setItem('simulator_variant', variant);
-  // }
-  
-  // NEW CODE:
-  const posthogVariant = posthog.getFeatureFlag('word-search-difficulty');
-  
-  let variant;
-  if (posthogVariant === '3-words') {
-    variant = 'A';
-  } else if (posthogVariant === '4-words') {
-    variant = 'B';
-  } else {
-    // Fallback if experiment not loaded yet
-    variant = Math.random() < 0.5 ? 'A' : 'B';
-  }
-  
-  localStorage.setItem('simulator_variant', variant);
-  return variant;
-}
-```
-
-#### 1.5: Update Event Tracking to PostHog
+#### 1.4: ✅ Added PostHog Event Tracking
 **File:** `static/js/ab-simulator.js`
 
-**Find and update these functions:**
+Added PostHog tracking to all events with proper feature flag properties:
+- `puzzle_started` (lines 417-423) - includes `$feature_flag` and `$feature_flag_response`
+- `puzzle_completed` (lines 330-338) - includes `$feature_flag` and `$feature_flag_response`
+- `puzzle_failed` (lines 375-382) - includes `$feature_flag` and `$feature_flag_response`
 
-```javascript
-// Update trackStarted()
-function trackStarted() {
-  const variant = localStorage.getItem('simulator_variant');
-  const username = localStorage.getItem('simulator_username');
-  
-  // PostHog event
-  posthog.capture('puzzle_started', {
-    variant: variant,
-    username: username,
-    difficulty: variant === 'A' ? 3 : 4
-  });
-  
-  // Keep Supabase tracking for now (we'll migrate later)
-  fetch(`${API_BASE_URL}/api/track`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      experiment_id: EXPERIMENT_ID,
-      user_id: username,
-      variant: variant,
-      action_type: 'started',
-      success: false
-    })
-  });
-}
+**Note:** Still tracking to Supabase via FastAPI as backup (will remove in Chunk 6)
 
-// Update trackCompleted()
-function trackCompleted(completionTime, guessCount) {
-  const variant = localStorage.getItem('simulator_variant');
-  const username = localStorage.getItem('simulator_username');
-  
-  // PostHog event
-  posthog.capture('puzzle_completed', {
-    variant: variant,
-    username: username,
-    completion_time: completionTime,
-    guess_count: guessCount,
-    difficulty: variant === 'A' ? 3 : 4
-  });
-  
-  // Keep Supabase tracking
-  fetch(`${API_BASE_URL}/api/track`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      experiment_id: EXPERIMENT_ID,
-      user_id: username,
-      variant: variant,
-      action_type: 'completed',
-      completion_time: completionTime,
-      success: true,
-      attempts_count: guessCount
-    })
-  });
-}
-```
+#### 1.5: ✅ Launched & Tested
+- **Experiment Status:** RUNNING in PostHog
+- **Verified:**
+  - ✅ Variants assign correctly (50/50 split)
+  - ✅ Events appear in PostHog dashboard
+  - ✅ Experiment metrics tracking both variants
+  - ✅ Both Firefox and Brave browsers working
+  - ✅ Existing FastAPI tracking still functional
 
-#### 1.6: Test Locally
+### Debugging Notes & Lessons Learned
+
+**Issue 1: Feature flags not loading in time**
+- **Problem:** Called `getFeatureFlag()` before PostHog loaded flags
+- **Solution:** Used `posthog.onFeatureFlags(callback)` to wait for flags
+
+**Issue 2: Variant mapping mismatch**
+- **Problem:** Code expected `'3-words'` but PostHog returned `'control'`
+- **Solution:** Updated mapping logic to handle `'control'` and `'4-words'`
+
+**Issue 3: Events not appearing in experiment metrics**
+- **Problem:** Missing `$feature_flag` and `$feature_flag_response` properties
+- **Solution:** Added these properties to all PostHog events
+
+**Issue 4: Firefox stuck on one variant**
+- **Problem:** PostHog caches feature flags per user, old flags persisting
+- **Solution:** Reset command:
+  ```javascript
+  localStorage.clear();
+  posthog.reset();
+  posthog.reloadFeatureFlags();
+  location.reload();
+  ```
+
+### Testing Locally
+
+To test variant assignment:
 ```bash
-cd soma-blog-hugo
+# Run Hugo
 hugo server --disableFastRender
+
+# In browser console, reset to get new variant:
+localStorage.clear();
+posthog.reset();
+posthog.reloadFeatureFlags();
+location.reload();
 ```
 
-**Verify:**
-- [ ] Page loads without errors
-- [ ] Open browser console: `posthog.getFeatureFlag('word-search-difficulty')` returns a variant
-- [ ] Play puzzle, check PostHog dashboard: Events → "puzzle_started" and "puzzle_completed" appear
-- [ ] Verify variant is consistent across page refreshes
-
-#### 1.7: Launch PostHog Experiment
-```
-1. In PostHog: Go to experiment "Word Search Difficulty"
-2. Click "Launch"
-3. Verify it's running
-```
-
-**STOP AND VERIFY BEFORE PROCEEDING:**
-- [ ] PostHog events are being tracked
-- [ ] Variant assignment is working
-- [ ] Existing Supabase tracking still works
-- [ ] Puzzle game functions normally
+### Next Steps
+→ Proceed to **CHUNK 2: PostHog → Supabase Data Pipeline**
 
 ---
 
-## CHUNK 2: PostHog → Supabase Data Pipeline
+## ✅ CHUNK 2: PostHog → Supabase Data Pipeline (COMPLETED)
 
-**Goal:** Set up automated data export from PostHog to Supabase. Eliminate FastAPI dependency on event ingestion.
+**Status:** ✅ DONE
+**Actual Time:** ~3 hours
+**Date Completed:** 2025-10-25
 
-**Time Estimate:** 1-2 hours
+### What We Did
 
-### Steps
+**Chose real-time webhooks over batch exports** for immediate data availability, giving Streamlit dashboard live updates within seconds instead of hourly delays.
 
-#### 2.1: Create Supabase Batch Destination in PostHog
+#### 2.1: ✅ Created Supabase Schema
 
-**Option A: Use PostHog Batch Exports (Recommended)**
-```
-1. PostHog dashboard → Data pipelines → Batch exports
-2. Click "New export"
-3. Destination: "PostgreSQL"
-4. Configure:
-   - Host: [your-supabase-project].supabase.co
-   - Port: 5432
-   - Database: postgres
-   - User: postgres
-   - Password: [from Supabase settings]
-   - Table name: posthog_events
-5. Frequency: Hourly
-6. Click "Create"
-```
+**File:** `supabase-schema.sql` (created in root directory)
 
-**Option B: Use Webhooks (Real-time, more complex)**
-```
-1. Create Supabase Edge Function to receive webhooks
-2. PostHog → Settings → Webhooks
-3. Add webhook URL pointing to Edge Function
-```
+Created optimized PostgreSQL schema with:
+- Main table: `posthog_events` with JSONB properties
+- Generated columns for fast queries (variant, completion_time_seconds, etc.)
+- Two analysis views: `v_variant_stats` and `v_conversion_funnel`
+- Function: `fn_get_user_percentile` for percentile calculations
+- Proper indexes on uuid (unique), event, distinct_id, timestamp, and variant
 
-**Recommendation:** Start with Option A (batch exports) - simpler, more reliable.
+**Key Design Decision:** Used PostgreSQL generated columns to extract JSONB properties for faster querying without duplicating data.
 
-#### 2.2: Create PostHog Events Table in Supabase
+#### 2.2: ✅ Set Up PostHog Batch Export (Backup)
 
-**File:** Run this SQL in Supabase SQL Editor
+**Configuration:**
+- Destination: PostgreSQL (Supabase)
+- Host: `aws-1-us-east-2.pooler.supabase.com` (connection pooler, not direct)
+- Port: `6543` (pooler port, not 5432)
+- User: `postgres.nazioidbiydxduonenmb`
+- Table: `posthog_events`
+- Frequency: Hourly
 
-```sql
--- Create table for PostHog events
-CREATE TABLE posthog_events (
-  id BIGSERIAL PRIMARY KEY,
-  event TEXT NOT NULL,
-  distinct_id TEXT NOT NULL,
-  properties JSONB,
-  timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+**Important:** Used Supabase connection pooler to avoid IPv6 connection errors (PostHog doesn't support IPv6).
 
--- Index for faster queries
-CREATE INDEX idx_posthog_events_event ON posthog_events(event);
-CREATE INDEX idx_posthog_events_distinct_id ON posthog_events(distinct_id);
-CREATE INDEX idx_posthog_events_timestamp ON posthog_events(timestamp);
+#### 2.3: ✅ Created Supabase Edge Function for Real-Time Webhooks
 
--- Index on JSONB properties for variant queries
-CREATE INDEX idx_posthog_events_variant ON posthog_events ((properties->>'variant'));
-```
+**File:** `supabase-edge-function-posthog-webhook.ts`
 
-#### 2.3: Verify Data Flow
-```
-1. Wait 1 hour (for first batch export)
-2. In Supabase SQL Editor, run:
-   SELECT * FROM posthog_events LIMIT 10;
-3. Verify events are appearing
-```
+Created Deno/TypeScript Edge Function that:
+- Receives PostHog webhook POST requests
+- Extracts event data from nested payload structure (`payload.event`)
+- Inserts into `posthog_events` table using Supabase client
+- Handles duplicate events gracefully (idempotent via uuid unique constraint)
+- Returns 200 OK even for duplicates
 
-**If batch export isn't working:**
-- Check PostHog logs: Data pipelines → Your export → Logs
-- Verify Supabase credentials
-- Check firewall rules (Supabase should allow PostHog IPs)
+**Deployed to:** `https://nazioidbiydxduonenmb.supabase.co/functions/v1/bright-posthog-webhook`
 
-#### 2.4: Create Views for Analysis
+#### 2.4: ✅ Configured PostHog HTTP Webhook
 
-**File:** Run in Supabase SQL Editor
+**Settings:**
+- URL: Edge Function endpoint
+- Method: POST
+- Events: `puzzle_started`, `puzzle_completed`, `puzzle_failed`
+- Headers:
+  - `Content-Type: application/json`
+  - `Authorization: Bearer [SUPABASE_ANON_KEY]`
+- Log responses: Enabled (for debugging)
 
-```sql
--- View for puzzle completions with parsed properties
-CREATE VIEW puzzle_completions AS
-SELECT 
-  id,
-  distinct_id as user_id,
-  properties->>'variant' as variant,
-  (properties->>'completion_time')::integer as completion_time_ms,
-  (properties->>'guess_count')::integer as guess_count,
-  timestamp,
-  created_at
-FROM posthog_events
-WHERE event = 'puzzle_completed';
+**Key Fix:** Had to use `Authorization: Bearer ...` header format (not just `apikey`) for Supabase Edge Function authentication.
 
--- View for puzzle starts
-CREATE VIEW puzzle_starts AS
-SELECT 
-  id,
-  distinct_id as user_id,
-  properties->>'variant' as variant,
-  timestamp,
-  created_at
-FROM posthog_events
-WHERE event = 'puzzle_started';
+#### 2.5: ✅ Set Up PostHog Experiment Metrics
 
--- Aggregated stats by variant
-CREATE VIEW variant_stats AS
-SELECT 
-  variant,
-  COUNT(DISTINCT user_id) as unique_users,
-  COUNT(*) as total_completions,
-  AVG(completion_time_ms / 1000.0) as avg_completion_time_seconds,
-  MIN(completion_time_ms / 1000.0) as min_completion_time_seconds,
-  MAX(completion_time_ms / 1000.0) as max_completion_time_seconds,
-  PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY completion_time_ms / 1000.0) as median_completion_time_seconds
-FROM puzzle_completions
-GROUP BY variant;
-```
+Created two metrics in PostHog experiment:
 
-#### 2.5: Test Queries
+**Primary Metric: completionTime (Ratio)**
+- Event: `puzzle_completed`
+- SQL Expression: `avg(toFloat(properties.completion_time_seconds))`
+- Goal: Lower is better (we want faster times, but showing decrease goal)
+- Date filter included to avoid old test data
 
-Run these in Supabase SQL Editor to verify:
+**Secondary Metric: successRate (Ratio)**
+- Numerator: `puzzle_completed` count
+- Denominator: `puzzle_started` count
+- Goal: Increase
+- Measures conversion from start to completion
 
-```sql
--- Check variant distribution
-SELECT variant, COUNT(*) 
-FROM puzzle_completions 
-GROUP BY variant;
+### Debugging Notes & Lessons Learned
 
--- Check recent completions
-SELECT * FROM puzzle_completions 
-ORDER BY timestamp DESC 
-LIMIT 10;
+**Issue 1: IPv6 Connection Failure**
+- **Problem:** PostHog batch export failed with `connection to server at "2600:1f16..." failed: Network is unreachable`
+- **Root Cause:** PostHog doesn't support IPv6, Supabase direct connection uses IPv6
+- **Solution:** Used Supabase connection pooler (`aws-1-us-east-2.pooler.supabase.com:6543`) which is IPv4-compatible
 
--- Check aggregated stats
-SELECT * FROM variant_stats;
-```
+**Issue 2: Edge Function 401 Unauthorized**
+- **Problem:** PostHog webhooks received 401 errors from Supabase Edge Function
+- **Root Cause:** Missing/incorrect authentication header format
+- **Solution:** Added `Authorization: Bearer [SUPABASE_ANON_KEY]` header to PostHog webhook (not just `apikey`)
 
-**STOP AND VERIFY BEFORE PROCEEDING:**
-- [ ] PostHog events are flowing to Supabase
-- [ ] Views are created and queryable
-- [ ] Data looks correct (variants A/B, completion times reasonable)
+**Issue 3: PostHog Webhook Payload Structure**
+- **Problem:** Edge Function couldn't parse event data (undefined values)
+- **Root Cause:** PostHog nests event data in `payload.event`, not at top level
+- **Solution:** Updated Edge Function to extract from `payload.event.uuid`, `payload.event.properties`, etc.
+
+**Issue 4: Experiment Metric Showing Wrong Values**
+- **Problem:** Metric showed 1.24s and 0.97s when actual data was 6-7s
+- **Root Cause:** Old test events from before proper implementation were included
+- **Solution:** Reset experiment data using localStorage.clear() + posthog.reset(), then added date filters to metrics
+
+**Issue 5: Control Variant Metric Still Wrong After Fix**
+- **Problem:** 4-words variant fixed (6.83s) but control still showed 4.55s instead of 6.0s
+- **Root Cause:** Additional old test events in control group
+- **Solution:** Complete experiment reset and fresh data collection
+
+### Architecture Decisions
+
+**Why Webhooks + Batch Export (Hybrid)?**
+1. **Webhooks:** Real-time data (< 1 second latency) for Streamlit dashboard
+2. **Batch Export:** Backup/reconciliation in case webhooks fail
+3. **Deduplication:** PostgreSQL uuid unique constraint prevents duplicates from both sources
+
+**Same Table Strategy:**
+- Both webhook and batch export write to same `posthog_events` table
+- UUID unique constraint handles conflicts automatically
+- Edge Function returns 200 OK for duplicate attempts (idempotent)
+- No data duplication, single source of truth
+
+### Testing & Verification
+
+**Verified:**
+- ✅ Webhook delivers events to Supabase in real-time (< 1 second)
+- ✅ Batch export running hourly as backup
+- ✅ No duplicate events in database
+- ✅ Generated columns populate correctly
+- ✅ Both experiment metrics tracking accurately
+- ✅ PostHog experiment results match SQL query results
+
+### Next Steps
+→ Proceed to **CHUNK 3: Build Streamlit Dashboard**
 
 ---
 
@@ -481,315 +429,47 @@ SELECT * FROM variant_stats;
 
 ### Steps
 
-#### 3.1: Create GitHub Repo for Streamlit App
+See implementation files:
+- **Schema:** [supabase-schema.sql](supabase-schema.sql) - Complete database schema with tables, views, indexes, and functions
+- **Edge Function:** [supabase-edge-function-posthog-webhook.ts](supabase-edge-function-posthog-webhook.ts) - Real-time webhook handler
+- **PostHog Configuration:** Batch export + HTTP webhook configured via PostHog dashboard
+- **Experiment Metrics:** Configured directly in PostHog experiment UI
 
-```bash
-# Locally, create new directory
-mkdir soma-streamlit-dashboard
-cd soma-streamlit-dashboard
-git init
+---
 
-# Create structure
-touch app.py
-touch requirements.txt
-touch .gitignore
-touch README.md
-```
+## CHUNK 3: Build Streamlit Dashboard
 
-#### 3.2: Create `.gitignore`
+**Goal:** Create a Streamlit app that reads from Supabase and displays live stats. Deploy to Streamlit Community Cloud.
 
-**File:** `.gitignore`
+**Time Estimate:** 2-3 hours
 
-```
-__pycache__/
-*.py[cod]
-*$py.class
-.env
-.streamlit/secrets.toml
-venv/
-.DS_Store
-```
+### Overview
 
-#### 3.3: Create `requirements.txt`
+Create a new repository `soma-streamlit-dashboard` with:
 
-**File:** `requirements.txt`
+**Files needed:**
+- `app.py` - Main Streamlit application
+- `requirements.txt` - Dependencies (streamlit, pandas, plotly, psycopg2-binary, sqlalchemy)
+- `.gitignore` - Exclude venv, secrets, __pycache__
+- `.streamlit/secrets.toml` - Supabase connection string (local only, not committed)
 
-```
-streamlit==1.29.0
-pandas==2.1.4
-plotly==5.18.0
-psycopg2-binary==2.9.9
-sqlalchemy==2.0.25
-```
+**Key Features:**
+- Connect to Supabase using SQLAlchemy
+- Query the views created in Chunk 2 (`v_variant_stats`, `v_conversion_funnel`)
+- Display metrics: completion time, success rate, variant comparison
+- Interactive charts: histograms, funnel charts, time series
+- Auto-refresh every 10 seconds using `st.cache_data(ttl=10)`
 
-#### 3.4: Create Streamlit App
+**Deployment:**
+1. Create GitHub repo and push code
+2. Deploy to share.streamlit.io
+3. Configure secrets in Streamlit dashboard (Supabase connection string)
+4. Note the app URL for embedding in Hugo
 
-**File:** `app.py`
-
-```python
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-from sqlalchemy import create_engine
-import time
-
-# Page config
-st.set_page_config(
-    page_title="A/B Test Dashboard",
-    page_icon="📊",
-    layout="wide"
-)
-
-# Database connection
-@st.cache_resource
-def get_db_connection():
-    """Create database connection from Streamlit secrets"""
-    connection_string = st.secrets["supabase"]["connection_string"]
-    engine = create_engine(connection_string)
-    return engine
-
-# Load data functions
-@st.cache_data(ttl=10)  # Cache for 10 seconds (auto-refresh)
-def load_variant_stats():
-    """Load aggregated variant statistics"""
-    engine = get_db_connection()
-    query = "SELECT * FROM variant_stats"
-    df = pd.read_sql(query, engine)
-    return df
-
-@st.cache_data(ttl=10)
-def load_completions():
-    """Load all puzzle completions"""
-    engine = get_db_connection()
-    query = """
-        SELECT 
-            variant,
-            completion_time_ms / 1000.0 as completion_time_seconds,
-            guess_count,
-            timestamp
-        FROM puzzle_completions
-        ORDER BY timestamp DESC
-        LIMIT 1000
-    """
-    df = pd.read_sql(query, engine)
-    return df
-
-@st.cache_data(ttl=10)
-def load_funnel_data():
-    """Load funnel data (starts vs completions)"""
-    engine = get_db_connection()
-    query = """
-        SELECT 
-            variant,
-            COUNT(DISTINCT user_id) FILTER (WHERE event = 'puzzle_started') as started,
-            COUNT(DISTINCT user_id) FILTER (WHERE event = 'puzzle_completed') as completed
-        FROM posthog_events
-        WHERE event IN ('puzzle_started', 'puzzle_completed')
-        GROUP BY variant
-    """
-    df = pd.read_sql(query, engine)
-    return df
-
-# Title
-st.title("📊 A/B Test Dashboard: Word Search Difficulty")
-st.markdown("Live results updating every 10 seconds")
-
-# Auto-refresh indicator
-st.markdown(f"*Last updated: {time.strftime('%H:%M:%S')}*")
-
-# Load data
-try:
-    variant_stats = load_variant_stats()
-    completions = load_completions()
-    funnel_data = load_funnel_data()
-    
-    # Summary Stats - Three Columns
-    st.header("Summary Statistics")
-    
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.subheader("Variant A (3 words)")
-        if not variant_stats[variant_stats['variant'] == 'A'].empty:
-            stats_a = variant_stats[variant_stats['variant'] == 'A'].iloc[0]
-            st.metric("Users", int(stats_a['unique_users']))
-            st.metric("Completions", int(stats_a['total_completions']))
-            st.metric("Avg Time", f"{stats_a['avg_completion_time_seconds']:.1f}s")
-            st.metric("Median Time", f"{stats_a['median_completion_time_seconds']:.1f}s")
-        else:
-            st.info("No data yet")
-    
-    with col2:
-        st.subheader("Variant B (4 words)")
-        if not variant_stats[variant_stats['variant'] == 'B'].empty:
-            stats_b = variant_stats[variant_stats['variant'] == 'B'].iloc[0]
-            st.metric("Users", int(stats_b['unique_users']))
-            st.metric("Completions", int(stats_b['total_completions']))
-            st.metric("Avg Time", f"{stats_b['avg_completion_time_seconds']:.1f}s")
-            st.metric("Median Time", f"{stats_b['median_completion_time_seconds']:.1f}s")
-        else:
-            st.info("No data yet")
-    
-    with col3:
-        st.subheader("Difficulty Analysis")
-        if len(variant_stats) == 2:
-            stats_a = variant_stats[variant_stats['variant'] == 'A'].iloc[0]
-            stats_b = variant_stats[variant_stats['variant'] == 'B'].iloc[0]
-            
-            time_diff = stats_b['avg_completion_time_seconds'] - stats_a['avg_completion_time_seconds']
-            pct_diff = (time_diff / stats_a['avg_completion_time_seconds']) * 100
-            
-            st.metric("Time Difference", f"{time_diff:.1f}s", 
-                     delta=f"{pct_diff:.1f}% {'slower' if time_diff > 0 else 'faster'}")
-            
-            if pct_diff > 10:
-                st.info("🔴 B is significantly harder")
-            elif pct_diff < -10:
-                st.info("🟢 B is significantly easier")
-            else:
-                st.info("🟡 Similar difficulty")
-        else:
-            st.info("Need data from both variants")
-    
-    # Visualizations
-    st.header("Interactive Visualizations")
-    
-    # Completion Time Distribution
-    st.subheader("Completion Time Distribution")
-    fig_dist = px.histogram(
-        completions, 
-        x="completion_time_seconds", 
-        color="variant",
-        nbins=30,
-        barmode="overlay",
-        labels={"completion_time_seconds": "Completion Time (seconds)", "count": "Count"},
-        title="How long does it take to complete the puzzle?"
-    )
-    fig_dist.update_layout(height=400)
-    st.plotly_chart(fig_dist, use_container_width=True)
-    
-    # Funnel Chart
-    st.subheader("Conversion Funnel")
-    if not funnel_data.empty:
-        # Calculate completion rates
-        funnel_data['completion_rate'] = (funnel_data['completed'] / funnel_data['started'] * 100).round(1)
-        
-        fig_funnel = go.Figure()
-        
-        for variant in ['A', 'B']:
-            variant_data = funnel_data[funnel_data['variant'] == variant]
-            if not variant_data.empty:
-                fig_funnel.add_trace(go.Funnel(
-                    name=f"Variant {variant}",
-                    y=["Started", "Completed"],
-                    x=[variant_data.iloc[0]['started'], variant_data.iloc[0]['completed']],
-                    textinfo="value+percent initial"
-                ))
-        
-        fig_funnel.update_layout(height=400, title="Started vs Completed")
-        st.plotly_chart(fig_funnel, use_container_width=True)
-    
-    # Time Series
-    st.subheader("Completion Times Over Time")
-    fig_time = px.scatter(
-        completions, 
-        x="timestamp", 
-        y="completion_time_seconds",
-        color="variant",
-        trendline="lowess",
-        labels={"timestamp": "Time", "completion_time_seconds": "Completion Time (seconds)"},
-        title="Are people getting faster over time?"
-    )
-    fig_time.update_layout(height=400)
-    st.plotly_chart(fig_time, use_container_width=True)
-    
-    # Raw Data Table
-    with st.expander("📋 View Raw Data"):
-        st.dataframe(completions.head(50), use_container_width=True)
-
-except Exception as e:
-    st.error(f"Error loading data: {str(e)}")
-    st.info("Make sure Supabase connection is configured in Streamlit secrets")
-
-# Auto-refresh (rerun every 10 seconds)
-time.sleep(10)
-st.rerun()
-```
-
-#### 3.5: Test Locally
-
-```bash
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Create secrets file for local testing
-mkdir .streamlit
-touch .streamlit/secrets.toml
-```
-
-**File:** `.streamlit/secrets.toml`
-
-```toml
-[supabase]
-connection_string = "postgresql://postgres:[YOUR-PASSWORD]@[YOUR-PROJECT].supabase.co:5432/postgres"
-```
-
-**Replace:** `[YOUR-PASSWORD]` and `[YOUR-PROJECT]` with your Supabase credentials
-
-```bash
-# Run Streamlit locally
-streamlit run app.py
-```
-
-**Verify:**
-- [ ] App loads without errors
-- [ ] Data appears in dashboard
-- [ ] Charts render correctly
-- [ ] Auto-refresh works (page updates every 10 seconds)
-
-#### 3.6: Push to GitHub
-
-```bash
-git add .
-git commit -m "Initial Streamlit dashboard"
-git remote add origin https://github.com/YOUR-USERNAME/soma-streamlit-dashboard.git
-git push -u origin main
-```
-
-#### 3.7: Deploy to Streamlit Community Cloud
-
-```
-1. Go to share.streamlit.io
-2. Sign in with GitHub
-3. Click "New app"
-4. Select:
-   - Repository: YOUR-USERNAME/soma-streamlit-dashboard
-   - Branch: main
-   - Main file path: app.py
-5. Click "Advanced settings"
-6. Add secrets (paste content from .streamlit/secrets.toml):
-   [supabase]
-   connection_string = "postgresql://..."
-7. Click "Deploy"
-8. Wait 2-3 minutes
-9. Note down the URL: https://YOUR-APP-NAME.streamlit.app
-```
-
-**Verify:**
-- [ ] App is live at Streamlit URL
-- [ ] Data loads correctly
-- [ ] Auto-refresh works
-
-**STOP AND VERIFY BEFORE PROCEEDING:**
-- [ ] Streamlit dashboard is deployed and working
-- [ ] Data from Supabase displays correctly
-- [ ] All visualizations render
-- [ ] Auto-refresh works
+**Reference the Supabase views:**
+- `v_variant_stats` - Pre-aggregated statistics by variant
+- `v_conversion_funnel` - Start → Complete → Fail rates
+- Query `posthog_events` directly for raw event data
 
 ---
 
@@ -801,92 +481,25 @@ git push -u origin main
 
 ### Steps
 
-#### 4.1: Update Dashboard Shortcode
+1. **Update dashboard shortcode** (`layouts/shortcodes/ab-simulator-dashboard.html`):
+   - Replace custom HTML with iframe pointing to Streamlit app
+   - Use `?embed=true` parameter to hide Streamlit header
+   - Set appropriate height (typically 1800-2000px)
 
-**File:** `layouts/shortcodes/ab-simulator-dashboard.html`
+2. **Add CSS for embed** (`static/css/ab-simulator.css`):
+   - Style the iframe container
+   - Adjust margins and shadows
+   - Hide Streamlit header if needed
 
-**Replace entire contents with:**
+3. **Test locally:**
+   - Run `hugo server --disableFastRender`
+   - Verify dashboard loads and is interactive
+   - Check mobile responsiveness
 
-```html
-<div id="dashboard-section" class="simulator-section">
-  <h3>Live Dashboard</h3>
-  
-  <div style="margin-bottom: 1rem;">
-    <p style="color: #666; font-size: 0.9rem;">
-      This dashboard updates automatically every 10 seconds with live data from the experiment.
-    </p>
-  </div>
-  
-  <div class="streamlit-embed">
-    <iframe 
-      src="https://YOUR-APP-NAME.streamlit.app/?embed=true" 
-      height="1800" 
-      style="width: 100%; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
-      title="A/B Test Dashboard"
-    ></iframe>
-  </div>
-</div>
-```
-
-**Replace:** `YOUR-APP-NAME` with your actual Streamlit app name
-
-#### 4.2: Add CSS for Embed
-
-**File:** `static/css/ab-simulator.css`
-
-Add:
-
-```css
-/* Streamlit embed container */
-.streamlit-embed {
-  margin: 2rem 0;
-  background-color: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.streamlit-embed iframe {
-  display: block;
-}
-
-/* Hide Streamlit's default header in embed mode */
-.streamlit-embed iframe {
-  margin-top: -80px;  /* Hide Streamlit header */
-  height: calc(1800px + 80px);  /* Adjust height */
-}
-```
-
-#### 4.3: Test Embed
-
-```bash
-cd soma-blog-hugo
-hugo server --disableFastRender
-```
-
-Navigate to simulator page and verify:
-- [ ] Streamlit dashboard loads in iframe
-- [ ] Dashboard is interactive (can scroll, hover on charts)
-- [ ] No scrollbar issues
-- [ ] Mobile responsive
-
-**Height adjustment:** If iframe is too short/tall, adjust the `height` attribute in the iframe tag
-
-#### 4.4: Remove Old Dashboard Code
-
-**Optional (after verifying embed works):**
-
-You can now delete:
-- Custom dashboard rendering code in `ab-simulator.js` (updateDashboard functions)
-- Dashboard-specific CSS (variant-stats, dashboard grid, etc.)
-- Plotly.js script tags
-
-**Keep for now:** Will clean up in Chunk 6
-
-**STOP AND VERIFY BEFORE PROCEEDING:**
-- [ ] Streamlit dashboard appears in Hugo page
-- [ ] Iframe is properly sized
-- [ ] Dashboard is interactive
-- [ ] Mobile layout looks good
+4. **Optional cleanup** (do in Chunk 6):
+   - Remove old dashboard JS code
+   - Remove Plotly.js script tag
+   - Clean up unused CSS
 
 ---
 
@@ -896,65 +509,27 @@ You can now delete:
 
 **Time Estimate:** 30 minutes
 
-### Steps
+### Testing Checklist
 
-#### 5.1: Complete Flow Test
+**Flow Test:**
+1. Play puzzle game and complete it
+2. Check PostHog Events page (should see events immediately)
+3. Check Supabase `posthog_events` table (should see event within 1 second via webhook)
+4. Check Streamlit dashboard (should update within 10 seconds)
+5. Check PostHog experiment metrics (should reflect new data)
 
-```
-1. Open Hugo site in browser
-2. Play puzzle game (complete it)
-3. Check PostHog dashboard:
-   - Events → Should see puzzle_started and puzzle_completed
-4. Wait 1 hour (for batch export)
-5. Check Supabase:
-   - SQL Editor → SELECT * FROM posthog_events WHERE event = 'puzzle_completed' ORDER BY timestamp DESC LIMIT 5
-   - Should see your completion
-6. Check Streamlit dashboard (embedded in Hugo):
-   - Should show updated stats
-   - Wait 10 seconds, should auto-refresh
-```
+**Data Accuracy:**
+- Verify variant distribution is ~50/50
+- Verify completion times are reasonable (3-60 seconds)
+- Compare PostHog metrics with Supabase SQL queries (should match)
+- Test with multiple browsers/incognito windows
 
-#### 5.2: Verify Data Accuracy
-
-Run these checks:
-
-**In Supabase:**
-```sql
--- Check variant distribution (should be ~50/50)
-SELECT variant, COUNT(*) 
-FROM puzzle_completions 
-GROUP BY variant;
-
--- Check completion times are reasonable (3-60 seconds typical)
-SELECT variant, AVG(completion_time_ms / 1000.0), MIN(completion_time_ms / 1000.0), MAX(completion_time_ms / 1000.0)
-FROM puzzle_completions
-GROUP BY variant;
-```
-
-**In PostHog:**
-- Go to Insights → Create new insight
-- Event: puzzle_completed
-- Group by: properties.variant
-- Verify chart shows data
-
-#### 5.3: Test Multiple Users
-
-Open simulator in:
-1. Normal browser window
-2. Incognito window
-3. Different browser
-
-Play puzzle in each, verify:
-- [ ] Different variants assigned (roughly 50/50 over many trials)
-- [ ] All completions tracked in PostHog
-- [ ] All completions appear in Supabase (after batch export)
-- [ ] Streamlit dashboard updates
-
-**STOP AND VERIFY BEFORE PROCEEDING:**
-- [ ] Complete data pipeline works
-- [ ] PostHog → Supabase export working
-- [ ] Streamlit shows accurate data
-- [ ] No data loss or errors
+**What to verify:**
+- [ ] Real-time webhook delivers events (< 1 second)
+- [ ] Batch export runs as backup (hourly)
+- [ ] No duplicate events in database
+- [ ] Streamlit dashboard shows accurate data
+- [ ] PostHog experiment metrics match SQL results
 
 ---
 
@@ -964,161 +539,40 @@ Play puzzle in each, verify:
 
 **Time Estimate:** 1 hour
 
-### Steps
+### Cleanup Tasks
 
-#### 6.1: Remove FastAPI Event Tracking
+**Code Cleanup:**
+1. **Remove FastAPI tracking** from `static/js/ab-simulator.js`:
+   - Remove all `fetch()` calls to FastAPI endpoints
+   - Remove `API_BASE_URL` constant
+   - Keep only PostHog `capture()` calls
 
-**File:** `static/js/ab-simulator.js`
+2. **Remove custom dashboard code**:
+   - Delete dashboard rendering functions
+   - Remove Plotly.js script tag
+   - Clean up dashboard-specific CSS
 
-**Find and remove all `fetch()` calls to FastAPI:**
+3. **Update shortcodes** if needed:
+   - Reference actual implemented files
+   - Update code examples to show PostHog/Streamlit approach
 
-```javascript
-// DELETE THESE SECTIONS:
+**Infrastructure Cleanup:**
+1. **Destroy FastAPI Fly.io app** (if deployed separately):
+   ```bash
+   fly apps destroy api-spring-night-5744
+   ```
 
-// In trackStarted():
-fetch(`${API_BASE_URL}/api/track`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({...})
-});
+2. **Remove API code**:
+   ```bash
+   rm -rf api/
+   git add . && git commit -m "Remove FastAPI"
+   ```
 
-// In trackCompleted():
-fetch(`${API_BASE_URL}/api/track`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({...})
-});
-
-// In trackRepeated():
-fetch(`${API_BASE_URL}/api/track`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({...})
-});
-```
-
-**Remove constants:**
-```javascript
-// DELETE:
-const API_BASE_URL = window.location.hostname === 'localhost' 
-  ? 'http://localhost:8000'
-  : 'https://api-spring-night-5744.fly.dev';
-```
-
-**Keep only PostHog tracking:**
-```javascript
-function trackStarted() {
-  const variant = localStorage.getItem('simulator_variant');
-  const username = localStorage.getItem('simulator_username');
-  
-  posthog.capture('puzzle_started', {
-    variant: variant,
-    username: username,
-    difficulty: variant === 'A' ? 3 : 4
-  });
-}
-
-function trackCompleted(completionTime, guessCount) {
-  const variant = localStorage.getItem('simulator_variant');
-  const username = localStorage.getItem('simulator_username');
-  
-  posthog.capture('puzzle_completed', {
-    variant: variant,
-    username: username,
-    completion_time: completionTime,
-    guess_count: guessCount,
-    difficulty: variant === 'A' ? 3 : 4
-  });
-}
-```
-
-#### 6.2: Remove Custom Dashboard Code
-
-**File:** `static/js/ab-simulator.js`
-
-**Delete these functions:**
-- `updateDashboard()`
-- `startAutoRefresh()`
-- `loadPlotlyCharts()`
-- Any Plotly-specific code
-
-**Remove Plotly.js script tag:**
-
-**File:** `content/experiments/ab-test-simulator.md`
-
-Remove:
-```html
-<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-```
-
-#### 6.3: Clean Up CSS
-
-**File:** `static/css/ab-simulator.css`
-
-**Remove unused CSS:**
-- Old `.dashboard` styles (two-column grid)
-- Old `.variant-stats` styles
-- Any Plotly-specific styles
-
-**Keep:**
-- `.puzzle-layout` (three-column for puzzle)
-- `.puzzle-left`, `.puzzle-right`
-- `.leaderboard-card`
-- `.streamlit-embed`
-
-#### 6.4: Remove FastAPI Deployment
-
-**On Fly.io:**
-```bash
-# List your apps
-fly apps list
-
-# Destroy FastAPI app (if you deployed it separately)
-fly apps destroy api-spring-night-5744  # Or your API app name
-
-# Confirm deletion
-```
-
-**In your repo:**
-```bash
-# Delete api folder
-cd soma-blog-hugo
-rm -rf api/
-
-# Commit changes
-git add .
-git commit -m "Remove FastAPI - using PostHog + Streamlit"
-git push
-```
-
-#### 6.5: Update Hugo Deployment
-
-If your `fly.toml` references the API, clean it up:
-
-**File:** `fly.toml`
-
-Remove any API-related services or mounts.
-
-Redeploy Hugo:
-```bash
-fly deploy
-```
-
-#### 6.6: Final Verification
-
-Test on production (Fly.io):
-- [ ] Simulator page loads
-- [ ] Puzzle game works
-- [ ] PostHog tracking works (check PostHog dashboard)
-- [ ] Streamlit dashboard loads in iframe
-- [ ] No console errors
-- [ ] No 404s from old API calls
-
-**STOP AND VERIFY BEFORE PROCEEDING:**
-- [ ] FastAPI completely removed
-- [ ] No broken links or missing resources
-- [ ] Production site works perfectly
-- [ ] PostHog + Streamlit pipeline complete
+3. **Verify production**:
+   - No console errors
+   - No 404s from old API calls
+   - PostHog tracking works
+   - Streamlit dashboard loads
 
 ---
 
@@ -1128,249 +582,34 @@ Test on production (Fly.io):
 
 **Time Estimate:** 1 hour
 
-### Steps
-
-#### 7.1: Update README
-
-**File:** `README.md` (in soma-blog-hugo repo)
-
-Add section:
-
-```markdown
-## A/B Testing Simulator Architecture
-
-### Stack
-- **Frontend:** Hugo + Custom JavaScript puzzle game
-- **Analytics:** PostHog (experiment assignment + event tracking)
-- **Data Warehouse:** Supabase (PostgreSQL)
-- **Dashboard:** Streamlit (hosted on Community Cloud)
-- **Deployment:** Fly.io (Hugo), Streamlit Community Cloud (dashboard)
-
-### Data Flow
-1. User plays puzzle → PostHog SDK tracks events
-2. PostHog → Hourly batch export → Supabase
-3. Streamlit → Reads from Supabase → Auto-refreshing dashboard
-4. Hugo → Embeds Streamlit via iframe
-
-### Local Development
-
-**Hugo Site:**
-```bash
-hugo server --disableFastRender
-```
-
-**Streamlit Dashboard:**
-```bash
-cd ../soma-streamlit-dashboard
-streamlit run app.py
-```
-
-### Deployment
-
-**Hugo:**
-```bash
-fly deploy
-```
-
-**Streamlit:**
-Push to GitHub → Auto-deploys via Streamlit Community Cloud
-```
-
-#### 7.2: Create Streamlit README
-
-**File:** `README.md` (in soma-streamlit-dashboard repo)
-
-```markdown
-# SOMA Blog - A/B Test Dashboard
-
-Streamlit dashboard for analyzing word search puzzle A/B test results.
-
-## Features
-- Live stats (auto-refresh every 10 seconds)
-- Variant comparison (A vs B)
-- Completion time distribution
-- Conversion funnel
-- Time series analysis
-
-## Data Source
-Reads from Supabase (PostgreSQL) which receives batch exports from PostHog.
-
-## Local Development
-
-1. Create `.streamlit/secrets.toml`:
-```toml
-[supabase]
-connection_string = "postgresql://postgres:[PASSWORD]@[PROJECT].supabase.co:5432/postgres"
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Run:
-```bash
-streamlit run app.py
-```
-
-## Deployment
-Hosted on Streamlit Community Cloud. Auto-deploys on push to main.
-
-## Embedded in Hugo
-This dashboard is embedded in the SOMA blog at:
-https://soma-blog-hugo-shy-bird-7985.fly.dev/experiments/ab-test-simulator/
-```
-
-#### 7.3: Update Python Code Display Shortcode
-
-Since you're no longer using FastAPI, update the code example:
-
-**File:** `layouts/shortcodes/ab-simulator-code.html`
-
-Replace with:
-
-```html
-<div id="code-section" class="simulator-section">
-  <h3>How We Calculate It</h3>
-  <p>This is the actual Python code (from our Streamlit dashboard) powering the analysis:</p>
-  
-  <pre><code class="language-python">import pandas as pd
-import plotly.express as px
-from sqlalchemy import create_engine
-
-# Connect to Supabase
-engine = create_engine(st.secrets["supabase"]["connection_string"])
-
-# Load data from PostHog events (via Supabase)
-query = """
-    SELECT 
-        properties->>'variant' as variant,
-        (properties->>'completion_time')::integer / 1000.0 as time_seconds,
-        timestamp
-    FROM posthog_events
-    WHERE event = 'puzzle_completed'
-"""
-df = pd.read_sql(query, engine)
-
-# Calculate stats by variant
-stats = df.groupby('variant').agg({
-    'time_seconds': ['count', 'mean', 'median', 'std']
-}).round(2)
-
-# Create distribution chart
-fig = px.histogram(
-    df, 
-    x='time_seconds', 
-    color='variant',
-    nbins=30,
-    barmode='overlay'
-)
-
-# Display in Streamlit
-st.dataframe(stats)
-st.plotly_chart(fig)
-  </code></pre>
-  
-  <p><strong>Live Dashboard:</strong> See the full interactive dashboard embedded above, powered by this Python code running on Streamlit.</p>
-</div>
-```
-
-#### 7.4: Add PostHog Privacy Notice
-
-**File:** `content/experiments/ab-test-simulator.md`
-
-Add at the bottom:
-
-```markdown
-## Privacy & Data Collection
-
-This simulator uses PostHog for analytics and A/B testing. We collect:
-- Experiment variant assignment (A or B)
-- Puzzle completion times
-- Anonymous session IDs
-
-No personally identifiable information is collected. Data is used solely for demonstrating analytics capabilities.
-
-[PostHog Privacy Policy](https://posthog.com/privacy)
-```
-
-#### 7.5: Create Architecture Diagram
-
-**Optional:** Create a visual diagram of your architecture
-
-Tools: Excalidraw, draw.io, or Mermaid (in markdown)
-
-**Example Mermaid diagram:**
-
-**File:** Add to README or blog post
-
-```markdown
-```mermaid
-graph TD
-    A[Hugo Blog] -->|PostHog SDK| B[PostHog Cloud]
-    B -->|Batch Export| C[Supabase PostgreSQL]
-    C -->|SQL Query| D[Streamlit Dashboard]
-    D -->|iframe embed| A
-```
-```
-
-#### 7.6: Blog Post Draft
-
-**Optional:** Draft a blog post explaining the architecture
-
-**File:** `content/posts/building-enterprise-ab-testing-platform.md`
-
-```markdown
----
-title: "Building an Enterprise-Grade A/B Testing Platform with PostHog and Streamlit"
-date: 2025-10-21
-tags: ["experimentation", "data-engineering", "analytics"]
-draft: true
----
-
-# Building an Enterprise-Grade A/B Testing Platform
-
-In this post, I'll walk through how I built a production-quality A/B testing and analytics platform using modern data tools...
-
-## Architecture
-
-[Insert architecture diagram]
-
-## Why This Stack?
-
-### PostHog
-- Proper experiment assignment (not localStorage hacks)
-- Built-in statistical testing
-- Feature flags for future use
-
-### Supabase
-- PostgreSQL = industry standard
-- Free tier generous
-- Easy to query from Python
-
-### Streamlit
-- Pure Python (no HTML/CSS)
-- Rapid iteration
-- Community Cloud = free hosting
-
-## The Result
-
-[Link to simulator]
-
-## Lessons Learned
-
-1. Tools over custom code
-2. Composable architecture
-3. Batch processing is underrated
-
-[More content...]
-```
-
-**STOP AND VERIFY:**
-- [ ] README files updated
-- [ ] Code examples accurate
-- [ ] Privacy notice added
-- [ ] Documentation complete
+### Documentation Tasks
+
+1. **Update main README** (`soma-blog-hugo/README.md`):
+   - Document new architecture (PostHog → Supabase → Streamlit)
+   - Explain data flow
+   - Add local development instructions
+   - Reference key files created
+
+2. **Create Streamlit README** (`soma-streamlit-dashboard/README.md`):
+   - Describe features
+   - Setup instructions
+   - Deployment notes
+   - Link to embedded version
+
+3. **Update code example shortcode**:
+   - Replace FastAPI code with Streamlit/PostHog examples
+   - Show actual queries used
+   - Reference [supabase-schema.sql](supabase-schema.sql) views
+
+4. **Add privacy notice** to simulator page:
+   - Explain PostHog tracking
+   - List what data is collected
+   - Link to PostHog privacy policy
+
+5. **Optional enhancements**:
+   - Create architecture diagram (Mermaid or Excalidraw)
+   - Draft blog post about the migration
+   - Document lessons learned
 
 ---
 

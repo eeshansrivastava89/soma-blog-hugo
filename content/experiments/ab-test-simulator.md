@@ -37,6 +37,6 @@ This simulator shows both approaches because they answer different questions:
 
 The 95% credible interval means: "We're 95% confident the true value is in this range."
 
-<link rel="stylesheet" href="/css/ab-simulator.css?v=1.8">
+<link rel="stylesheet" href="/css/ab-simulator.css?v=1.12">
 <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-<script src="/js/ab-simulator.js?v=1.8"></script>
+<script src="/js/ab-simulator.js?v=1.12"></script>
