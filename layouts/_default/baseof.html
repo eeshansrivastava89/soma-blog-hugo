@@ -12,11 +12,12 @@
       const originalWarn = console.warn;
       console.warn = function(...args) {
         const message = args[0]?.toString?.() || '';
-        // Suppress SameSite cookie warnings - these are expected
+        // Suppress expected cross-site cookie warnings and PostHog feature warnings
         if (message.includes('SameSite') || 
             message.includes('streamlit_csrf') ||
             message.includes('preload') ||
-            message.includes('cross-site context')) {
+            message.includes('cross-site context') ||
+            message.includes('Unrecognized feature')) {
           return; // Don't log these warnings
         }
         originalWarn.apply(console, args);
@@ -25,11 +26,13 @@
       const originalError = console.error;
       console.error = function(...args) {
         const message = args[0]?.toString?.() || '';
-        // Suppress expected cross-site errors
+        // Suppress expected cross-site errors and permissions policy violations
         if (message.includes('SameSite') || 
             message.includes('cross-site') ||
-            message.includes('Cookie')) {
-          return; // Don't log these errors
+            message.includes('Cookie') ||
+            message.includes('Potential permissions policy violation') ||
+            message.includes('[Violation]')) {
+          return; // Don't log these harmless errors
         }
         originalError.apply(console, args);
       };
