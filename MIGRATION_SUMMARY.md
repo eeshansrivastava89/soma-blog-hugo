@@ -13,6 +13,7 @@
     - [4.1 PostHog → Supabase](#41-posthog--supabase)
     - [4.2 Supabase Connection](#42-supabase-connection)
     - [4.3 Streamlit Dashboard](#43-streamlit-dashboard)
+    - [4.4 Event Sync Strategy](#44-event-sync-strategy)
   - [5. Architecture Comparison](#5-architecture-comparison)
     - [Before (FastAPI)](#before-fastapi)
     - [After (Streamlit)](#after-streamlit)
@@ -25,13 +26,14 @@
   - [12. Future Enhancement Ideas](#12-future-enhancement-ideas)
   - [13. Critical Implementation Notes](#13-critical-implementation-notes)
     - [PostHog Integration Challenges](#posthog-integration-challenges)
+    - [Event Sync \& Batch Export](#event-sync--batch-export)
     - [Supabase Challenges](#supabase-challenges)
     - [Streamlit Deployment](#streamlit-deployment)
   - [14. Working With This Project](#14-working-with-this-project)
     - [If You Need to Debug](#if-you-need-to-debug)
     - [If You Need to Modify](#if-you-need-to-modify)
     - [If You Need to Deploy](#if-you-need-to-deploy)
-  - [15. Contact Info \& References](#15-contact-info--references)
+  - [15. References](#15-references)
   - [16. Success Metrics](#16-success-metrics)
   - [17. Knowledge Transfer](#17-knowledge-transfer)
 
@@ -102,6 +104,14 @@ URL:      https://soma-app-dashboard-bfabkj7dkvffezprdsnm78.streamlit.app/
 Embed:    ?embed=true&embed_options=show_colored_line
 Height:   2400px
 Refresh:  10-second cache TTL (manual refresh button)
+```
+
+### 4.4 Event Sync Strategy
+```
+Webhook filters:     puzzle_started, puzzle_completed, puzzle_failed (3 events)
+Batch export filters: Same 3 events (for backup/reconciliation)
+Expected row count:  ~200-300 events in Supabase
+Data freshness:      <1s via webhook, reconciled hourly via batch
 ```
 
 ---
@@ -200,6 +210,8 @@ Hugo → PostHog SDK → Webhook → Supabase → Streamlit (iframe) → Hugo
 | Streamlit dashboard blank | Check Supabase connection string in secrets. Verify query output. |
 | iframe too short/tall | Adjust `height` attribute. Typical range: 1500-2400px |
 | SameSite warnings in console | ✅ Safe to ignore. These are harmless security messages. |
+| Batch export failing with duplicate UUID | ✅ Filter batch export to only: puzzle_started, puzzle_completed, puzzle_failed |
+| Supabase has 200 rows but PostHog has 800 | ✅ Expected. Webhook filters 3 events, batch export does too. Mismatch = old data or configuration not applied. |
 
 ---
 
@@ -249,6 +261,36 @@ Hugo → PostHog SDK → Webhook → Supabase → Streamlit (iframe) → Hugo
 - **Feature flags race condition:** Used `posthog.onFeatureFlags(callback)` + 3s timeout fallback
 - **Variant mapping:** `'control'` → A, `'4-words'` → B (not intuitive, watch for typos)
 - **Property names:** Must include `$feature_flag` and `$feature_flag_response` for experiment tracking
+
+### Event Sync & Batch Export
+**Problem:** PostHog batch export was capturing all ~800 events but Supabase only had ~200 from webhook, causing duplicate UUID errors.
+
+**Solution (Option A - Implemented):**
+1. **Webhook:** Filters 3 events only (puzzle_started, puzzle_completed, puzzle_failed)
+2. **Batch Export:** Also filters to same 3 events (prevents junk data)
+3. **Result:** Both sources in sync, no duplicates, lean data warehouse
+
+**How to configure batch export in PostHog:**
+```
+PostHog Dashboard → Data pipelines → PostgreSQL export → Configuration
+  → Include events section → Add:
+    - puzzle_started
+    - puzzle_completed
+    - puzzle_failed
+```
+
+**Verification query (run in Supabase SQL Editor):**
+```sql
+SELECT event, COUNT(*) as count FROM posthog_events GROUP BY event;
+-- Expected: ~120 started, ~120 completed, ~20 failed
+-- NOT: 800+ total with page_view/autocapture junk
+```
+
+**Benefits of filtered approach:**
+- ✅ Data stays lean (no PageView clutter)
+- ✅ Queries fast (fewer rows to scan)
+- ✅ Flexible for future events (just add to both filters)
+- ✅ No duplicate errors from batch export
 
 ### Supabase Challenges  
 - **IPv6 issue:** PostHog can't connect to IPv6. Use connection pooler (`pooler.supabase.com:6543`)
