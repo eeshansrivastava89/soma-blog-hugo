@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Timeout fallback - if PostHog doesn't fire callback in 3 seconds, initialize anyway
-  setTimeout(doInit, 3000);
+  setTimeout(doInit, 1000);
 });
 
 function initializeVariant() {

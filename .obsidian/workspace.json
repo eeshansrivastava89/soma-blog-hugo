@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/posts/first-post.md",
+                "file": "MIGRATION_SUMMARY.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "first-post"
+              "title": "MIGRATION_SUMMARY"
             }
           }
         ]
@@ -171,6 +171,8 @@
   },
   "active": "7314b01c11338a3b",
   "lastOpenFiles": [
+    "MIGRATION_SUMMARY.md.sb-b9be6b97-zyQwUF",
+    "content/posts/first-post.md",
     "layouts/_default/baseof.html",
     "package-lock.json",
     "package.json",
@@ -182,7 +184,6 @@
     "node_modules/@vercel/speed-insights/README.md",
     "node_modules/@vercel/speed-insights/tsup.config.js",
     "node_modules/@vercel/speed-insights/tsconfig.json",
-    "node_modules/@vercel/speed-insights/LICENSE",
     "phase-2-implementation-roadmap.md",
     "phase-2-implementation-roadmap_2.md",
     "content/experiments/ab-test-simulator.md",

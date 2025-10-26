@@ -4,6 +4,37 @@
 **Status:** ✅ ALL COMPLETE  
 **Last Updated:** 2025-10-25
 
+
+- [PostHog + Supabase + Streamlit Migration — Executive Summary](#posthog--supabase--streamlit-migration--executive-summary)
+  - [1. Project at a Glance](#1-project-at-a-glance)
+  - [2. What Was Built](#2-what-was-built)
+  - [3. Migration Timeline](#3-migration-timeline)
+  - [4. Critical Integration Points](#4-critical-integration-points)
+    - [4.1 PostHog → Supabase](#41-posthog--supabase)
+    - [4.2 Supabase Connection](#42-supabase-connection)
+    - [4.3 Streamlit Dashboard](#43-streamlit-dashboard)
+  - [5. Architecture Comparison](#5-architecture-comparison)
+    - [Before (FastAPI)](#before-fastapi)
+    - [After (Streamlit)](#after-streamlit)
+  - [6. Data Flow Diagram](#6-data-flow-diagram)
+  - [7. Key Files Quick Reference](#7-key-files-quick-reference)
+  - [8. Verification Checklist](#8-verification-checklist)
+  - [9. Troubleshooting Quick Links](#9-troubleshooting-quick-links)
+  - [10. Deployment Checklist](#10-deployment-checklist)
+  - [11. Cost Analysis](#11-cost-analysis)
+  - [12. Future Enhancement Ideas](#12-future-enhancement-ideas)
+  - [13. Critical Implementation Notes](#13-critical-implementation-notes)
+    - [PostHog Integration Challenges](#posthog-integration-challenges)
+    - [Supabase Challenges](#supabase-challenges)
+    - [Streamlit Deployment](#streamlit-deployment)
+  - [14. Working With This Project](#14-working-with-this-project)
+    - [If You Need to Debug](#if-you-need-to-debug)
+    - [If You Need to Modify](#if-you-need-to-modify)
+    - [If You Need to Deploy](#if-you-need-to-deploy)
+  - [15. Contact Info \& References](#15-contact-info--references)
+  - [16. Success Metrics](#16-success-metrics)
+  - [17. Knowledge Transfer](#17-knowledge-transfer)
+
 ---
 
 ## 1. Project at a Glance
@@ -21,14 +52,14 @@
 
 ## 2. What Was Built
 
-| Component | Technology | Status | Key Files |
-|-----------|-----------|--------|-----------|
-| **A/B Experiment** | PostHog feature flags | ✅ Live | Feature flag: `word_search_difficulty_v2` |
-| **Event Tracking** | PostHog SDK | ✅ Live | `layouts/_default/baseof.html` |
-| **Data Pipeline** | PostHog → Supabase webhook | ✅ Live | `supabase-edge-function-posthog-webhook.ts` |
-| **Database Schema** | PostgreSQL views | ✅ Live | `supabase-schema.sql` |
-| **Analytics Dashboard** | Streamlit app | ✅ Live | GitHub: `soma-streamlit-dashboard` |
-| **Embedding** | Hugo iframe | ✅ Live | `layouts/shortcodes/ab-simulator-dashboard.html` |
+| Component               | Technology                 | Status | Key Files                                        |
+|-------------------------|----------------------------|--------|--------------------------------------------------|
+| **A/B Experiment**      | PostHog feature flags      | ✅ Live | Feature flag: `word_search_difficulty_v2`        |
+| **Event Tracking**      | PostHog SDK                | ✅ Live | `layouts/_default/baseof.html`                   |
+| **Data Pipeline**       | PostHog → Supabase webhook | ✅ Live | `supabase-edge-function-posthog-webhook.ts`      |
+| **Database Schema**     | PostgreSQL views           | ✅ Live | `supabase-schema.sql`                            |
+| **Analytics Dashboard** | Streamlit app              | ✅ Live | GitHub: `soma-streamlit-dashboard`               |
+| **Embedding**           | Hugo iframe                | ✅ Live | `layouts/shortcodes/ab-simulator-dashboard.html` |
 
 ---
 
@@ -256,7 +287,7 @@ cd soma-streamlit-dashboard && git push origin main  # Streamlit auto-deploys
 
 ---
 
-## 15. Contact Info & References
+## 15. References
 
 | Item | Link |
 |------|------|

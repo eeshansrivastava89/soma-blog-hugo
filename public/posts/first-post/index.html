@@ -37,7 +37,7 @@ What to expect More content coming soon about marketing analytics and experiment
 
   
   
-  <meta http-equiv="Content-Security-Policy" content="frame-src https://soma-app-dashboard-bfabkj7dkvffezprdsnm78.streamlit.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://us.i.posthog.com;">
+  <meta http-equiv="Content-Security-Policy" content="frame-src https://soma-app-dashboard-bfabkj7dkvffezprdsnm78.streamlit.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://us.i.posthog.com https://us-assets.i.posthog.com;">
   
   <script>
       
@@ -49,7 +49,8 @@ What to expect More content coming soon about marketing analytics and experiment
         if (message.includes('SameSite') || 
             message.includes('streamlit_csrf') ||
             message.includes('preload') ||
-            message.includes('cross-site context')) {
+            message.includes('cross-site context') ||
+            message.includes('Unrecognized feature')) {
           return; 
         }
         originalWarn.apply(console, args);
@@ -61,7 +62,9 @@ What to expect More content coming soon about marketing analytics and experiment
         
         if (message.includes('SameSite') || 
             message.includes('cross-site') ||
-            message.includes('Cookie')) {
+            message.includes('Cookie') ||
+            message.includes('Potential permissions policy violation') ||
+            message.includes('[Violation]')) {
           return; 
         }
         originalError.apply(console, args);

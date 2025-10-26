@@ -33,7 +33,7 @@
 
   
   
-  <meta http-equiv="Content-Security-Policy" content="frame-src https://soma-app-dashboard-bfabkj7dkvffezprdsnm78.streamlit.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://us.i.posthog.com;">
+  <meta http-equiv="Content-Security-Policy" content="frame-src https://soma-app-dashboard-bfabkj7dkvffezprdsnm78.streamlit.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://us.i.posthog.com https://us-assets.i.posthog.com;">
   
   <script>
       
@@ -45,7 +45,8 @@
         if (message.includes('SameSite') || 
             message.includes('streamlit_csrf') ||
             message.includes('preload') ||
-            message.includes('cross-site context')) {
+            message.includes('cross-site context') ||
+            message.includes('Unrecognized feature')) {
           return; 
         }
         originalWarn.apply(console, args);
@@ -57,7 +58,9 @@
         
         if (message.includes('SameSite') || 
             message.includes('cross-site') ||
-            message.includes('Cookie')) {
+            message.includes('Cookie') ||
+            message.includes('Potential permissions policy violation') ||
+            message.includes('[Violation]')) {
           return; 
         }
         originalError.apply(console, args);
@@ -329,8 +332,9 @@ b_avg_time = b_completed['completion_time'].mean()
 </ul>
 <h4 id="what-are-credible-intervals">What Are Credible Intervals?</h4>
 <p>The 95% credible interval means: &ldquo;We&rsquo;re 95% confident the true value is in this range.&rdquo;</p>
-<link rel="stylesheet" href="/css/ab-simulator.css?v=1.14">
-<script src="/js/ab-simulator.js?v=1.14"></script></section></main>
+<link rel="stylesheet" href="/css/ab-simulator.css?v=1.15">
+<script src="/js/ab-simulator.js?v=1.15"></script>
+</section></main>
         <footer id="main-footer"><div class="footer">
   <a href="#">Scroll to Top</a>
   <div class="footer-copyright">

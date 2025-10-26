@@ -40,12 +40,24 @@ let puzzleState = {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
   // Wait for PostHog feature flags to load before initializing
-  posthog.onFeatureFlags(function() {
+  let hasInitialized = false;
+  
+  function doInit() {
+    if (hasInitialized) return;
+    hasInitialized = true;
     initializeVariant();
     displayVariant();
     setupPuzzle();
     updateLeaderboard();
-  });
+  }
+  
+  // Try PostHog callback first
+  if (posthog && posthog.onFeatureFlags) {
+    posthog.onFeatureFlags(doInit);
+  }
+  
+  // Timeout fallback - if PostHog doesn't fire callback in 3 seconds, initialize anyway
+  setTimeout(doInit, 1000);
 });
 
 function initializeVariant() {

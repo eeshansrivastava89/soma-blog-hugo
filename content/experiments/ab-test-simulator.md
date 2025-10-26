@@ -41,5 +41,6 @@ This simulator shows both approaches because they answer different questions:
 
 The 95% credible interval means: "We're 95% confident the true value is in this range."
 
-<link rel="stylesheet" href="/css/ab-simulator.css?v=1.14">
-<script src="/js/ab-simulator.js?v=1.14"></script>
+<link rel="stylesheet" href="/css/ab-simulator.css?v=1.15">
+<script src="/js/ab-simulator.js?v=1.15"></script>
+
