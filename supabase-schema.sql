@@ -123,44 +123,57 @@ GROUP BY variant, feature_flag_response;
 
 COMMENT ON VIEW v_variant_stats IS 'Aggregated statistics by variant for A/B test analysis';
 
--- View: Conversion Funnel
+-- View: Conversion Funnel (Event-Based)
 CREATE OR REPLACE VIEW v_conversion_funnel AS
-WITH starts AS (
-  SELECT variant, COUNT(DISTINCT distinct_id) as started_users
+WITH started_events AS (
+  SELECT 
+    variant,
+    'Started' as stage,
+    COUNT(*) as event_count,
+    COUNT(DISTINCT distinct_id) as unique_users,
+    1 as stage_order
   FROM posthog_events
-  WHERE event = 'puzzle_started' AND variant IS NOT NULL AND feature_flag_response IS NOT NULL
+  WHERE event = 'puzzle_started' AND variant IS NOT NULL
   GROUP BY variant
 ),
-completions AS (
-  SELECT variant, COUNT(DISTINCT distinct_id) as completed_users
+completed_events AS (
+  SELECT 
+    variant,
+    'Completed' as stage,
+    COUNT(*) as event_count,
+    COUNT(DISTINCT distinct_id) as unique_users,
+    2 as stage_order
   FROM posthog_events
-  WHERE event = 'puzzle_completed' AND variant IS NOT NULL AND feature_flag_response IS NOT NULL
+  WHERE event = 'puzzle_completed' AND variant IS NOT NULL
   GROUP BY variant
 ),
-failures AS (
-  SELECT variant, COUNT(DISTINCT distinct_id) as failed_users
-  FROM posthog_events
-  WHERE event = 'puzzle_failed' AND variant IS NOT NULL AND feature_flag_response IS NOT NULL
-  GROUP BY variant
+repeated_events AS (
+  SELECT 
+    c.variant,
+    'Repeated' as stage,
+    COUNT(DISTINCT c.distinct_id) as event_count,
+    COUNT(DISTINCT c.distinct_id) as unique_users,
+    3 as stage_order
+  FROM posthog_events c
+  INNER JOIN posthog_events s 
+    ON c.distinct_id = s.distinct_id 
+    AND s.event = 'puzzle_started'
+    AND s.variant = c.variant
+    AND s.timestamp > c.timestamp
+  WHERE c.event = 'puzzle_completed' AND c.variant IS NOT NULL
+  GROUP BY c.variant
 )
-SELECT
-  COALESCE(s.variant, c.variant, f.variant) as variant,
-  COALESCE(s.started_users, 0) as started_users,
-  COALESCE(c.completed_users, 0) as completed_users,
-  COALESCE(f.failed_users, 0) as failed_users,
-  ROUND(
-    CASE
-      WHEN COALESCE(s.started_users, 0) > 0
-      THEN (COALESCE(c.completed_users, 0)::numeric / s.started_users::numeric * 100)
-      ELSE 0
-    END,
-    2
-  ) as completion_rate_pct
-FROM starts s
-FULL OUTER JOIN completions c ON s.variant = c.variant
-FULL OUTER JOIN failures f ON COALESCE(s.variant, c.variant) = f.variant;
+SELECT variant, stage, event_count, unique_users, stage_order
+FROM (
+  SELECT * FROM started_events
+  UNION ALL
+  SELECT * FROM completed_events
+  UNION ALL
+  SELECT * FROM repeated_events
+) funnel_stages
+ORDER BY variant, stage_order;
 
-COMMENT ON VIEW v_conversion_funnel IS 'Funnel analysis: started → completed → failed by variant';
+COMMENT ON VIEW v_conversion_funnel IS 'Event-based funnel: started events → completed events → users who repeated (started again after completing)';
 
 -- ====================
 -- 4. Helper Functions
