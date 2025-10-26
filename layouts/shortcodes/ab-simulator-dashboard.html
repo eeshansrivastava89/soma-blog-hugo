@@ -1,37 +1,23 @@
 <div id="dashboard-section" class="simulator-section">
   <h3>Results (Live)</h3>
-  
-  <div class="dashboard">
-    <div class="variant-stats">
-      <h4>Variant A</h4>
-      <p>Users: <strong id="variant-a-users">0</strong></p>
-      <p>Completions: <strong id="variant-a-completions">0</strong></p>
-      <p>Avg Time: <strong id="variant-a-avg-time">-</strong></p>
-      <p>Success Rate: <strong id="variant-a-success-rate">-</strong></p>
-    </div>
-    <div class="variant-stats">
-      <h4>Variant B</h4>
-      <p>Users: <strong id="variant-b-users">0</strong></p>
-      <p>Completions: <strong id="variant-b-completions">0</strong></p>
-      <p>Avg Time: <strong id="variant-b-avg-time">-</strong></p>
-      <p>Success Rate: <strong id="variant-b-success-rate">-</strong></p>
-    </div>
-    <div class="variant-stats">
-      <h4>Difficulty Analysis</h4>
-      <p id="difficulty-comparison" style="margin: 0; color: #333; font-size: 0.95rem;">Loading difficulty analysis...</p>
-    </div>
+
+  <div style="margin-bottom: 1rem;">
+    <p style="color: #666; font-size: 0.9rem;">
+      Real-time analytics dashboard powered by PostHog + Supabase + Streamlit. Data updates when you interact with the dashboard.
+    </p>
   </div>
-  
-  <h4 style="margin-top: 2rem;">Interactive Visualizations</h4>
-  
-  <div id="funnel-chart" style="width: 100%; height: 450px; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 1rem;"></div>
-  
-  <div id="time-distribution-chart" style="width: 100%; height: 450px; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 1rem;"></div>
-  
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-    <div id="success-rate-chart" style="width: 100%; height: 400px; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px;"></div>
-    <div id="avg-time-chart" style="width: 100%; height: 400px; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px;"></div>
+
+  <div class="streamlit-embed">
+    <iframe
+      src="https://soma-app-dashboard-bfabkj7dkvffezprdsnm78.streamlit.app/?embed=true&embed_options=show_colored_line"
+      height="2400"
+      style="width: 100%; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;"
+      title="A/B Test Dashboard"
+      loading="lazy"
+      scrolling="no"
+      sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+      allow="payment"
+      referrerpolicy="no-referrer"
+    ></iframe>
   </div>
-  
-  <p class="last-updated">Last updated: <span id="last-updated">never</span></p>
 </div>
