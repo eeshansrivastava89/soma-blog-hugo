@@ -1,19 +1,15 @@
-/* Unified card styling for all sections */
-.card {
-  background-color: #fff;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-}
+/* ============================================
+   A/B SIMULATOR STYLES - MINIMAL & CLEAN
+   ============================================ */
 
+/* Leaderboard Styling */
 .leaderboard-card {
   background-color: #fff;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1rem;
-  margin-top: 0 !important; /* Remove any top margin */
+  margin-top: 0 !important;
 }
 
 .leaderboard-card h3 {
@@ -49,7 +45,10 @@
   font-weight: 500;
 }
 
-/* Three-column layout for puzzle section */
+/* ============================================
+   PUZZLE LAYOUT - THREE COLUMN GRID
+   ============================================ */
+
 .puzzle-layout {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -84,7 +83,7 @@
   margin-top: 0 !important;
 }
 
-/* Responsive: stack on smaller screens */
+/* Responsive: 2 columns on tablets */
 @media (max-width: 1200px) {
   .puzzle-layout {
     grid-template-columns: 1fr 1fr;
@@ -93,11 +92,9 @@
   #leaderboard-display {
     grid-column: 1 / -1;
   }
-
 }
 
-
-/* Mobile */
+/* Responsive: 1 column on mobile */
 @media (max-width: 768px) {
   .puzzle-layout {
     grid-template-columns: 1fr;
@@ -113,6 +110,10 @@
     padding: 0.4rem;
   }
 }
+
+/* ============================================
+   SIMULATOR SECTION WRAPPER
+   ============================================ */
 
 .simulator-section {
   border: 1px solid #e0e0e0;
@@ -134,7 +135,10 @@
   color: #333;
 }
 
-/* Letter grid - more compact */
+/* ============================================
+   LETTER GRID & LETTERS
+   ============================================ */
+
 .letter-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -170,131 +174,17 @@
   transform: scale(0.95);
 }
 
-.letter.variant-a {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-}
-
-.letter.variant-b {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-}
-
-.puzzle-button {
-  padding: 10px 20px;
-  margin-right: 0.5rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  background-color: #0066cc;
-  color: white;
-}
-
-.puzzle-button:hover {
-  opacity: 0.9;
-}
-
-
-.dashboard {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.variant-stats {
-  border: 1px solid #e0e0e0;
-  padding: 1rem;
-  border-radius: 4px;
-  background-color: #fff;
-  color: #333;
-}
-
-.variant-stats h4 {
-  margin-top: 0;
-  color: #333;
-}
-
-.last-updated {
-  font-size: 0.9rem;
-  color: #999;
-  text-align: right;
-}
-
+/* Mobile: 4-column grid for letters */
 @media (max-width: 768px) {
   .letter-grid {
     grid-template-columns: repeat(4, 1fr);
   }
-  
-  .dashboard {
-    grid-template-columns: 1fr;
-  }
-  
-  .completion-stats {
-    grid-template-columns: 1fr;
-  }
-
 }
 
-.funnel-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin: 1.5rem 0;
-}
+/* ============================================
+   ANIMATIONS
+   ============================================ */
 
-.funnel-variant {
-  border: 1px solid #e0e0e0;
-  padding: 1rem;
-  border-radius: 4px;
-  background-color: #fff;
-}
-
-.funnel-variant h5 {
-  margin: 0 0 1rem 0;
-  color: #333;
-}
-
-.funnel-bar {
-  position: relative;
-  margin-bottom: 1rem;
-}
-
-.funnel-label {
-  font-size: 0.85rem;
-  color: #666;
-  margin-bottom: 0.25rem;
-}
-
-.funnel-bar-fill {
-  height: 30px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  padding-left: 0.5rem;
-  transition: width 0.3s ease;
-  min-width: 40px;
-}
-
-.funnel-count {
-  color: white;
-  font-weight: bold;
-  font-size: 0.9rem;
-}
-
-.funnel-rates {
-  font-size: 0.85rem;
-  color: #666;
-  margin-top: 1rem;
-}
-
-@media (max-width: 768px) {
-  .funnel-container {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Celebration animations */
 @keyframes celebrate {
   0%, 100% { transform: scale(1); }
   25% { transform: scale(1.05) rotate(2deg); }
@@ -312,14 +202,14 @@
   }
 }
 
-.celebration-animate {
-  animation: celebrate 0.6s ease-in-out, fadeInUp 0.4s ease-out;
-}
-
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
   20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.celebration-animate {
+  animation: celebrate 0.6s ease-in-out, fadeInUp 0.4s ease-out;
 }
 
 .shake-animate {
@@ -327,13 +217,16 @@
   border-color: #e74c3c !important;
 }
 
-/* Variant color coding */
+/* ============================================
+   VARIANT COLOR THEMING
+   ============================================ */
+
 .variant-a-theme {
   border-left-color: #27ae60 !important;
 }
 
 .variant-a-theme .letter {
-  background-color: #27ae60 !important;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
 }
 
 .variant-a-theme #user-variant {
@@ -345,10 +238,24 @@
 }
 
 .variant-b-theme .letter {
-  background-color: #3498db !important;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
 }
 
 .variant-b-theme #user-variant {
   color: #3498db;
 }
 
+/* ============================================
+   STREAMLIT EMBED STYLING
+   ============================================ */
+
+.streamlit-embed {
+  margin: 2rem 0;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.streamlit-embed iframe {
+  display: block;
+}

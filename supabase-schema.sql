@@ -116,7 +116,9 @@ SELECT
   PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY completion_time_seconds) as p90_completion_time,
   PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY completion_time_seconds) as p95_completion_time
 FROM posthog_events
-WHERE event = 'puzzle_completed' AND variant IS NOT NULL
+WHERE event = 'puzzle_completed'
+  AND variant IS NOT NULL
+  AND feature_flag_response IS NOT NULL
 GROUP BY variant, feature_flag_response;
 
 COMMENT ON VIEW v_variant_stats IS 'Aggregated statistics by variant for A/B test analysis';
@@ -126,19 +128,19 @@ CREATE OR REPLACE VIEW v_conversion_funnel AS
 WITH starts AS (
   SELECT variant, COUNT(DISTINCT distinct_id) as started_users
   FROM posthog_events
-  WHERE event = 'puzzle_started' AND variant IS NOT NULL
+  WHERE event = 'puzzle_started' AND variant IS NOT NULL AND feature_flag_response IS NOT NULL
   GROUP BY variant
 ),
 completions AS (
   SELECT variant, COUNT(DISTINCT distinct_id) as completed_users
   FROM posthog_events
-  WHERE event = 'puzzle_completed' AND variant IS NOT NULL
+  WHERE event = 'puzzle_completed' AND variant IS NOT NULL AND feature_flag_response IS NOT NULL
   GROUP BY variant
 ),
 failures AS (
   SELECT variant, COUNT(DISTINCT distinct_id) as failed_users
   FROM posthog_events
-  WHERE event = 'puzzle_failed' AND variant IS NOT NULL
+  WHERE event = 'puzzle_failed' AND variant IS NOT NULL AND feature_flag_response IS NOT NULL
   GROUP BY variant
 )
 SELECT

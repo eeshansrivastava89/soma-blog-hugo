@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../soma-streamlit-dashboard"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"**/layouts/index.json": "hugo",
+			"**/layouts/_default/searchindex.json": "hugo"
+		}
+	}
+}

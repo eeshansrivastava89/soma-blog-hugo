@@ -8,7 +8,11 @@ build:
   list: true
 ---
 
-Welcome! This is an interactive simulator where you can see A/B testing and statistical analysis in action.
+Welcome! This is an interactive simulator where you can see A/B testing and statistical analysis in action. 
+
+Complete this puzzle in 60 seconds where you will be "randomly" assigned in either Variant A and Variant B. One variant is harder than the other. We will do hypothesis testing to test that. 
+* Primary KPI: Avg. Time to Complete
+* Secondary KPI: Completion Rate (completed puzzles / started puzzles)
 
 ## Section 1: Word Search Challenge
 
@@ -37,6 +41,5 @@ This simulator shows both approaches because they answer different questions:
 
 The 95% credible interval means: "We're 95% confident the true value is in this range."
 
-<link rel="stylesheet" href="/css/ab-simulator.css?v=1.12">
-<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-<script src="/js/ab-simulator.js?v=1.12"></script>
+<link rel="stylesheet" href="/css/ab-simulator.css?v=1.14">
+<script src="/js/ab-simulator.js?v=1.14"></script>
