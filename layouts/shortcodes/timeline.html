@@ -1,9 +1,136 @@
 {{- $timeline := site.Data.timeline.timeline -}}
 {{- if $timeline -}}
+<style>
+.timeline {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  grid-column-gap: 20px;
+  row-gap: 0;
+}
+
+.timeline-entry {
+  display: contents;
+}
+
+.timeline-left {
+  grid-column: 1;
+  vertical-align: top;
+  border-left: 2px solid #cfcfcf;
+  position: relative;
+  padding-bottom: 20px;
+}
+
+.timeline-entry-dot {
+  position: absolute;
+  top: 3px;
+  left: -8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #cfcfcf;
+  border: 2px solid white;
+}
+
+.timeline-year {
+  font-size: 13px;
+  color: #999;
+  font-weight: 600;
+  text-align: right;
+  padding-right: 10px;
+}
+
+.timeline-right {
+  grid-column: 2;
+  vertical-align: top;
+  font-size: 16px;
+  padding-bottom: 20px;
+}
+
+.timeline-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.timeline-company {
+  font-size: 15px;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  font-style: italic;
+}
+
+.timeline-description {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+
+.timeline-details {
+  font-size: 14px;
+  color: #444;
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  list-style-type: disc;
+}
+
+.timeline-details li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.timeline-category {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  margin-top: 0.75rem;
+}
+
+.timeline-category.work {
+  background: rgba(205, 92, 92, 0.12);
+  color: #cd5c5c;
+}
+
+.timeline-category.education {
+  background: rgba(100, 149, 237, 0.12);
+  color: #6495ed;
+}
+
+.timeline-category.project {
+  background: rgba(144, 238, 144, 0.12);
+  color: #32cd32;
+}
+
+@media (max-width: 768px) {
+  .timeline {
+    grid-template-columns: 1fr;
+    grid-column-gap: 0;
+  }
+  
+  .timeline-left {
+    display: none;
+  }
+  
+  .timeline-right {
+    grid-column: 1;
+  }
+}
+</style>
+
 <div class="timeline">
   {{- range $timeline -}}
-  <div class="timeline-entry">
+  <div class="timeline-left">
+    <div class="timeline-entry-dot"></div>
     <div class="timeline-year">{{ .year }}</div>
+  </div>
+  <div class="timeline-right">
     <h3 class="timeline-title">{{ .title }}</h3>
     {{- if .company -}}
     <div class="timeline-company">{{ .company }}</div>
