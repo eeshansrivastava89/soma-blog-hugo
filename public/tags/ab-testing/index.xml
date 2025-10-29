@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ab-Testing on Eeshan S.</title>
+    <link>http://localhost:1313/tags/ab-testing/</link>
+    <description>Recent content in Ab-Testing on Eeshan S.</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 17 Oct 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/ab-testing/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A/B Testing Simulator</title>
+      <link>http://localhost:1313/projects/ab-test-simulator/</link>
+      <pubDate>Fri, 17 Oct 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/projects/ab-test-simulator/</guid>
+      <description>&lt;p&gt;Welcome! This is an interactive simulator where you can see A/B testing and statistical analysis in action.&lt;/p&gt;&#xA;&lt;p&gt;Complete this puzzle in 60 seconds where you will be &amp;ldquo;randomly&amp;rdquo; assigned in either Variant A and Variant B. One variant is harder than the other. We will do hypothesis testing to test that.&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Primary KPI: Avg. Time to Complete&lt;/li&gt;&#xA;&lt;li&gt;Secondary KPI: Completion Rate (completed puzzles / started puzzles)&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;section-1-word-search-challenge&#34;&gt;Section 1: Word Search Challenge&lt;/h2&gt;&#xA;&lt;div id=&#34;puzzle-section&#34; class=&#34;simulator-section&#34;&gt;&#xA;  &lt;div class=&#34;puzzle-layout&#34;&gt;&#xA;    &#xA;    &lt;div class=&#34;puzzle-left&#34;&gt;&#xA;      &lt;div style=&#34;text-align: center; margin-bottom: 0.75rem; width: 100%;&#34;&gt;&#xA;        &lt;div style=&#34;display: inline-flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem;&#34;&gt;&#xA;          &lt;span style=&#34;font-size: 1.25rem;&#34;&gt;🎯&lt;/span&gt;&#xA;          &lt;h3 style=&#34;margin: 0; color: #1f2937; font-size: 1rem;&#34;&gt;Your Challenge&lt;/h3&gt;&#xA;        &lt;/div&gt;&#xA;        &lt;div style=&#34;display: flex; flex-direction: column; gap: 0.25rem; align-items: center;&#34;&gt;&#xA;          &lt;p style=&#34;margin: 0; font-size: 0.85rem; color: #6b7280;&#34;&gt;&#xA;            Variant: &lt;strong id=&#34;user-variant&#34; style=&#34;color: #10b981;&#34;&gt;Loading...&lt;/strong&gt;&#xA;          &lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

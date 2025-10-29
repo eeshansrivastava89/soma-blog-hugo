@@ -3,6 +3,8 @@ title: "A/B Testing Simulator"
 description: "Interactive A/B test with real-time Bayesian and Frequentist statistics"
 date: 2025-10-17
 draft: false
+categories: ["projects"]
+tags: ["ab-testing","posthog","streamlit","supabase","hypothesis testing"]
 build:
   render: true
   list: true
