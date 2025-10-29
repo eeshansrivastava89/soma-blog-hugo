@@ -8,6 +8,9 @@ tags: ["ab-testing","posthog","streamlit","supabase","hypothesis testing"]
 build:
   render: true
   list: true
+
+rtwt:
+  sidePane: false
 ---
 
 Welcome! This is an interactive simulator where you can see A/B testing and statistical analysis in action. 

@@ -131,14 +131,13 @@ pre:has(code) {
 .search-result header {
   margin-bottom: 0.5rem; /* Ensure header has breathing room */
 }
-
 .main-content,
 .content,
 main {
   margin-top: -40px; /* Adjust this value as needed */
 }
 
-Or alternatively, reduce padding on the container
+/* Reduce padding on the container for tighter layout */
 .container {
   padding-top: 0.5rem; 
 }
@@ -146,11 +145,6 @@ Or alternatively, reduce padding on the container
 /* #theme-switcher {
   display: none !important;
 } */
-
-/* Hide sidebar */
-aside#side-pane {
-  display: none;
-}
 
 /* 1. Set overall container to 75% of viewport */
 div#container {
@@ -174,129 +168,4 @@ div.flex.grow {
 #main-content {
   max-width: 100% !important;
   width: 100% !important;
-}
-
-/* Timeline Styles */
-.timeline {
-  position: relative;
-  padding: 2rem 0;
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--primary-color);
-  opacity: 0.3;
-}
-
-.timeline-entry {
-  margin-left: 3rem;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  position: relative;
-}
-
-.timeline-entry::before {
-  content: '';
-  position: absolute;
-  left: -2.5rem;
-  top: 1.75rem;
-  width: 1rem;
-  height: 1rem;
-  background: var(--primary-color);
-  border: 3px solid white;
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px var(--primary-color);
-}
-
-.timeline-year {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--primary-color);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 0.25rem;
-}
-
-.timeline-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 0.25rem;
-}
-
-.timeline-company {
-  font-size: 0.95rem;
-  color: #666;
-  font-style: italic;
-  margin-bottom: 0.75rem;
-}
-
-.timeline-description {
-  font-size: 0.95rem;
-  color: #333;
-  line-height: 1.6;
-  margin-bottom: 0.75rem;
-}
-
-.timeline-details {
-  font-size: 0.9rem;
-  color: #555;
-  margin-left: 1rem;
-  border-left: 2px solid rgba(205, 92, 92, 0.3);
-  padding-left: 1rem;
-}
-
-.timeline-details li {
-  margin-bottom: 0.4rem;
-  line-height: 1.5;
-}
-
-.timeline-category {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  margin-top: 0.5rem;
-}
-
-.timeline-category.work {
-  background: rgba(205, 92, 92, 0.1);
-  color: var(--primary-color);
-}
-
-.timeline-category.education {
-  background: rgba(100, 149, 237, 0.1);
-  color: #6495ed;
-}
-
-.timeline-category.project {
-  background: rgba(144, 238, 144, 0.1);
-  color: #32cd32;
-}
-
-/* Responsive timeline */
-@media (max-width: 768px) {
-  .timeline {
-    padding-left: 0;
-  }
-  
-  .timeline::before {
-    left: 0;
-  }
-  
-  .timeline-entry {
-    margin-left: 2.5rem;
-  }
-  
-  .timeline-entry::before {
-    left: -2rem;
-  }
 }

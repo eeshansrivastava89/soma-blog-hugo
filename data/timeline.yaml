@@ -1,40 +1,47 @@
 timeline:
-  - year: 2019
+  - timespan: "2019 — Present"
     title: "Sr. Manager Data Science"
-    company: "Starbucks"
-    category: "work"
     description: "Leading data science initiatives across marketing and product analytics"
+    logo: ""
     details:
       - "Built experimentation platform for A/B testing at scale"
       - "Developed predictive models for customer behavior and churn"
       - "Led cross-functional projects on personalization and targeting"
 
-  - year: 2016
+  - timespan: "2016 — 2019"
     title: "Manager of Data Analytics"
-    company: "Overstock"
-    category: "work"
     description: "Managed analytics team and drove data-driven decision making"
+    logo: ""
     details:
       - "Scaled analytics infrastructure and reporting systems"
       - "Mentored junior analysts and data scientists"
       - "Launched customer segmentation and lifecycle analytics"
 
-  - year: 2015
-    title: "Sr. Product Manager"
-    company: "Amazon"
-    category: "work"
+  - timespan: "Summer 2015"
+    title: "Sr. Product Manager - MBA Intern"
     description: "Product management and analytics role"
+    logo: ""
 
-  - year: 2015
-    title: "MBA + Self-Learning"
-    category: "education"
+  - timespan: "2014 — 2016"
+    title: "MBA - Case Western Reserve University"
     description: "Advanced studies in business and data science"
+    logo: ""
     details:
       - "MBA completion"
       - "Self-directed learning in statistics and machine learning"
       - "MIT coursework in analytics"
+  
+  - timespan: "2013 — 2014"
+    title: "Automation Engineer"
+    description: "Product management and analytics role"
+    logo: ""
 
-  - year: 2012
-    title: "Computer Science Degree"
-    category: "education"
+  - timespan: "2010 — 2013"
+    title: "Lead Software Engineer"
+    description: "Product management and analytics role"
+    logo: ""
+
+  - timespan: "2006 — 2010"
+    title: "Computer Science - GGSIPU, Delhi"
     description: "Undergraduate studies in Computer Science"
+    logo: ""

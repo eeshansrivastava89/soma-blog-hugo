@@ -10,7 +10,7 @@
   <meta property="og:title" content="About">
   <meta property="og:description" content="I’m Eeshan. A data science and analytics practitioner with over a decade of experience in marketing &amp; product analytics, experimentation, and data science. I believe in two levels of learning:
 learning by doing learning by teaching In this site, you will see me doing both.
-My Journey 2019 Sr. Manager Data ScienceStarbucksLeading data science initiatives across marketing and product analytics">
+My Journey 2019 — Present • Sr. Manager Data ScienceLeading data science initiatives across marketing and product analyticsBuilt experimentation platform for A/B testing at scaleDeveloped predictive models for customer behavior and churnLed cross-functional projects on personalization and targeting 2016 — 2019 • Manager of Data AnalyticsManaged analytics team and drove data-driven decision makingScaled analytics infrastructure and reporting systemsMentored junior analysts and data scientistsLaunched customer segmentation and lifecycle analytics Summer 2015 • Sr. Product Manager - MBA InternProduct management and analytics role 2014 — 2016 • MBA - Case Western Reserve UniversityAdvanced studies in business and data scienceMBA completionSelf-directed learning in statistics and machine learningMIT coursework in analytics 2013 — 2014 • Automation EngineerProduct management and analytics role 2010 — 2013 • Lead Software EngineerProduct management and analytics role 2006 — 2010 • Computer Science - GGSIPU, DelhiUndergraduate studies in Computer Science Elsewhere You can connect with me or receive my updates through the following:">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="website">
 
@@ -18,7 +18,7 @@ My Journey 2019 Sr. Manager Data ScienceStarbucksLeading data science initiative
   <meta name="twitter:title" content="About">
   <meta name="twitter:description" content="I’m Eeshan. A data science and analytics practitioner with over a decade of experience in marketing &amp; product analytics, experimentation, and data science. I believe in two levels of learning:
 learning by doing learning by teaching In this site, you will see me doing both.
-My Journey 2019 Sr. Manager Data ScienceStarbucksLeading data science initiatives across marketing and product analytics">
+My Journey 2019 — Present • Sr. Manager Data ScienceLeading data science initiatives across marketing and product analyticsBuilt experimentation platform for A/B testing at scaleDeveloped predictive models for customer behavior and churnLed cross-functional projects on personalization and targeting 2016 — 2019 • Manager of Data AnalyticsManaged analytics team and drove data-driven decision makingScaled analytics infrastructure and reporting systemsMentored junior analysts and data scientistsLaunched customer segmentation and lifecycle analytics Summer 2015 • Sr. Product Manager - MBA InternProduct management and analytics role 2014 — 2016 • MBA - Case Western Reserve UniversityAdvanced studies in business and data scienceMBA completionSelf-directed learning in statistics and machine learningMIT coursework in analytics 2013 — 2014 • Automation EngineerProduct management and analytics role 2010 — 2013 • Lead Software EngineerProduct management and analytics role 2006 — 2010 • Computer Science - GGSIPU, DelhiUndergraduate studies in Computer Science Elsewhere You can connect with me or receive my updates through the following:">
 
     <link rel="stylesheet" href="/css/custom.css">
     <link rel="stylesheet" href="/css/root.css">
@@ -158,153 +158,218 @@ My Journey 2019 Sr. Manager Data ScienceStarbucksLeading data science initiative
 <style>
 .timeline {
   display: grid;
-  grid-template-columns: 100px 1fr;
-  grid-column-gap: 20px;
-  row-gap: 0;
+  grid-template-columns: 160px 80px 1fr;
+  column-gap: 32px;
+  row-gap: 28px;
+  font-family: inherit;
 }
 
-.timeline-entry {
-  display: contents;
-}
-
-.timeline-left {
-  grid-column: 1;
-  vertical-align: top;
-  border-left: 2px solid #cfcfcf;
+.timeline-timespan {
   position: relative;
-  padding-bottom: 20px;
-}
-
-.timeline-entry-dot {
-  position: absolute;
-  top: 3px;
-  left: -8px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: #cfcfcf;
-  border: 2px solid white;
-}
-
-.timeline-year {
+  padding-right: 24px;
+  padding-bottom: 32px;
+  color: #9a9a9a;
   font-size: 13px;
-  color: #999;
   font-weight: 600;
+  line-height: 1.4;
   text-align: right;
-  padding-right: 10px;
 }
 
-.timeline-right {
-  grid-column: 2;
-  vertical-align: top;
-  font-size: 16px;
-  padding-bottom: 20px;
+.timeline-dot {
+  position: absolute;
+  right: -18px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d8d8d8;
+  border: 2px solid #fff;
 }
 
-.timeline-title {
+.timeline-separator {
+  position: absolute;
+  right: -12px;
+  top: 18px;
+  bottom: -14px;
+  width: 2px;
+  background: #d8d8d8;
+}
+
+.timeline-logo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.timeline-logo img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+}
+
+.timeline-logo-placeholder {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b0b0b0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.timeline-content {
+  padding-top: 4px;
+}
+
+.timeline-content h3 {
   font-size: 18px;
   font-weight: 700;
-  color: #000;
-  margin: 0 0 0.5rem 0;
-  line-height: 1.2;
+  margin: 0 0 6px 0;
+  color: #111;
 }
 
 .timeline-company {
   font-size: 15px;
-  color: #666;
-  font-weight: 500;
-  margin-bottom: 0.75rem;
+  color: #717171;
   font-style: italic;
+  margin-bottom: 10px;
 }
 
 .timeline-description {
   font-size: 15px;
   color: #333;
+  margin-bottom: 10px;
   line-height: 1.6;
-  margin-bottom: 0.75rem;
 }
 
 .timeline-details {
   font-size: 14px;
   color: #444;
-  margin: 1rem 0;
-  padding-left: 1.5rem;
-  list-style-type: disc;
+  margin: 0 0 12px 0;
+  padding-left: 18px;
 }
 
 .timeline-details li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 6px;
   line-height: 1.5;
 }
 
-.timeline-category {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  padding: 0.35rem 0.85rem;
-  border-radius: 20px;
-  margin-top: 0.75rem;
-}
-
-.timeline-category.work {
-  background: rgba(205, 92, 92, 0.12);
-  color: #cd5c5c;
-}
-
-.timeline-category.education {
-  background: rgba(100, 149, 237, 0.12);
-  color: #6495ed;
-}
-
-.timeline-category.project {
-  background: rgba(144, 238, 144, 0.12);
-  color: #32cd32;
-}
-
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .timeline {
     grid-template-columns: 1fr;
-    grid-column-gap: 0;
+    row-gap: 20px;
   }
-  
-  .timeline-left {
-    display: none;
+
+  .timeline-timespan {
+      padding: 16px 0 0 0;
+      text-align: left;
   }
-  
-  .timeline-right {
-    grid-column: 1;
+
+  .timeline-dot {
+      right: auto;
+      left: 0;
+      top: -8px;
+  }
+
+  .timeline-logo {
+    justify-content: flex-start;
   }
 }
 </style>
 
-<div class="timeline"><div class="timeline-left">
-    <div class="timeline-entry-dot"></div>
-    <div class="timeline-year">2019</div>
+<div class="timeline">
+  <div class="timeline-timespan">
+    <span>2019 — Present</span>
+    <span class="timeline-dot"></span>
+    <span class="timeline-separator"></span>
   </div>
-  <div class="timeline-right">
-    <h3 class="timeline-title">Sr. Manager Data Science</h3><div class="timeline-company">Starbucks</div><p class="timeline-description">Leading data science initiatives across marketing and product analytics</p><ul class="timeline-details"><li>Built experimentation platform for A/B testing at scale</li><li>Developed predictive models for customer behavior and churn</li><li>Led cross-functional projects on personalization and targeting</li></ul><span class="timeline-category work">work</span></div><div class="timeline-left">
-    <div class="timeline-entry-dot"></div>
-    <div class="timeline-year">2016</div>
+
+  
+  <div class="timeline-logo"><div class="timeline-logo-placeholder">•</div></div>
+
+  
+  <div class="timeline-content">
+    <h3>Sr. Manager Data Science</h3><div class="timeline-description">Leading data science initiatives across marketing and product analytics</div><ul class="timeline-details"><li>Built experimentation platform for A/B testing at scale</li><li>Developed predictive models for customer behavior and churn</li><li>Led cross-functional projects on personalization and targeting</li></ul></div>
+  <div class="timeline-timespan">
+    <span>2016 — 2019</span>
+    <span class="timeline-dot"></span>
+    <span class="timeline-separator"></span>
   </div>
-  <div class="timeline-right">
-    <h3 class="timeline-title">Manager of Data Analytics</h3><div class="timeline-company">Overstock</div><p class="timeline-description">Managed analytics team and drove data-driven decision making</p><ul class="timeline-details"><li>Scaled analytics infrastructure and reporting systems</li><li>Mentored junior analysts and data scientists</li><li>Launched customer segmentation and lifecycle analytics</li></ul><span class="timeline-category work">work</span></div><div class="timeline-left">
-    <div class="timeline-entry-dot"></div>
-    <div class="timeline-year">2015</div>
+
+  
+  <div class="timeline-logo"><div class="timeline-logo-placeholder">•</div></div>
+
+  
+  <div class="timeline-content">
+    <h3>Manager of Data Analytics</h3><div class="timeline-description">Managed analytics team and drove data-driven decision making</div><ul class="timeline-details"><li>Scaled analytics infrastructure and reporting systems</li><li>Mentored junior analysts and data scientists</li><li>Launched customer segmentation and lifecycle analytics</li></ul></div>
+  <div class="timeline-timespan">
+    <span>Summer 2015</span>
+    <span class="timeline-dot"></span>
+    <span class="timeline-separator"></span>
   </div>
-  <div class="timeline-right">
-    <h3 class="timeline-title">Sr. Product Manager</h3><div class="timeline-company">Amazon</div><p class="timeline-description">Product management and analytics role</p><span class="timeline-category work">work</span></div><div class="timeline-left">
-    <div class="timeline-entry-dot"></div>
-    <div class="timeline-year">2015</div>
+
+  
+  <div class="timeline-logo"><div class="timeline-logo-placeholder">•</div></div>
+
+  
+  <div class="timeline-content">
+    <h3>Sr. Product Manager - MBA Intern</h3><div class="timeline-description">Product management and analytics role</div></div>
+  <div class="timeline-timespan">
+    <span>2014 — 2016</span>
+    <span class="timeline-dot"></span>
+    <span class="timeline-separator"></span>
   </div>
-  <div class="timeline-right">
-    <h3 class="timeline-title">MBA &#43; Self-Learning</h3><p class="timeline-description">Advanced studies in business and data science</p><ul class="timeline-details"><li>MBA completion</li><li>Self-directed learning in statistics and machine learning</li><li>MIT coursework in analytics</li></ul><span class="timeline-category education">education</span></div><div class="timeline-left">
-    <div class="timeline-entry-dot"></div>
-    <div class="timeline-year">2012</div>
+
+  
+  <div class="timeline-logo"><div class="timeline-logo-placeholder">•</div></div>
+
+  
+  <div class="timeline-content">
+    <h3>MBA - Case Western Reserve University</h3><div class="timeline-description">Advanced studies in business and data science</div><ul class="timeline-details"><li>MBA completion</li><li>Self-directed learning in statistics and machine learning</li><li>MIT coursework in analytics</li></ul></div>
+  <div class="timeline-timespan">
+    <span>2013 — 2014</span>
+    <span class="timeline-dot"></span>
+    <span class="timeline-separator"></span>
   </div>
-  <div class="timeline-right">
-    <h3 class="timeline-title">Computer Science Degree</h3><p class="timeline-description">Undergraduate studies in Computer Science</p><span class="timeline-category education">education</span></div></div>
+
+  
+  <div class="timeline-logo"><div class="timeline-logo-placeholder">•</div></div>
+
+  
+  <div class="timeline-content">
+    <h3>Automation Engineer</h3><div class="timeline-description">Product management and analytics role</div></div>
+  <div class="timeline-timespan">
+    <span>2010 — 2013</span>
+    <span class="timeline-dot"></span>
+    <span class="timeline-separator"></span>
+  </div>
+
+  
+  <div class="timeline-logo"><div class="timeline-logo-placeholder">•</div></div>
+
+  
+  <div class="timeline-content">
+    <h3>Lead Software Engineer</h3><div class="timeline-description">Product management and analytics role</div></div>
+  <div class="timeline-timespan">
+    <span>2006 — 2010</span>
+    <span class="timeline-dot"></span>
+    <span class="timeline-separator"></span>
+  </div>
+
+  
+  <div class="timeline-logo"><div class="timeline-logo-placeholder">•</div></div>
+
+  
+  <div class="timeline-content">
+    <h3>Computer Science - GGSIPU, Delhi</h3><div class="timeline-description">Undergraduate studies in Computer Science</div></div></div>
 <h2 id="elsewhere">Elsewhere</h2>
 <p>You can connect with me or receive my updates through the following:</p>
 <ul>
