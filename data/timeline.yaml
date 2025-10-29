@@ -1,0 +1,40 @@
+timeline:
+  - year: 2019
+    title: "Sr. Manager Data Science"
+    company: "Starbucks"
+    category: "work"
+    description: "Leading data science initiatives across marketing and product analytics"
+    details:
+      - "Built experimentation platform for A/B testing at scale"
+      - "Developed predictive models for customer behavior and churn"
+      - "Led cross-functional projects on personalization and targeting"
+
+  - year: 2016
+    title: "Manager of Data Analytics"
+    company: "Overstock"
+    category: "work"
+    description: "Managed analytics team and drove data-driven decision making"
+    details:
+      - "Scaled analytics infrastructure and reporting systems"
+      - "Mentored junior analysts and data scientists"
+      - "Launched customer segmentation and lifecycle analytics"
+
+  - year: 2015
+    title: "Sr. Product Manager"
+    company: "Amazon"
+    category: "work"
+    description: "Product management and analytics role"
+
+  - year: 2015
+    title: "MBA + Self-Learning"
+    category: "education"
+    description: "Advanced studies in business and data science"
+    details:
+      - "MBA completion"
+      - "Self-directed learning in statistics and machine learning"
+      - "MIT coursework in analytics"
+
+  - year: 2012
+    title: "Computer Science Degree"
+    category: "education"
+    description: "Undergraduate studies in Computer Science"

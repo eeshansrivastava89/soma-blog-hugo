@@ -1,0 +1,27 @@
+{{- $timeline := site.Data.timeline.timeline -}}
+{{- if $timeline -}}
+<div class="timeline">
+  {{- range $timeline -}}
+  <div class="timeline-entry">
+    <div class="timeline-year">{{ .year }}</div>
+    <h3 class="timeline-title">{{ .title }}</h3>
+    {{- if .company -}}
+    <div class="timeline-company">{{ .company }}</div>
+    {{- end -}}
+    {{- if .description -}}
+    <p class="timeline-description">{{ .description }}</p>
+    {{- end -}}
+    {{- if .details -}}
+    <ul class="timeline-details">
+      {{- range .details -}}
+      <li>{{ . }}</li>
+      {{- end -}}
+    </ul>
+    {{- end -}}
+    {{- if .category -}}
+    <span class="timeline-category {{ .category }}">{{ .category }}</span>
+    {{- end -}}
+  </div>
+  {{- end -}}
+</div>
+{{- end -}}
