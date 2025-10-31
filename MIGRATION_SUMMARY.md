@@ -36,6 +36,9 @@
   - [15. References](#15-references)
   - [16. Success Metrics](#16-success-metrics)
   - [17. Knowledge Transfer](#17-knowledge-transfer)
+  - [Domain Setup](#domain-setup)
+    - [Setting up DNS Records (not using proxy right now)](#setting-up-dns-records-not-using-proxy-right-now)
+    - [Setting up certificates](#setting-up-certificates)
 
 ---
 
@@ -378,3 +381,51 @@ curl -s https://soma-app-dashboard-bfabkj7dkvffezprdsnm78.streamlit.app | grep -
 
 **Status:** ✅ PRODUCTION READY — All components deployed and verified.  
 **Next Steps:** Monitor metrics, iterate on dashboard, plan enhancements.
+
+
+## Domain Setup
+
+Bought domain eeshans.com from Cloudflare
+
+### Setting up DNS Records (not using proxy right now)
+
+Choose your DNS setup:
+
+1. A and AAAA records (recommended for direct connections)
+
+   A    @ → 66.241.125.141
+   AAAA @ → 2a09:8280:1::a8:dc4:0
+
+2. External proxy setup
+
+   AAAA @ → 2a09:8280:1::a8:dc4:0
+
+   Use this setup when configuring a proxy or CDN in front of your Fly application.
+   When proxying traffic, you should only use your application's IPv6 address.
+
+Optional: DNS Challenge
+
+   CNAME _acme-challenge.eeshans.com → eeshans.com.dmzrq9d.flydns.net
+
+   Additional to one of the DNS setups.
+   Required for wildcard certificates, or to generate
+   a certificate before directing traffic to your application.
+
+Make sure to create another certificate for www.eeshans.com. 
+
+Once your DNS is configured correctly, we will automatically provision your certificate.
+Run fly certs check eeshans.com to check the progress.
+
+### Setting up certificates
+
+Status                    = Ready
+Hostname                  = eeshans.com
+DNS Provider              = cloudflare
+Certificate Authority     = Let's Encrypt
+Issued                    = rsa,ecdsa
+Added to App              = 1 minute ago
+Expires                   = 2 months from now
+Source                    = fly
+
+✓ Your certificate has been issued!
+Your DNS is correctly configured and this certificate will auto-renew before expiration.

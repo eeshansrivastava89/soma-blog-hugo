@@ -9,6 +9,7 @@ primary_region = 'dfw'
 
 [env]
   PORT = '8080'
+  HUGO_ENV = 'production'
 
 [http_service]
   internal_port = 8080
