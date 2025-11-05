@@ -36,9 +36,10 @@
   - [15. References](#15-references)
   - [16. Success Metrics](#16-success-metrics)
   - [17. Knowledge Transfer](#17-knowledge-transfer)
-  - [Domain Setup](#domain-setup)
-    - [Setting up DNS Records (not using proxy right now)](#setting-up-dns-records-not-using-proxy-right-now)
-    - [Setting up certificates](#setting-up-certificates)
+  - [Custom Domain Setup (Cloudflare + Fly.io)](#custom-domain-setup-cloudflare--flyio)
+    - [What We Did](#what-we-did)
+    - [Instructions](#instructions)
+    - [Watchouts](#watchouts)
 
 ---
 
@@ -383,49 +384,25 @@ curl -s https://soma-app-dashboard-bfabkj7dkvffezprdsnm78.streamlit.app | grep -
 **Next Steps:** Monitor metrics, iterate on dashboard, plan enhancements.
 
 
-## Domain Setup
 
-Bought domain eeshans.com from Cloudflare
+## Custom Domain Setup (Cloudflare + Fly.io)
 
-### Setting up DNS Records (not using proxy right now)
+### What We Did
+Pointed eeshans.com (purchased on Cloudflare) to your Hugo site on Fly.io by adding DNS records, creating SSL certificates via Let's Encrypt, and deploying. DNS → Fly.io IPs, certificates auto-renew, requires no maintenance.
 
-Choose your DNS setup:
+### Instructions
+1. Get app IPs: `fly ips list`
+2. Add DNS records in Cloudflare (DNS only / gray cloud):
+   - A record: `@` → IPv4
+   - AAAA record: `@` → IPv6  
+   - CNAME record: `www` → root domain
+3. Create certs: `fly certs add yourdomain.com` and `fly certs add www.yourdomain.com`
+4. Update `[env]` in fly.toml: `HUGO_ENV = 'production'`
+5. Deploy: `fly deploy`
+6. Wait 5-15 min, test both https://yourdomain.com and https://www.yourdomain.com
 
-1. A and AAAA records (recommended for direct connections)
-
-   A    @ → 66.241.125.141
-   AAAA @ → 2a09:8280:1::a8:dc4:0
-
-2. External proxy setup
-
-   AAAA @ → 2a09:8280:1::a8:dc4:0
-
-   Use this setup when configuring a proxy or CDN in front of your Fly application.
-   When proxying traffic, you should only use your application's IPv6 address.
-
-Optional: DNS Challenge
-
-   CNAME _acme-challenge.eeshans.com → eeshans.com.dmzrq9d.flydns.net
-
-   Additional to one of the DNS setups.
-   Required for wildcard certificates, or to generate
-   a certificate before directing traffic to your application.
-
-Make sure to create another certificate for www.eeshans.com. 
-
-Once your DNS is configured correctly, we will automatically provision your certificate.
-Run fly certs check eeshans.com to check the progress.
-
-### Setting up certificates
-
-Status                    = Ready
-Hostname                  = eeshans.com
-DNS Provider              = cloudflare
-Certificate Authority     = Let's Encrypt
-Issued                    = rsa,ecdsa
-Added to App              = 1 minute ago
-Expires                   = 2 months from now
-Source                    = fly
-
-✓ Your certificate has been issued!
-Your DNS is correctly configured and this certificate will auto-renew before expiration.
+### Watchouts
+- **IPv6 required** for cert validation (always add AAAA record)
+- **DNS propagation takes 5-15 min** — use `fly certs check` to monitor
+- **Certificates auto-renew** — no action needed
+- **If using Cloudflare proxy** (orange cloud): only add AAAA, set SSL to "Full"

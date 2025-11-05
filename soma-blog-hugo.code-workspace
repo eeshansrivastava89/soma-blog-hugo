@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../soma-streamlit-dashboard"
+		},
+		{
+			"path": "../soma-portfolio"
 		}
 	],
 	"settings": {
