@@ -5,7 +5,7 @@
 -- ============================================
 
 -- ====================
--- 1. PostHog Events Table
+-- 1. PostHog Events Tables
 -- ====================
 CREATE TABLE IF NOT EXISTS posthog_events (
   id BIGSERIAL PRIMARY KEY,
