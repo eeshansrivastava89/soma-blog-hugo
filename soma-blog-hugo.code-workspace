@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "../soma-portfolio"
+		},
+		{
+			"path": "../soma-analytics"
 		}
 	],
 	"settings": {
